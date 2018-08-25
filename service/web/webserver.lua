@@ -13,7 +13,7 @@ local hotfix        = require "hotfix"
 local table = table
 local string = string
 
-local mode, server_path, player_path, port, preload, gate = ...
+local mode, server_path, handler_path, port, preload, gate = ...
 local port = tonumber(port)
 local preload = preload and tonumber(preload) or 20
 
@@ -26,20 +26,20 @@ local function response(fd, ...)
 end
 
 if mode == "agent" then
-local player = require(player_path)
+local handler = require(handler_path)
 
--- 如果是非字符串，player需要提供pack和unpack方法
-player.pack = player.pack or function (_, data)
+-- 如果是非字符串，handler需要提供pack和unpack方法
+handler.pack = handler.pack or function (_, data)
     return data
 end
-player.unpack = player.unpack or function (_, data)
+handler.unpack = handler.unpack or function (_, data)
     return data
 end
 
 function on_message(cmd, data, body, ip)
-    if player[cmd] then
-        local ret = player[cmd](player, player:unpack(data), ip)
-        return player:pack(ret or "")
+    if handler[cmd] then
+        local ret = handler[cmd](handler, handler:unpack(data), ip)
+        return handler:pack(ret or "")
     else
         return '{"err":-1}'
     end
@@ -48,7 +48,7 @@ end
 skynet.start(function()
     skynet.dispatch("lua", function (_,_,fd, ip)
         if fd == "hotfix" then
-            player = hotfix.module(player_path)
+            handler = hotfix.module(handler_path)
             return
         end
         socket.start(fd)
@@ -77,7 +77,7 @@ skynet.start(function()
         end
         socket.close(fd)
     end)
-    player:init(gate)
+    handler:init(gate)
     hotfix.reg()
 end)
 
@@ -101,7 +101,7 @@ skynet.start(function()
 
     local agent = {}
     for i= 1, preload do
-        agent[i] = skynet.newservice(SERVICE_NAME, "agent", server_path, player_path, port, preload, skynet.self())
+        agent[i] = skynet.newservice(SERVICE_NAME, "agent", server_path, handler_path, port, preload, skynet.self())
     end
     local balance = 1
     
