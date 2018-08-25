@@ -2,7 +2,7 @@ local skynet = require "skynet.manager"
 local cluster = require "skynet.cluster"
 
 local M = {}
-function M.auto(count)
-    return cluster.call("share", "autoid", "auto", count)
+function M.create(count)
+    return cluster.call("share", "autoid", "create", count)
 end
 return M
