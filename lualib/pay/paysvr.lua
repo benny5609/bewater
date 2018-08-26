@@ -1,6 +1,6 @@
 -- 项目可以按需制定
 local M = {}
-function M.init()
+function M:init()
     print("paysvr init")
 end
 function M:pay_result()
