@@ -40,7 +40,7 @@ function M:create_order(param)
         out_trade_no    = order_no..'-'..os.time(),
         total_fee       = pay_price*100//1 >> 0,
         spbill_create_ip= '127.0.0.1',
-        notify_url      = string.format("%s:%s/api/pay", conf.wx.host, conf.wx.port),
+        notify_url      = string.format("%s:%s/api/wxpay_notify", conf.wx.host, conf.wx.port),
     }
     args.sign = sign.md5_args(args, key)
     local xml = lua2xml.encode("xml", args, true)

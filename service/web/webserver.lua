@@ -36,9 +36,9 @@ handler.unpack = handler.unpack or function (_, data)
     return data
 end
 
-function on_message(cmd, data, body, ip)
+function on_message(cmd, args, body, ip)
     if handler[cmd] then
-        local ret = handler[cmd](handler, handler:unpack(data), ip)
+        local ret = handler[cmd](handler, handler:unpack(args), handler:unpack(body), ip)
         return handler:pack(ret or "")
     else
         return '{"err":-1}'
