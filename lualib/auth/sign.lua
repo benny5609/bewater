@@ -6,7 +6,7 @@ local table_sort    = table.sort
 local table_concat  = table.concat
 
 local M = {}
-function M.md5_args(args)
+function M.md5_args(args, key)
     local list = {} 
     for k, v in pairs(args) do
         list[#list+1] = string_format("%s=%s", k, v)
@@ -16,7 +16,9 @@ function M.md5_args(args)
         return a < b
     end)
     local str = table_concat(list, "&")
-    --print(str)
+    if key then
+        str = str .. "&key=" .. key
+    end
     return string_upper(md5.sumhexa(str))
 end
 

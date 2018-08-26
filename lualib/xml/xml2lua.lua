@@ -138,4 +138,11 @@ function xml2lua.loadFile(xmlFilePath)
     error(e)
 end
 
+function xml2lua.decode(xml)
+    local handler = require "xml.tree"
+    local parser = xml2lua.parser(handler)
+    parser:parse(xml)
+    return handler.root
+end
+
 return xml2lua

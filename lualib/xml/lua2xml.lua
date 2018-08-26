@@ -1,25 +1,25 @@
 local string_format = string.format
 local M = {}
-function M.add(k, v)
+-- 不带属性的key-value, CDATA标签用于说明数据不被XML解析器解析
+function M.encode(k, v, cdata)
     local str = '<'..k..'>'
     if type(v) == "table" then
         for kk, vv in pairs(v) do
-            str = str .. M.add(kk, vv)
+            str = str .. '\n' .. M.encode(kk, vv, cdata)
         end
     else
-        str = str .. v
+        if cdata then
+            str = str .. '<![CDATA['..v..']]>'
+        else
+            str = str .. v
+        end
     end
     str = str..'</'..k..'>'
     return str
 end
 
--- 不带属性的key-value
-function M.kv(t)
-    return M.add("xml", t)
-end
-
 -- 带属性的key-value
-function M.attr_kv(t)
+function M.attr_encode(t)
     -- todo 
 end
 return M
