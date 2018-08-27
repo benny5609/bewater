@@ -34,7 +34,7 @@ end
 
 local hotfix_addrs = {}
 function CMD.reg_hotfix(addr)
-    trace("reg_hotfix:%s", addr)
+    --trace("reg_hotfix:%s", addr)
     hotfix_addrs[addr] = true 
 end
 
@@ -87,4 +87,9 @@ function skynet_cmd.hotfix()
     for addr, _ in pairs(hotfix_addrs) do
         skynet.send(addr, "lua", "hotfix")
     end
+end
+
+function skynet_cmd.publish(nodename)
+    trace("publish:%s", nodename)
+    skynet.newservice("publish", nodename) 
 end
