@@ -65,8 +65,8 @@ function M.get_profile()
     }
 end
 
-function M._proj_name()
-    return conf.proj_name
+function M._proj()
+    return conf.proj
 end
 
 function M._clustername()

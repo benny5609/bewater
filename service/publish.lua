@@ -6,10 +6,10 @@ require "bash"
 local function publish(pconf, confname)
     local tmp = "../tmp/"..confname
     local common = "../common"
-    local proj_name = string.match(bash("cd %s && pwd", conf.workspace), "(%w+)\n")
-    local proj = tmp.."/proj/"..proj_name
+    local proj = string.match(bash("cd %s && pwd", conf.workspace), "(%w+)\n")
+    local proj = tmp.."/proj/"..proj
     bash("mkdir -p %s", tmp)    
-    bash("cd %s && mkdir -p skynet common proj/%s", tmp, proj_name)
+    bash("cd %s && mkdir -p skynet common proj/%s", tmp, proj)
     bash("cp -r skynet luaclib lualib service cservice %s/skynet", tmp)
     bash("cp -r %s/lualib %s/luaclib %s/service %s/common", common, common, common, tmp)
     bash("cp -r %s/* %s", conf.workspace, proj)

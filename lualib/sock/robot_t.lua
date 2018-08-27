@@ -13,8 +13,8 @@ local class     = require "class"
 local fd
 
 local M = class("robot_t")
-function M:ctor(proj_name)
-    self._proj_name = proj_name
+function M:ctor(proj)
+    self._proj = proj
     self._host = nil
     self._port = nil
     self._fd = nil
@@ -30,7 +30,7 @@ end
 function M:login(acc)
     --local ret, resp = http.get("http://www.kaizhan8.com:8888/login/req_login", {
     local ret, resp = http.get("http://huangjx.top/login/req_login", {
-        proj_name = self._proj_name 
+        proj = self._proj 
     })
     if resp == "error" then
         return
