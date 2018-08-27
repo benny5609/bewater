@@ -66,7 +66,8 @@ end
 function M:_send_binary(op, tbl)
     local data = protobuf.encode(opcode.toname(op), tbl)
     --print("send", #data)
-    self._ws:send_binary(string.pack(">Hs2", op, data))
+    -- self._ws:send_binary(string.pack(">Hs2", op, data))
+    self._ws:send_binary(string.pack(">H", op)..data)
 end
 
 function M:_recv_text(t)
@@ -84,7 +85,9 @@ function M:_recv_text(t)
 end
 
 function M:_recv_binary(sock_buff)
-    local op, buff = string.unpack(">Hs2", sock_buff)
+    --local op, buff = string.unpack(">Hs2", sock_buff)
+    local op = string.unpack(">H", sock_buff)
+    local buff = string.sub(sock_buff, 3, #sock_buff)
     local opname = opcode.toname(op)
     local modulename = opcode.tomodule(op)
     local simplename = opcode.tosimplename(op)
