@@ -38,10 +38,16 @@ end
 
 function on_message(cmd, args, body, ip)
     if handler[cmd] then
-        local ret = handler[cmd](handler, handler:unpack(args), handler:unpack(body), ip)
+        local ret, data = util.try(function()
+            return handler:unpack(body, cmd)
+        end)
+        if not ret then
+            return '{"err":-2, "desc":"body error"}'
+        end
+        local ret = handler[cmd](handler, args, data, ip)
         return handler:pack(ret or "")
     else
-        return '{"err":-1}'
+        return '{"err":-1, "desc":"api not exist"}'
     end
 end
 

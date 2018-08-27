@@ -54,6 +54,9 @@ function opcode.urlrequest(code)
     return code2urlrequest[code]
 end
 
+function opcode.get_code2name()
+    return code2name
+end
 ----------------------------------------------------------------
 -- S2C 服务器主动发给客户端的封包    
 REG(0x0111, "User.s2c_log", false, NOSESSION)
