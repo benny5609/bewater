@@ -11,6 +11,7 @@ local orders = {}
 
 local M = {}
 function M.create_order(param)
+    local order_no      = assert(param.order_no)
     local uid           = assert(param.uid)
     local appid         = assert(param.appid)
     local mch_id        = assert(param.mch_id)
@@ -20,19 +21,17 @@ function M.create_order(param)
     local pay_channel   = assert(param.pay_channel)
     local pay_method    = assert(param.pay_method)
     local pay_price     = assert(param.pay_price)
-
-    local order_no = string.format("%d%04d", uid, item_sn)
     
     local args = {
         appid           = appid,
         mch_id          = mch_id,
         nonce_str       = math.random(10000)..uid,
-        trade_type      = pay_method == "mobile" and "APP" or "NATIVE",
+        trade_type      = pay_method == "wxpay" and "APP" or "NATIVE",
         body            = item_desc,    
         out_trade_no    = order_no..'-'..os.time(),
         total_fee       = pay_price*100//1 >> 0,
         spbill_create_ip= '127.0.0.1',
-        notify_url      = string.format("%s:%s/api/wxpay_notify", conf.host, conf.port),
+        notify_url      = string.format("%s:%s/api/wxpay_notify", conf.gate.host, conf.gate.port),
     }
     args.sign = sign.md5_args(args, key)
     local xml = lua2xml.encode("xml", args, true)
@@ -47,28 +46,17 @@ function M.create_order(param)
         return errcode.WxorderFail
     end
     
-    M.query_order(order_no, {
-        order_no    = order_no,
-        uid         = uid,
-        item_sn     = item_sn,
-        item_state  = 0,
-        pay_channel = pay_channel,
-        pay_method  = pay_method,
-        pay_time    = os.time(),
-        pay_price   = pay_price,
-        tid         = "",
-    })
-   
     local ret
     if data.trade_type == "APP" then 
         ret = {
+            appid = appid,
             partnerid = mch_id,
-            nonce_str = data.nonce_str,
+            noncestr = data.nonce_str,
             package = 'Sign=WXPay',
-            prepay_id = data.prepay_id,
+            prepayid = data.prepay_id,
             timestamp = os.time(),
         }
-        ret.sign = sign.md5_args(ret)
+        ret.sign = sign.md5_args(ret, key)
     else
         ret = {
             code_url = data.code_url
@@ -77,28 +65,6 @@ function M.create_order(param)
     ret.order_no = order_no
     return ret
 end
-
-function M.query_order(order_no, default)
-    local order = orders[order_no]
-    if order then
-        return order
-    end
-    order = mongo.find_one("payment", {order_no = order_no}) 
-    if order then
-        orders[order_no] = order
-        return order
-    elseif default then
-        print("insert order")
-        orders[order_no] = default
-        mongo.insert("payment", default)
-        return default
-    end
-end
-
-function M.update_order(order_no, order)
-    mongo.update("payment", {order_no = order_no}, order)
-end
-
 
 local WX_OK = {
     return_code = "SUCCESS",
@@ -110,8 +76,7 @@ local WX_FAIL = {
     return_msg  = "FAIL",
 }
 
-function M.notify(order_no, key, param)
-    local order = M.query_order(order_no)
+function M.notify(order, key, param)
     if order.item_state == 1 then
         return WX_OK
     end
@@ -128,17 +93,13 @@ function M.notify(order_no, key, param)
         return WX_FAIL
     end
     
-    if param.return_code ~= "SUCCESS" or param.return_msg ~= "SUCCESS" then
+    if param.result_code ~= "SUCCESS" or param.return_code ~= "SUCCESS" then
         order.item_state = -1
     else
         order.item_state = 1
         order.pay_time = os.time()
         order.tid = param.transaction_id
-        mysql.query(string.format('insert payment (order_no, uid, item_sn, item_state, pay_channel, pay_method, pay_time, pay_price, tid)\
-            VALUES("%s", "%s","%s","%s","%s","%s",Now(),"%s","%s")',
-            order.order_no, order.uid, order.item_sn, order.item_state, order.pay_channel, order.pay_method, order.pay_price, order.tid)) 
     end
-    M.update_order(order_no, order)
     return WX_OK
 end
 return M

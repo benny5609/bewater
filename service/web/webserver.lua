@@ -44,7 +44,12 @@ function on_message(cmd, args, body, ip)
         if not ret then
             return '{"err":-2, "desc":"body error"}'
         end
-        local ret = handler[cmd](handler, args, data, ip)
+        local ret = 0
+        if not util.try(function()
+            ret = handler[cmd](handler, args, data, ip)
+        end) then
+            ret = '{"err":-3, "desc":"server traceback"}'
+        end
         return handler:pack(ret or "")
     else
         return '{"err":-1, "desc":"api not exist"}'
