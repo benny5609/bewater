@@ -87,13 +87,13 @@ end
 function M:_recv_binary(sock_buff)
     --local op, buff = string.unpack(">Hs2", sock_buff)
     local op = string.unpack(">H", sock_buff)
-    local buff = string.sub(sock_buff, 3, #sock_buff)
+    local buff = string.sub(sock_buff, 3, #sock_buff) or ""
     local opname = opcode.toname(op)
     local modulename = opcode.tomodule(op)
     local simplename = opcode.tosimplename(op)
 
-    local data = protobuf.decode(opname, buff, sz)
-    print("recv_binary", opname)
+    print("recv_binary", opname, op, buff)
+    local data = protobuf.decode(opname, buff)
     --util.printdump(data)
 
     local player = self.player

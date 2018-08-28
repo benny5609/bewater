@@ -6,6 +6,8 @@ local xml2lua = require "xml.xml2lua"
 local http = require "web.http_helper"
 local conf = require "conf"
 
+local orders = {}
+
 local M = {}
 function M.create_order(param)
     local uid           = assert(param.uid)
@@ -19,11 +21,7 @@ function M.create_order(param)
     local pay_price     = assert(param.pay_price)
 
     local order_no = string.format("%d%04d", uid, item_sn)
-    local order = mongo.find_one("payment", {order_no = order_no})
-    if order then
-        return order
-    end
-
+    
     local args = {
         appid           = appid,
         mch_id          = mch_id,
@@ -47,27 +45,26 @@ function M.create_order(param)
     if data.return_code ~= "SUCCESS" and data.return_msg ~= "OK" then
         return errcode.WxorderFail
     end
-
-    order = {
+    
+    M.query_order(order_no, {
         order_no    = order_no,
         uid         = uid,
         item_sn     = item_sn,
-        item_state  = item_state,
+        item_state  = 0,
         pay_channel = pay_channel,
         pay_method  = pay_method,
         pay_time    = os.time(),
         pay_price   = pay_price,
         tid         = "",
-    }
-    --mongo.safe_insert("payment", order)
+    })
    
     local ret
     if data.trade_type == "APP" then 
         ret = {
             partnerid = mch_id,
-            noncestr = data.noncestr,
+            nonce_str = data.nonce_str,
             package = 'Sign=WXPay',
-            prepayid = data.prepayid,
+            prepay_id = data.prepay_id,
             timestamp = os.time(),
         }
         ret.sign = sign.md5_args(ret)
@@ -78,6 +75,26 @@ function M.create_order(param)
     end
     ret.order_no = order_no
     return ret
+end
+
+function M.query_order(order_no, default)
+    local order = orders[order_no]
+    if order then
+        return order
+    end
+    order = mongo.find_one("payment", {order_no = order_no}) 
+    if order then
+        orders[order_no] = order
+        return order
+    else
+        orders[order_no] = default
+        mongo.insert("payment", default)
+        return default
+    end
+end
+
+function M.update_order(order_no, order)
+    mongo.update("payment", {order_no = order_no}, order)
 end
 
 function M.pay_callback(param)
