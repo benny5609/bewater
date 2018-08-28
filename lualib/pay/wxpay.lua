@@ -1,5 +1,6 @@
 local skynet = require "skynet"
 local mongo = require "db.mongo_helper"
+local mysql = require "db.mysql_helper"
 local sign = require "auth.sign"
 local lua2xml = require "xml.lua2xml"
 local xml2lua = require "xml.xml2lua"
@@ -86,7 +87,8 @@ function M.query_order(order_no, default)
     if order then
         orders[order_no] = order
         return order
-    else
+    elseif default then
+        print("insert order")
         orders[order_no] = default
         mongo.insert("payment", default)
         return default
@@ -97,7 +99,46 @@ function M.update_order(order_no, order)
     mongo.update("payment", {order_no = order_no}, order)
 end
 
-function M.pay_callback(param)
 
+local WX_OK = {
+    return_code = "SUCCESS",
+    return_msg  = "OK",
+}
+
+local WX_FAIL = {
+    return_code = "FAIL",
+    return_msg  = "FAIL",
+}
+
+function M.notify(order_no, key, param)
+    local order = M.query_order(order_no)
+    if order.item_state == 1 then
+        return WX_OK
+    end
+    local args = {}
+    for k, v in pairs(param) do
+        if k ~= "sign" then
+            args[k] = v
+        end
+    end
+    
+    local sign1 = sign.md5_args(args, key)
+    local sign2 = param.sign
+    if sign1 ~= sign2 then
+        return WX_FAIL
+    end
+    
+    if param.return_code ~= "SUCCESS" or param.return_msg ~= "SUCCESS" then
+        order.item_state = -1
+    else
+        order.item_state = 1
+        order.pay_time = os.time()
+        order.tid = param.transaction_id
+        mysql.query(string.format('insert payment (order_no, uid, item_sn, item_state, pay_channel, pay_method, pay_time, pay_price, tid)\
+            VALUES("%s", "%s","%s","%s","%s","%s",Now(),"%s","%s")',
+            order.order_no, order.uid, order.item_sn, order.item_state, order.pay_channel, order.pay_method, order.pay_price, order.tid)) 
+    end
+    M.update_order(order_no, order)
+    return WX_OK
 end
 return M
