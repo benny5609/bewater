@@ -10,7 +10,7 @@ function M.remove(ip)
 end
 
 function M.check(ip)
-    return db.sismember("whitelist", ip)
+    return db.sismember("whitelist", string.match(ip, "([^:]+)"))
 end
 
 function M.list()

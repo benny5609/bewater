@@ -15,7 +15,7 @@ function M.get(url, get, no_reply)
     end
 end
 
-function M.post(url, post)
+function M.post(url, post, no_reply)
     --skynet.error("http post:", url, post)
     if no_reply then
         return skynet.send(sname.WEB, "lua", "request", url, nil, post, no_reply)
