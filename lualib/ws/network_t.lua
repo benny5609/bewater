@@ -92,7 +92,7 @@ function M:_recv_binary(sock_buff)
     local modulename = opcode.tomodule(op)
     local simplename = opcode.tosimplename(op)
 
-    print("recv_binary", opname, op, buff)
+    skynet.error(string.format("recv_binary %s %s %s", opname, op, buff))
     local data = protobuf.decode(opname, buff)
     --util.printdump(data)
 
