@@ -326,6 +326,34 @@ function util.str2tbl(str)
     return load("return " .. str)()
 end
 
+-- todo 格式化json, 临时用，字符串中不能包含单双引号，否则出错
+function util.format_json(str)
+    local depth = 0
+    local mark
+    return string.gsub(str, '([,{}\'\"])', function(c)
+        if mark then
+            if mark == c then
+                mark = nil
+                return c
+            else
+                return c
+            end
+        end
+        if c == '{' then
+            depth = depth + 1
+            return '{\n'..string.rep(' ', depth*4)
+        elseif c == '}' then
+            depth = depth - 1
+            return '\n'..string.rep(' ', depth*4)..'}'
+        elseif c == ',' then
+            return ',\n'..string.rep(' ', depth*4)
+        elseif c == '\"' or c == '\'' then
+            mark = c
+            return c
+        end
+    end)
+end
+
 -- 方法本身
 function util.callee()
     return debug.getinfo(2, "f").func
