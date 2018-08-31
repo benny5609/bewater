@@ -1,6 +1,5 @@
 local md5 = require "md5"
 local crypt = require "skynet.crypt"
-local cryptopp = require "cryptopp"
 local codec = require "codec"
 
 local string_format = string.format
@@ -39,15 +38,15 @@ function M.md5_args(args, key, mark)
     return string_upper(md5.sumhexa(str))
 end
 
-function M.rsa_sign(args, private_key, mark)
-    --[[local str = M.concat_args(args) 
-    local priv_key = cryptopp.pem2der(private_key)
-    local signer = cryptopp.rsa_signer(priv_key)
-    return crypt.base64encode(signer(str))]]
+function M.rsa_private_sign(args, private_key, mark)
     local str = M.concat_args(args, mark)
     local bs = codec.rsa_private_sign(str, private_key)
     return encode_uri(codec.base64_encode(bs))
 end
-
-
+--[[
+function M.rsa_public_verify(args, public_key, mark)
+    local str = M.concat_args(args, mark)
+    return codec.rsa_public_verify(str, public_key)
+end
+]]
 return M

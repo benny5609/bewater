@@ -78,7 +78,12 @@ end
 
 function M:call(op, data)
     self:send(op, data)
-    return coroutine.yield(op)
+    local ret = coroutine.yield(op)
+    local code = ret.err
+    if code ~= 0 then
+        skynet.error(string.format("call error:0x%x, desc:%s", code, errcode.describe(code)))
+    end
+    return ret
 end
 
 function M:wait(time)

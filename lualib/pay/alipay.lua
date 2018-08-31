@@ -3,7 +3,9 @@ local mongo = require "db.mongo_helper"
 local mysql = require "db.mysql_helper"
 local http = require "web.http_helper"
 local conf = require "conf"
+local util = require "util"
 local sign = require "auth.sign"
+local codec = require "codec"
 
 local M = {}
 function M.create_order(param)
@@ -34,7 +36,7 @@ function M.create_order(param)
         it_b_pay = '30m',
         return_url = 'm.alipay.com',
     }
-    args.sign = sign.rsa_sign(args, private_key, true)
+    args.sign = sign.rsa_private_sign(args, private_key, true)
     args.sign_type = "RSA"
     return {
         order_no = order_no,
@@ -42,7 +44,27 @@ function M.create_order(param)
     }
 end
 
-function M.notify()
+function M.notify(partner, public_key, param)
+    print("alipay notify")
+    if param.trade_status ~= "TRADE_SUCCESS" then
+        return
+    end
+    local args = {}
+    for k, v in pairs(param) do
+        if k ~= "sign" and k ~= "sign_type" then
+            args[k] = v
+        end
+    end
+
+    local src = sign.concat_args(args, true)
+    local bs = param.sign
+    local bs = codec.base64_decode(param.sign)
+    local pem = public_key
+    --print(src)
+    print(bs)
+    --print(pem)
+    local ret = codec.rsa_public_verify(src, bs, pem, 0)
+    print("verify", ret)
 
 end
 
