@@ -103,7 +103,7 @@ function M:send(op, tbl)
     self._csn = self._csn + 1
     
     local data, len
-    protobuf.encode(opcode.toname(op), tbl, function(buffer, bufferlen)
+    protobuf.encode(opcode.toname(op), tbl or {}, function(buffer, bufferlen)
         data, len = packet.pack(op, self._csn, self._ssn, 
             self._crypt_type, self._crypt_key, buffer, bufferlen)
     end)
