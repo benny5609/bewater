@@ -28,6 +28,7 @@ end
 if mode == "agent" then
 local handler = require(handler_path)
 
+-- handler 需要提供 hander.api = {[[/api/xxx/ooo]] = func}
 -- 如果是非字符串，handler需要提供pack和unpack方法
 handler.pack = handler.pack or function (_, data)
     return data
@@ -36,17 +37,17 @@ handler.unpack = handler.unpack or function (_, data)
     return data
 end
 
-function on_message(cmd, args, body, ip)
-    if handler[cmd] then
+function on_message(url, args, body, ip)
+    if handler.api[url] then
         local ret, data = util.try(function()
-            return handler:unpack(body, cmd)
+            return handler:unpack(body, url)
         end)
         if not ret then
             return '{"err":-2, "desc":"body error"}'
         end
         local ret = 0
         if not util.try(function()
-            ret = handler[cmd](handler, args, data, ip)
+            ret = handler.api[url](handler, args, data, ip)
         end) then
             ret = '{"err":-3, "desc":"server traceback"}'
         end
@@ -65,19 +66,18 @@ skynet.start(function()
         socket.start(fd)
         -- limit request body size to 8192 (you can pass nil to unlimit)
         local code, url, method, header, body = httpd.read_request(sockethelper.readfunc(fd), 8192)
-        --print(string.format("recv code:%s, url:%s, method:%s, header:%s, body:%s", code, url, method, header, body))
+        print(string.format("recv code:%s, url:%s, method:%s, header:%s, body:%s", code, url, method, header, body))
         if code then
             if code ~= 200 then
                 response(fd, code)
             else
                 local data 
                 local path, query = urllib.parse(url)
-                local cmd = string.match(path, "([^/]+)$")        
                 if query then
                     data = urllib.parse_query(query)
                 end
 
-                response(fd, code, on_message(cmd, data, body, ip), {["Access-Control-Allow-Origin"] = "*"})
+                response(fd, code, on_message(url, data, body, ip), {["Access-Control-Allow-Origin"] = "*"})
             end
         else
             if url == sockethelper.socket_error then

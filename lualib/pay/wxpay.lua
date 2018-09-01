@@ -31,16 +31,12 @@ function M.create_order(param)
         out_trade_no    = order_no..'-'..os.time(),
         total_fee       = pay_price*100//1 >> 0,
         spbill_create_ip= '127.0.0.1',
-        notify_url      = string.format("%s:%s/api/wxpay_notify", conf.pay.host, conf.pay.port),
+        notify_url      = string.format("%s:%s/api/payment/wxpay_notify", conf.pay.host, conf.pay.port),
     }
     args.sign = sign.md5_args(args, key)
     local xml = lua2xml.encode("xml", args, true)
-    print(xml)
     local ret, resp = http.post("https://api.mch.weixin.qq.com/pay/unifiedorder", xml)
-    print(ret, resp)
     local data = xml2lua.decode(resp).xml
-    print(data.return_code)
-    print(data.return_msg)
 
     if data.return_code ~= "SUCCESS" and data.return_msg ~= "OK" then
         return errcode.WxorderFail

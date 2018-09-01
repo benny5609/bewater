@@ -23,11 +23,10 @@ function M.create_order(param)
         partner = partner,
         seller_id = partner,
         out_trade_no = order_no..'-'..os.time(),
-        --out_trade_no = "11241000-1535641016", 
         subject = item_desc,
         body = item_desc,
         total_fee = pay_price,
-        notify_url = string.format("%s:%s/api/alipay_notify", conf.pay.host, conf.pay.port),
+        notify_url = string.format("%s:%s/api/payment/alipay_notify", conf.pay.host, conf.pay.port),
         service = "mobile.securitypay.pay",
         payment_type = '1',
         anti_phishing_key = '',
@@ -56,15 +55,9 @@ function M.notify(partner, public_key, param)
     end
 
     local src = sign.concat_args(args)
-    --local bs = param.sign
     local bs = codec.base64_decode(param.sign)
     local pem = public_key
-    print("src", src)
-    print("bs", bs)
-    print("pem", pem)
-    local ret = codec.rsa_public_verify(src, bs, pem, 2)
-    print("verify", ret)
-
+    return codec.rsa_public_verify(src, bs, pem, 2)
 end
 
 return M
