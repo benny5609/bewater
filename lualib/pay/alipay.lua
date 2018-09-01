@@ -45,7 +45,6 @@ function M.create_order(param)
 end
 
 function M.notify(partner, public_key, param)
-    print("alipay notify")
     if param.trade_status ~= "TRADE_SUCCESS" then
         return
     end
@@ -56,14 +55,14 @@ function M.notify(partner, public_key, param)
         end
     end
 
-    local src = sign.concat_args(args, true)
-    local bs = param.sign
+    local src = sign.concat_args(args)
+    --local bs = param.sign
     local bs = codec.base64_decode(param.sign)
     local pem = public_key
-    --print(src)
-    print(bs)
-    --print(pem)
-    local ret = codec.rsa_public_verify(src, bs, pem, 0)
+    print("src", src)
+    print("bs", bs)
+    print("pem", pem)
+    local ret = codec.rsa_public_verify(src, bs, pem, 2)
     print("verify", ret)
 
 end

@@ -79,7 +79,7 @@ end
 function M:call(op, data)
     self:send(op, data)
     local ret = coroutine.yield(op)
-    local code = ret.err
+    local code = ret and ret.err
     if code ~= 0 then
         skynet.error(string.format("call error:0x%x, desc:%s", code, errcode.describe(code)))
     end

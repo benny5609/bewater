@@ -20,11 +20,13 @@ local function call(...)
     cluster.call("monitor", "svr", ...)
 end
 
-local addr = conf.cluster.addr
+local name = info.clustername
+local addr = conf.cluster[name]
+
 local CMD = {}
 function CMD.start()
     util.try(function()
-        call("node_start", conf.cluster.name, conf.cluster.addr, conf.proj, info.pnet_addr, info.inet_addr, 
+        call("node_start", name, addr, conf.proj, info.pnet_addr, info.inet_addr, 
             info.pid, string.format("%s:%s", conf.webconsole.host, conf.webconsole.port))
     end)
     skynet.fork(function()

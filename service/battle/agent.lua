@@ -1,23 +1,30 @@
 local skynet    = require "skynet"
 local util      = require "util"
 
-local room_path = ...
-local room_t = require(room_path)
+local battle_path = ...
+local battle_t = require(battle_path)
 
-local rooms = {}
-local function create_room(room_id)
-   local room = room_t.new(room_id, function()
-        rooms[room_id] = nil  
+local map = {}
+local function create(battle_id)
+   local battle = battle_t.new(battle_id, function()
+        map[battle_id] = nil  
    end)
-   rooms[room_id] = room
-   return room
+   map[battle_id] = battle
+   return battle
+end
+
+local function destroy(battle_id)
+    map[battle_id] = nil
 end
 
 skynet.start(function()
-    skynet.dispatch("lua", function(_, _, room_id, cmd, ...)
-        local room = rooms[room_id] or create_room(room_id)
-        local f = assert(room[cmd], cmd)
-        util.ret(f(room, ...))
+    skynet.dispatch("lua", function(_, _, battle_id, cmd, ...)
+        local battle = map[battle_id] or create(battle_id)
+        local f = assert(battle[cmd], cmd)
+        util.ret(f(battle, ...))
+        if cmd == "destroy" then
+            destroy(battle_id)    
+        end
     end)
 end)
 
