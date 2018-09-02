@@ -65,7 +65,7 @@ function M:_send_text(op, msg) -- 兼容text
 end
 
 function M:_send_binary(op, tbl)
-    local data = protobuf.encode(opcode.toname(op), tbl)
+    local data = protobuf.encode(opcode.toname(op), tbl or {})
     --print("send", #data)
     -- self._ws:send_binary(string.pack(">Hs2", op, data))
     self._ws:send_binary(string.pack(">H", op)..data)

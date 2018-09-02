@@ -80,6 +80,7 @@ function M:call(op, data)
     self:send(op, data)
     local ret = coroutine.yield(op)
     local code = ret and ret.err
+    assert(code, string.format("opcode %s no errcode", opcode.toname(op)))
     if code ~= 0 then
         skynet.error(string.format("call %s error:0x%x, desc:%s", 
             opcode.toname(op), code, errcode.describe(code)))
@@ -153,10 +154,10 @@ function M:_dispatch(op, data)
 end
 
 function M:_recv_binary(sock_buff)
-    --print("recv_binary", #sock_buff)
     local op = string.unpack(">H", sock_buff)
     local buff = string.sub(sock_buff, 3, #sock_buff)
     local opname = opcode.toname(op)
+    print("recv_binary", opname, #sock_buff)
     
     local data = protobuf.decode(opname, buff, sz)
     --util.printdump(data)

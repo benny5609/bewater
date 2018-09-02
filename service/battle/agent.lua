@@ -23,10 +23,14 @@ function CMD.destroy(battle_id)
 end
 
 function CMD.call_battle(battle_id, cmd, ...)
+    print("call_battle", battle_id)
     local battle = battles[battle_id]
     if not battle then
+        print("battle not exist", battle_id)
         return errcode.BattleNotExist
     end
+    local f = assert(battle[cmd], cmd)
+    return f(battle, ...)
 end
 
 skynet.start(function()
