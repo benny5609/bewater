@@ -6,6 +6,7 @@ local packet    = require "sock.packet"
 local packetc   = require "packet.core"
 local protobuf  = require "protobuf"
 local opcode    = require "def.opcode"
+local errcode   = require "def.errcode"
 local util      = require "util"
 local json      = require "cjson"
 local class     = require "class"
@@ -92,7 +93,13 @@ end
 
 function M:call(op, data)
     self:send(op, data)
-    return coroutine.yield(op)
+    local ret = coroutine.yield(op)
+    local code = ret and ret.err
+    if code ~= 0 then
+        skynet.error(string.format("call %s error:0x%x, desc:%s", 
+            opcode.toname(op), code, errcode.describe(code)))
+    end
+    return ret
 end
 
 function M:wait(time)

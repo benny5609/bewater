@@ -46,7 +46,13 @@ end
 
 local function close_socket(fd)
     local uid = fd2uid[fd]
+    if not uid then
+        return
+    end
     local agent = uid2agent[uid]
+    if not agent then
+        return
+    end
     skynet.call(agent, "lua", "socket_close", uid, fd)
     skynet.call(GATE, "lua", "kick", fd)
     fd2uid[fd] = nil
@@ -91,6 +97,7 @@ end
 
 -- 上线后agent绑定uid，下线缓存一段时间
 function CMD.player_online(agent, uid, fd)
+    print("watchdog player_online", agent, uid, fd)
     uid2agent[uid] = agent
     fd2uid[fd] = uid
 end

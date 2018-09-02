@@ -56,6 +56,7 @@ end
 
 -- from player
 function CMD.player_online(uid, fd)
+    print("agent player_online", uid, fd)
     local player = assert(fd2player[fd])
     uid2player[uid] = player
 end
