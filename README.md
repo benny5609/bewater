@@ -94,3 +94,16 @@ ws/agent      websocket消息代理，多个玩家共享，可配置
 sock/watchdog socket侦听服务
 sock/agent    socket消息代理，多个玩家共享，可配置
 ```
+
+## watchdog/agent
+代码里有很多对watchdog/agent，它们是专门用来监听和代发消息的服务，上层逻辑可以根据需求选择，不需要重复写这部分代码。每个agent是都会启动一个虚拟机，但是可以多个玩家共用一个agent，每个agent可配置最大玩家数，预加载一些，不够会自动创建，峰值过后agent不释放。如此设计主要是考虑到利用多核又不消耗过多的内存（一人一agent的土豪可以直接忽略）
+
+## 创建一个websocket监听服务
+	-- gamesvr.gamesvr 和 gamesvr.player分别为游戏服逻辑和玩家逻辑
+	local game = skynet.newservice("ws/watchdog", "gamesvr.gamesvr", "gamesvr.player")
+    skynet.call(game, "lua", "start", {
+        port = 8002, -- 监听端口
+        preload = 10, -- agent预加载数 
+        proto = conf.workspace.."script/def/proto/package.pb", -- pb文件路径
+        send_type = "text", -- websock类型 text/binary
+    })
