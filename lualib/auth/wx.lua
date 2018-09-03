@@ -40,13 +40,15 @@ function M:get_access_token()
     return self.access_token
 end
 
-function M:check_code(js_code)
+function M:check_code(appid, secret, js_code)
+    assert(appid and secret and js_code)
     local ret, resp = http.get("https://api.weixin.qq.com/sns/jscode2session",{
         js_code = js_code,
         grant_type = "authorization_code",
-        appid = self.appid,
-        secret = self.secret,
+        appid = appid,
+        secret = secret,
     })
+    print(ret, resp)
     if ret then
         return json.decode(resp)
     else
