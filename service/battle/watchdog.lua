@@ -1,6 +1,6 @@
 local skynet = require "skynet"
 local autoid = require "share.autoid"
-local util = require "util"
+local util   = require "util"
 
 local agents = {}
 local id2agent = {} -- battle_id -> agent
@@ -26,9 +26,10 @@ function CMD.create_battle()
 end
 
 function CMD.destroy_battle(battle_id)
+    local agent = id2agent[battle_id]
+    skynet.call(agent, "lua", "destroy", battle_id)
     id2agent[battle_id] = nil
 end
-
 
 skynet.start(function()
     skynet.dispatch("lua", function(_,_, cmd, ...)

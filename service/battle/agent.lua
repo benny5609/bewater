@@ -19,6 +19,8 @@ function CMD.create(battle_id, mode)
 end
 
 function CMD.destroy(battle_id)
+    local battle = battles[battle_id]
+    battle:destroy()
     battles[battle_id] = nil
 end
 

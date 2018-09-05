@@ -66,6 +66,7 @@ skynet.start(function()
         socket.start(fd)
         -- limit request body size to 8192 (you can pass nil to unlimit)
         local code, url, method, header, body = httpd.read_request(sockethelper.readfunc(fd), 8192)
+        util.printdump(header)
         print(string.format("recv code:%s, url:%s, method:%s, header:%s, body:%s", code, url, method, header, body))
         if code then
             if code ~= 200 then
