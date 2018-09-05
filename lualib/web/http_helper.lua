@@ -6,29 +6,24 @@ local sname     = require "sname"
 require "bash"
 
 local M = {}
-function M.get(url, get, no_reply, header)
+function M.get(url, get, header, no_reply)
     --skynet.error("http get:", url, json.encode(get))
     if no_reply then
-        return skynet.send(sname.WEB, "lua", "request", url, get, nil, no_reply, header)
+        return skynet.send(sname.WEB, "lua", "request", url, get, nil, header, no_reply)
     else
-        return skynet.call(sname.WEB, "lua", "request", url, get, nil, no_reply, header)
+        return skynet.call(sname.WEB, "lua", "request", url, get, nil, header, no_reply)
     end
 end
 
-function M.post(url, post, no_reply, header)
+function M.post(url, post, header, no_reply)
     --skynet.error("http post:", url, post)
     if no_reply then
-        return skynet.send(sname.WEB, "lua", "request", url, nil, post, no_reply, header)
+        return skynet.send(sname.WEB, "lua", "request", url, nil, post, header, no_reply)
     else
-        return skynet.call(sname.WEB, "lua", "request", url, nil, post, no_reply, header)
+        return skynet.call(sname.WEB, "lua", "request", url, nil, post, header, no_reply)
     end
 end
 
---[[
-function M.set_httpheader(header)
-    skynet.call(sname.WEB, "lua", "set_httpheader", header)
-end
-]]
 function M.url_encoding(tbl)
     local data = {}
     for k, v in pairs(tbl) do

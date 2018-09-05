@@ -28,7 +28,9 @@ end
 if mode == "agent" then
 local handler = require(handler_path)
 
--- handler 需要提供 hander.api = {[[/api/xxx/ooo]] = func}
+-- handler 需要提供 
+-- hander.api = {[[/api/xxx/ooo]] = func} 
+-- hander.auth = function(auth) return uid end -- 授权
 -- 如果是非字符串，handler需要提供pack和unpack方法
 handler.pack = handler.pack or function (_, data)
     return data
@@ -37,7 +39,7 @@ handler.unpack = handler.unpack or function (_, data)
     return data
 end
 
-function on_message(url, args, body, ip)
+function on_message(url, args, body, auth, ip)
     if handler.api[url] then
         local ret, data = util.try(function()
             return handler:unpack(body, url)
@@ -47,7 +49,8 @@ function on_message(url, args, body, ip)
         end
         local ret = 0
         if not util.try(function()
-            ret = handler.api[url](handler, args, data, ip)
+            local uid = handler.auth and handler.auth(handler, auth)
+            ret = handler.api[url](handler, args, data, uid, ip)
         end) then
             ret = '{"err":-3, "desc":"server traceback"}'
         end
@@ -78,7 +81,7 @@ skynet.start(function()
                     data = urllib.parse_query(query)
                 end
 
-                response(fd, code, on_message(url, data, body, ip), {["Access-Control-Allow-Origin"] = "*"})
+                response(fd, code, on_message(url, data, body, header.authorization, ip), {["Access-Control-Allow-Origin"] = "*"})
             end
         else
             if url == sockethelper.socket_error then
