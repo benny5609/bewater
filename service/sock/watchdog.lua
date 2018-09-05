@@ -1,5 +1,5 @@
 local skynet = require "skynet"
-local util = require "util"
+local util   = require "util"
 
 local server_path, player_path = ...
 assert(server_path) -- 服务器逻辑(xxx.xxxserver)
@@ -59,22 +59,22 @@ local function close_socket(fd)
 end
 
 function SOCKET.close(fd)
-	print("socket close",fd)
+	--print("socket close",fd)
     close_socket(fd)
 end
 
 function SOCKET.error(fd, msg)
-	print("socket error",fd, msg)
+	--print("socket error",fd, msg)
     close_socket(fd)
 end
 
 function SOCKET.warning(fd, size)
 	-- size K bytes havn't send out in fd
-	print("socket warning", fd, size)
+	--print("socket warning", fd, size)
 end
 
 function SOCKET.data(fd, msg)
-    print("socket data", fd, msg)
+    --print("socket data", fd, msg)
 end
 
 local CMD = {}
@@ -97,7 +97,6 @@ end
 
 -- 上线后agent绑定uid，下线缓存一段时间
 function CMD.player_online(agent, uid, fd)
-    print("watchdog player_online", agent, uid, fd)
     uid2agent[uid] = agent
     fd2uid[fd] = uid
 end
@@ -107,7 +106,6 @@ function CMD.free_player(agent, uid)
     uid2agent[uid] = nil
     free_agents[agent] = true
     full_agents[agent] = false
-    print("&&&&& watchdog free_player")
 end
 
 function CMD.reconnect(fd, uid)

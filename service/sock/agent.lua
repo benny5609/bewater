@@ -56,13 +56,11 @@ end
 
 -- from player
 function CMD.player_online(uid, fd)
-    print("agent player_online", uid, fd)
     local player = assert(fd2player[fd])
     uid2player[uid] = player
 end
 
 function CMD.free_player(uid)
-    print("&&& agent free_player")
     uid2player[uid] = nil
     if count == MAX_COUNT then
         skynet.call(WATCHDOG, "lua", "set_free", skynet.self())
