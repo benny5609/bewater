@@ -2,22 +2,21 @@
   方便多个项目一起维护，支持sock,web,websock
 # 项目结构
 ```
-3rd(第三方库,非必要)
 common(通用模块,本库)
     luaclib(编译好的c库)
     lualib-src(c库源码)
     lualib(lua库)
     service(通用服务)
 skynet(fork skynet项目，不作任何改动)
-test(项目例子,https://github.com/zhandouxiaojiji/test.git)
-    sample
-proj(你的项目)
-    xxgame
+proj
+    xxgame(你的项目)
         lualib(项目lua库)
         service(项目用到的服务)
         script(项目的逻辑脚本)
-    monitor
-    share
+    monitor(监视节点)
+    share(数据共享节点)
+    
+生成项目的脚本:common/tools/workspace.sh
 ```
 # 配置
 ```
@@ -25,13 +24,14 @@ mkdir workspace
 cd workspace
 git clone https://github.com/zhandouxiaojiji/common.git
 git clone https://github.com/zhandouxiaojiji/skynet.git
-git clone https://github.com/zhandouxiaojiji/test.git
-mkdir proj #项目目录，参考test
+mkdir proj #项目目录，参考monitor和share
 cd skynet && make linux
-cd ..
-cd test/sample/shell
-sh etc.sh game gamed #生成启动配置, etc.sh [配置名] [启动脚本] [是否以进程的方式启动]
-./run.sh game #启动进程, run.sh [配置名]
+cd ../proj
+git clone https://github.com/zhandouxiaojiji/share.git
+git clone https://github.com/zhandouxiaojiji/monitor.git
+cd monitor/shell
+sh etc.sh monitor monitor monitor #生成启动配置, etc.sh [配置名] [启动脚本] [集群名] [是否以进程的方式启动]
+./run.sh monitor #启动进程, run.sh [配置名]
 ```
 # 脚本与库检索优先级
 ```
