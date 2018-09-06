@@ -1,5 +1,4 @@
 local skynet = require "skynet"
-local LOG = skynet.error
 
 local util = {}
 -- 处理skynet.send的消息
@@ -55,14 +54,14 @@ end
 
 function util.shell(cmd, ...)
     local cmd = string.format(cmd, ...)
-    LOG(cmd)
+    skynet.error(cmd)
     return io.popen(cmd):read("*all")
 end
 
 function util.run_cluster(clustername)
     local config = require "config"
     local cmd = string.format("cd %s/shell && sh start.sh %s", config.workspace, clustername)
-    LOG(cmd)
+    skynet.error(cmd)
     os.execute(cmd)
 end
 
@@ -71,7 +70,7 @@ function util.trace(prefix, ...)
     if config.debug then
         prefix = "["..prefix.."] "
         return function(...)
-            LOG(prefix .. string.format(...))
+            skynet.error(prefix .. string.format(...))
         end
     else
         return function() end
@@ -146,7 +145,7 @@ function util.dump(root, ...)
 end
 
 function util.printdump(root, ...)
-    LOG(util.dump(root, ...))
+    skynet.error(util.dump(root, ...))
 end
 
 function util.is_in_list(list, obj)
