@@ -2,7 +2,7 @@
   方便多个项目一起维护，支持sock,web,websock
 # 项目结构
 ```
-common(通用模块,本库)
+common(通用模块,本仓库) https://github.com/zhandouxiaojiji/common.git
     luaclib(编译好的c库)
     lualib-src(c库源码)
     lualib(lua库)
@@ -13,8 +13,8 @@ proj
         lualib(项目lua库)
         service(项目用到的服务)
         script(项目的逻辑脚本)
-    monitor(监视节点)
-    share(数据共享节点)
+    monitor(监视节点) https://github.com/zhandouxiaojiji/monitor.git
+    share(数据共享节点) https://github.com/zhandouxiaojiji/share.git
     
 生成项目的脚本:common/tools/workspace.sh
 ```
