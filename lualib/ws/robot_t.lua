@@ -11,11 +11,14 @@ local ws_client = require "ws.client"
 
 local M = class("robot_t")
 function M:ctor(url, send_type)
-    self._url = url
+    self._url       = url
     self._send_type = send_type or "text"
-    self._ws = ws_client:new()
+    self._ws        = ws_client:new()
+    self._csn       = 0
+    self._ssn       = 0
+
     self._call_requests = {} -- op -> co
-    self._waiting = {} -- co -> time
+    self._waiting       = {} -- co -> time
 end
 
 function M:start()
@@ -154,10 +157,12 @@ function M:_dispatch(op, data)
 end
 
 function M:_recv_binary(sock_buff)
-    local op = string.unpack(">H", sock_buff)
+    local op, csn, ssn = string.unpack(">HHH", sock_buff)
     local buff = string.sub(sock_buff, 3, #sock_buff)
     local opname = opcode.toname(op)
     print("recv_binary", opname, #sock_buff)
+
+    self._ssn = ssn
     
     local data = protobuf.decode(opname, buff, sz)
     --util.printdump(data)
@@ -168,7 +173,10 @@ function M:_send_binary(op, tbl)
     --print("send_binary", opcode.toname(op), util.dump(tbl))
     local data = protobuf.encode(opcode.toname(op), tbl or {})
     --print("send", data, #data)
-    self._ws:send_binary(string.pack(">Hs2", op, data))
+    if opcode.has_session(op) then
+        self._csn = self._csn + 1
+    end
+    self._ws:send_binary(string.pack(">HHHs2", op, self._csn, self._ssn, data))
 end
 
 return M

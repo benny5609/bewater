@@ -13,10 +13,11 @@ function M:ctor(player)
     self.player = assert(player, "network need player")
 end
 
-function M:init(watchdog, agent, fd)
+function M:init(watchdog, agent, fd, ip)
     self._watchdog = assert(watchdog)
     self._agent = assert(agent)
     self._fd = assert(fd)
+    self._ip = assert(ip)
     self._csn = 0
     self._ssn = 0
 
@@ -121,5 +122,25 @@ function M:_recv_binary(sock_buff)
     end                                                                                                                                                                                                                              
     self:send(op+1, ret)
 end
+
+
+function M:reconnect(fd, csn, ssn)
+    assert(fd, csn and ssn)
+    if self._csn ~= csn or self._ssn ~= ssn then
+        return false
+    end
+    self._ws:send_close()
+    self:init(self._watchdog, self._agent, fd, self._ip)
+    return true
+end
+
+function M:get_agent()
+    return self._agent
+end
+
+function M:get_ip()
+    return self._ip
+end
+
 
 return M

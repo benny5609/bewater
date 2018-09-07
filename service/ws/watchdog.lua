@@ -54,7 +54,7 @@ function CMD.start(conf)
         if not agent then
             agent = create_agent()
         end
-        skynet.call(agent, "lua", "new_player", fd)
+        skynet.call(agent, "lua", "new_player", fd, addr)
     end)
 end
 
@@ -70,6 +70,12 @@ function CMD.player_destroy(agent, uid)
     full_agents[agent] = false
 end
 
+function CMD.reconnect(fd, uid, csn, ssn)
+    local agent = uid2agent[uid] 
+    if agent and skynet.call(agent, "lua", "reconnect", fd, uid, csn, ssn) then
+        return agent
+    end
+end
 
 skynet.start(function()
     skynet.dispatch("lua", function(_, _, cmd1, ...)

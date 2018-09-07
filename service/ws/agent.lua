@@ -19,10 +19,10 @@ local uid2player = {}
 local count = 0
 
 
-function CMD.new_player(fd)
+function CMD.new_player(fd, ip)
     socket.start(fd)
     local player = player_t.new()
-    player.net:init(WATCHDOG, skynet.self(), fd)
+    player.net:init(WATCHDOG, skynet.self(), fd, ip)
     fd2player[fd] = player
     count = count + 1
     return count >= MAX_COUNT
@@ -57,6 +57,20 @@ function CMD.socket_close(fd)
     fd2player[fd] = nil
 end
 
+function CMD.reconnect(fd, uid, csn, ssn)
+    local player = uid2player[uid]
+    if not player then
+        return
+    end
+    local old_fd = player.net:get_fd()
+    if player.net:reconnect(fd, csn, ssn) then
+        fd2player[old_fd] = nil
+        fd2player[fd] = player
+        return true
+    else
+        fd2player[fd] = nil
+    end
+end
 
 skynet.start(function()
     skynet.dispatch("lua", function(_, _, arg1, arg2, arg3, ...)
