@@ -17,6 +17,8 @@ function M:init(watchdog, agent, fd)
     self._watchdog = assert(watchdog)
     self._agent = assert(agent)
     self._fd = assert(fd)
+    self._csn = 0
+    self._ssn = 0
 
     local handler = {}
     function handler.open()
@@ -68,7 +70,10 @@ function M:_send_binary(op, tbl)
     local data = protobuf.encode(opcode.toname(op), tbl or {})
     --print("send", #data)
     -- self._ws:send_binary(string.pack(">Hs2", op, data))
-    self._ws:send_binary(string.pack(">H", op)..data)
+    if opcode.has_session(op) then
+        self._ssn = self._ssn + 1
+    end
+    self._ws:send_binary(string.pack(">HHH", op, self._csn, self._ssn)..data)
 end
 
 function M:_recv_text(t)
@@ -87,11 +92,12 @@ end
 
 function M:_recv_binary(sock_buff)
     --local op, buff = string.unpack(">Hs2", sock_buff)
-    local op = string.unpack(">H", sock_buff)
-    local buff = string.sub(sock_buff, 3, #sock_buff) or ""
+    local op, csn, ssn = string.unpack(">HHH", sock_buff)
+    local buff = string.sub(sock_buff, 7, #sock_buff) or ""
     local opname = opcode.toname(op)
     local modulename = opcode.tomodule(op)
     local simplename = opcode.tosimplename(op)
+    self._csn = csn
 
     skynet.error(string.format("recv_binary %s %s %s", opname, op, #buff))
     local data = protobuf.decode(opname, buff)
