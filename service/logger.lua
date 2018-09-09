@@ -10,7 +10,7 @@ local sname = require "sname"
 require "bash"
 
 local errfile = io.open(string.format("%s/log/%s.log", 
-    conf.workspace,skynet.getenv("clustername") or "error"), "w+")
+    conf.workspace, conf.clustername or "error"), "w+")
 
 local function write_log(file, addr, str)
     local str = string.format("[%08x][%s] %s", addr, os.date("%Y-%m-%d %H:%M:%S", os.time()), str) 

@@ -24,6 +24,7 @@ local function publish(pconf, confname)
         conf.workspace, conf.workspace, conf.workspace, conf.workspace, proj)
 
     -- 配置文件
+    pconf.workspace = string.format("%s/proj/%s/", pconf.remote_path, projname)
     local str = "return ".. util.dump(pconf)
     local file = io.open(proj.."/script/conf.lua", "w+")
     file:write(str)
