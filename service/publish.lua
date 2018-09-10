@@ -45,7 +45,7 @@ local function publish(pconf, confname)
     bash("chmod 775 %s/start.sh", tmp)
 
     -- 停机脚本
-    local str = string.format("sh %s/proj/%s/shell/stop.sh %s", pconf.remote_path, projname, pconf.clustername)
+    local str = string.format("sh %s/proj/%s/shell/stop.sh %s", pconf.remote_path, projname, pconf.etcname)
     bash("echo %s > %s/stop.sh", str, tmp)
     bash("chmod 775 %s/stop.sh", tmp)
    

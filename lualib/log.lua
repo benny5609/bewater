@@ -27,4 +27,8 @@ function M.player(uid)
     end
 end
 
+function M.sighup()
+    skynet.send(".logger", "lua", "register_sighup", skynet.self())
+end
+
 return M

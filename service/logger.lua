@@ -71,6 +71,10 @@ function CMD.player(addr, uid, str)
     write_log(errfile, addr, str) 
 end
 
+local sighup_addr = nil
+function CMD.register_sighup(addr)
+    sighup_addr = addr
+end
 
 skynet.register_protocol {
     name = "text",
@@ -81,13 +85,19 @@ skynet.register_protocol {
     end
 }
 
+-- 捕捉sighup信号(kill -1)
 skynet.register_protocol {
     name = "SYSTEM",
     id = skynet.PTYPE_SYSTEM,
     unpack = function(...) return ... end,
-    dispatch = function()
+    dispatch = function(...)
         -- reopen signal
-        print("SIGHUP")
+        if sighup_addr then
+            skynet.send(sighup_addr, "lua", "SIGHUP")
+        else
+            skynet.error("handle SIGHUP, skynet will be stop")
+            skynet.abort()
+        end
     end
 }
 
