@@ -41,18 +41,24 @@ local function publish(pconf, confname)
 
     -- 启动脚本
     local str = string.format("sh %s/proj/%s/shell/run.sh %s", pconf.remote_path, projname, pconf.etcname)
-    bash("echo %s > %s/start.sh", str, tmp)
-    bash("chmod 775 %s/start.sh", tmp)
+    bash("echo %s > %s/run.sh", str, tmp)
+    bash("chmod 775 %s/run.sh", tmp)
 
     -- 停机脚本
-    local str = string.format("sh %s/proj/%s/shell/stop.sh %s", pconf.remote_path, projname, pconf.etcname)
-    bash("echo %s > %s/stop.sh", str, tmp)
-    bash("chmod 775 %s/stop.sh", tmp)
+    local str = string.format("sh %s/proj/%s/shell/kill.sh %s", pconf.remote_path, projname, pconf.etcname)
+    bash("echo %s > %s/kill.sh", str, tmp)
+    bash("chmod 775 %s/kill.sh", tmp)
    
-    -- 发布
-    bash("ssh -p %s %s mkdir -p %s", pconf.remote_port, pconf.remote_host, pconf.remote_path)
-    bash("scp -rpB -P %s %s/* %s:%s ", pconf.remote_port, tmp, pconf.remote_host, pconf.remote_path)
-    --bash('rsync -e "ssh -i ~/.ssh/id_rsa" -cvropg --copy-unsafe-links %s %s:%s', tmp, pconf.remote_host, pconf.remote_path)
+    if string.match(pconf.remote_host, "localhost") then
+        -- 发布到本地
+        bash("mkdir -p %s", pconf.remote_path)
+        bash("cp -r %s/* %s ", tmp, pconf.remote_path)
+    else
+        -- 发布到远程
+        bash("ssh -p %s %s mkdir -p %s", pconf.remote_port, pconf.remote_host, pconf.remote_path)
+        bash("scp -rpB -P %s %s/* %s:%s ", pconf.remote_port, tmp, pconf.remote_host, pconf.remote_path)
+        --bash('rsync -e "ssh -i ~/.ssh/id_rsa" -cvropg --copy-unsafe-links %s %s:%s', tmp, pconf.remote_host, pconf.remote_path)
+    end
 
     -- 删除临时目录
     bash "rm -rf ../tmp"

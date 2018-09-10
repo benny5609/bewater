@@ -33,7 +33,9 @@ function M:init(watchdog, agent, fd, ip)
         self:_recv_binary(sock_buff)
     end
     function handler.close()
-        self.player:offline()
+        if self.player.offline then
+            self.player:offline()
+        end
     end
     self._ws = ws_server.new(fd, handler)
 end
