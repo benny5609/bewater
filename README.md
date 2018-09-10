@@ -98,6 +98,20 @@ sock/agent    socket消息代理，多个玩家共享，可配置
 ## watchdog/agent
 代码里有很多对watchdog/agent，它们是专门用来监听和代发消息的服务，上层逻辑可以根据需求选择，不需要重复写这部分代码。每个agent是都会启动一个虚拟机，但是可以多个玩家共用一个agent，每个agent可配置最大玩家数，预加载一些，不够会自动创建，峰值过后agent不释放。如此设计主要是考虑到利用多核又不消耗过多的内存（一人一agent的土豪可以直接忽略）
 
+## 停机方法
+目前skynet只有在logger服务捕捉SIGHUP信号，其它信号需要写C服务，后续再加上  
+如需要安全停机:  
+```
+local log = require "log"
+log.sighup() -- 向logger注册信号处理服务                                                                                               
+skynet.dispatch("lua", function(_, _, cmd)                                                                  
+    if cmd == "SIGHUP" then
+    	-- todo save data
+        skynet.abort()                                                                                      
+    end                                                                                                     
+end) 
+```
+
 ## 创建一个websocket监听服务
 	-- gamesvr.gamesvr 和 gamesvr.player分别为游戏服逻辑和玩家逻辑
 	local game = skynet.newservice("ws/watchdog", "gamesvr.gamesvr", "gamesvr.player")
