@@ -9,6 +9,21 @@ function util.ret(noret, ...)
     end
 end
 
+-- 捕捉sighup信号(kill -1)
+function util.sighup(func)
+    assert(type(func) == "function")
+    skynet.register_protocol {
+        name = "SYSTEM",
+        id = skynet.PTYPE_SYSTEM,
+        unpack = function(...) return ... end,
+        dispatch = function(...)
+            -- reopen signal
+            func(...)
+        end
+    }
+end
+
+
 -- 有需要的节点在启动时调用
 function util.init_proto_env(path)
     local sname = require "sname"
