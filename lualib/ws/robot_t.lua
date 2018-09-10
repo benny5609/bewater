@@ -19,6 +19,8 @@ function M:ctor(url, send_type)
 
     self._call_requests = {} -- op -> co
     self._waiting       = {} -- co -> time
+
+    self:start()
 end
 
 function M:start()
