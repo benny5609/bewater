@@ -127,7 +127,7 @@ end
 
 
 function M:reconnect(fd, csn, ssn)
-    assert(fd, csn and ssn)
+    assert(fd and csn and ssn)
     if self._csn ~= csn or self._ssn ~= ssn then
         return false
     end

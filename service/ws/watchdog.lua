@@ -77,6 +77,10 @@ function CMD.reconnect(fd, uid, csn, ssn)
     end
 end
 
+function CMD.kick(uid)
+
+end
+
 skynet.start(function()
     skynet.dispatch("lua", function(_, _, cmd1, ...)
         local f = CMD[cmd1] or server[cmd1]

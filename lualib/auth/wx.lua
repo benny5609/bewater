@@ -15,6 +15,7 @@ local access_time       = 0
 local map = {} -- appid -> access
 
 local function request_access_token(appid, secret)
+    skynet.error("&&&&&& request_access_token")
     assert(appid and secret)
     local ret, resp = http.get("https://api.weixin.qq.com/cgi-bin/token", {
         grant_type  = "client_credential",
@@ -44,7 +45,7 @@ function M.get_access_token(appid, secret)
     return access.token
 end
 
-function M:check_code(appid, secret, js_code)
+function M.check_code(appid, secret, js_code)
     assert(appid and secret and js_code)
     local ret, resp = http.get("https://api.weixin.qq.com/sns/jscode2session",{
         js_code = js_code,
