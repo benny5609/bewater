@@ -6,9 +6,10 @@ local reg = {
     REDIS = "db/redisd",
     MONGO = "db/mongod",
     MYSQL = "db/mysqld",
-    ALERT = "alert", -- 警报服务
-    REPORT = "report", -- 自动向monitor发送报告
+    ALERT = "alert",    -- 警报服务
+    REPORT = "report",  -- 自动向monitor发送报告
     GM = "gm", 
+    OP = "operate",     -- 离线操作
 }
 
 local M = {}
