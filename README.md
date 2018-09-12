@@ -103,12 +103,12 @@ sock/agent    socket消息代理，多个玩家共享，可配置
 如需要安全停机:  
 ```
 local log = require "log"
-log.sighup() -- 向logger注册信号处理服务                                                                                               
-skynet.dispatch("lua", function(_, _, cmd)                                                                  
+log.sighup() -- 向logger注册信号处理服务
+skynet.dispatch("lua", function(_, _, cmd)
     if cmd == "SIGHUP" then
     	-- todo save data
-        skynet.abort()                                                                                      
-    end                                                                                                     
+        skynet.abort()
+    end
 end) 
 ```
 ## GM系统
