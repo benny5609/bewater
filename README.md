@@ -111,7 +111,12 @@ skynet.dispatch("lua", function(_, _, cmd)
     end                                                                                                     
 end) 
 ```
-
+## GM系统
+按模块添加方法集，然后在后台输入命令
+```
+local gm = require "gm"
+gm.add_gmcmd("test_module", "test_cmd")
+```
 ## 创建一个websocket监听服务
 	-- gamesvr.gamesvr 和 gamesvr.player分别为游戏服逻辑和玩家逻辑
 	local game = skynet.newservice("ws/watchdog", "gamesvr.gamesvr", "gamesvr.player")
