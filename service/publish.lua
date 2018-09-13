@@ -51,12 +51,18 @@ local function publish(pconf, confname)
    
     if string.match(pconf.remote_host, "localhost") then
         -- 发布到本地
+        bash("sh %s/kill.sh", pconf.remote_path)
+        skynet.sleep(100)
         bash("mkdir -p %s", pconf.remote_path)
         bash("cp -r %s/* %s ", tmp, pconf.remote_path)
+        bash("sh %s/run.sh", pconf.remote_path)
     else
         -- 发布到远程
+        bash("ssh -p %s %s sh %s/kill.sh", pconf.remote_port, pconf.remote_host, pconf.remote_path)
+        skynet.sleep(100)
         bash("ssh -p %s %s mkdir -p %s", pconf.remote_port, pconf.remote_host, pconf.remote_path)
         bash("scp -rpB -P %s %s/* %s:%s ", pconf.remote_port, tmp, pconf.remote_host, pconf.remote_path)
+        bash("ssh -p %s %s sh %s/run.sh", pconf.remote_port, pconf.remote_host, pconf.remote_path)
         --bash('rsync -e "ssh -i ~/.ssh/id_rsa" -cvropg --copy-unsafe-links %s %s:%s', tmp, pconf.remote_host, pconf.remote_path)
     end
 
