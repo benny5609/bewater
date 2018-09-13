@@ -73,7 +73,7 @@ end
 
 local sighup_addr = nil
 function CMD.register_sighup(addr)
-    assert(sighup_addr, "already register sighup")
+    assert(not sighup_addr, "already register sighup")
     sighup_addr = addr
 end
 

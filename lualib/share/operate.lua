@@ -8,7 +8,7 @@ setmetatable(M, {__index = function(t, k)
         return v
     else
         return function(...)
-            return cluster.call("share", "passport", k, ...)
+            return cluster.call("share", "operate", k, ...)
         end
     end
 end})

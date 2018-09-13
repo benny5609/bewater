@@ -1,6 +1,8 @@
-local skynet = require "skynet"
-local util = require "util"
-local log = require "log"
+local skynet    = require "skynet"
+local cluster   = require "skynet.cluster"
+local util      = require "util"
+local log       = require "log"
+
 local trace = log.trace("gm")
 
 local skynet_cmd = {}

@@ -74,6 +74,7 @@ end
 
 skynet.start(function()
     skynet.dispatch("lua", function(_, _, arg1, arg2, arg3, ...)
+        local conf = require "conf"
         local f = CMD[arg1]
         if f then
             util.ret(f(arg2, arg3, ...))

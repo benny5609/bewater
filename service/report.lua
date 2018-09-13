@@ -28,6 +28,7 @@ function CMD.start()
     util.try(function()
         call("node_start", name, addr, conf.proj, info.pnet_addr, info.inet_addr, 
             info.pid, string.format("%s:%s", conf.webconsole.host, conf.webconsole.port))
+        cluster.call("share", "svr", "node_start", name, addr) -- 向share上报集群配置
     end)
     skynet.fork(function()
         while true do
