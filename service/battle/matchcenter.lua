@@ -6,7 +6,7 @@ local addrs = {} -- mode -> service
 local CMD = {}
 function CMD.add_mode(mode, max_time, max_range)
     assert(not addrs[mode])
-    addrs[mode] = skynet.newservice("room/match")
+    addrs[mode] = skynet.newservice("battle/match")
     skynet.call(addrs[mode], "lua", "init", mode, max_time, max_range)
 end
 
