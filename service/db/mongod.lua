@@ -1,8 +1,8 @@
 local skynet = require "skynet.manager"
-local mongo = require "skynet.db.mongo"
-local sname = require "sname"
-local util = require "util"
-local conf = require "conf"
+local mongo  = require "skynet.db.mongo"
+local sname  = require "sname"
+local util   = require "util"
+local conf   = require "conf"
 
 local mod = ...
 

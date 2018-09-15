@@ -47,7 +47,7 @@ local function update()
     for uid, info in pairs(uid2info) do
         local value = info.value
         if cur_time - values[value][uid] > MAX_TIME then
-            info.ret = 0
+            info.ret = skynet.call("usercenter", "lua", "create_robot") -- 这个服务需要自定义
         else
             local list = {values[value]}
             for i = 1, MAX_RANGE do
@@ -73,9 +73,23 @@ local function update()
         if info.ret >= 0 then
             local id1 = uid
             local id2 = info.ret
-            skynet.call(info.agent, "lua", uid, "battle", "matched", MODE, info.ret)
-            uid2info[uid] = nil
-            values[info.value][uid] = nil
+            if uid2info[id1] then
+                skynet.call(uid2info[id1].agent, "lua", id1, "battle", "matched", MODE, id2)
+            end
+            if uid2info[id2] then
+                skynet.call(uid2info[id2].agent, "lua", id2, "battle", "matched", MODE, id1)
+            end
+            -- 创建战斗
+            local battle_id, battle_agent = skynet.call("battlecenter", "lua", "create_battle")
+            skynet.call(battle_agent, "lua", "create", battle_id, MODE)
+            for idx, uid in pairs({id1, id2}) do
+                local info = uid2info[uid]
+                skynet.call(battle_agent, "lua", "call_battle", battle_id, "join", uid, idx, info and info.agent or nil)
+                if uid2info[uid] then
+                    uid2info[uid] = nil
+                    values[info.value][uid] = nil
+                end
+            end
         end
     end
 end

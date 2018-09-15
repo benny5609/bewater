@@ -9,7 +9,6 @@ local battles = {}
 
 local CMD = {}
 function CMD.create(battle_id, mode)
-    print("&&&&&& create_battle", battle_id, mode)
     local battle = battle_t.new()
     battle:init_by_data({
         battle_id = battle_id,
