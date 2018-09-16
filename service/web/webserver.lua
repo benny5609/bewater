@@ -80,7 +80,7 @@ skynet.start(function()
                 if query then
                     data = urllib.parse_query(query)
                 end
-                ip = header['x-real-ip'] or string.match("[^:]+")
+                ip = header['x-real-ip'] or string.match(ip, "[^:]+")
                 response(fd, code, on_message(url, data, body, header.authorization, ip), {["Access-Control-Allow-Origin"] = "*"})
             end
         else
