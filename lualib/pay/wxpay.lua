@@ -39,7 +39,7 @@ function M.create_order(param)
     local data = xml2lua.decode(resp).xml
 
     if data.return_code ~= "SUCCESS" and data.return_msg ~= "OK" then
-        return errcode.WxorderFail
+        return errcode.WXORDER_FAIL
     end
     
     local ret

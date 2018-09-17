@@ -113,7 +113,7 @@ function M:_recv_binary(sock_buff)
         assert(player[modulename][simplename], string.format("handle nil [%s.%s]", modulename, simplename))
         ret = player[modulename][simplename](player[modulename], data) or 0
     end) then
-        ret = errcode.Traceback
+        ret = errcode.TRACEBACK
     end 
 
     assert(ret, string.format("no respone, opname %s", opname))

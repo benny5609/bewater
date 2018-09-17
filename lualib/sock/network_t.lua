@@ -71,7 +71,7 @@ function M:recv(op, csn, ssn, crypt_type, crypt_key, buff, sz)
     if not util.try(function()
         ret = f(mod, data) or 0
     end) then
-        ret = errcode.Traceback    
+        ret = errcode.TRACEBACK    
     end
     if type(ret) == "table" then
         ret.err = ret.err or 0

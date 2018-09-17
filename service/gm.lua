@@ -29,7 +29,7 @@ function CMD.run(modname, cmd, ...)
     if not util.try(function()
         ret = f(table.unpack(args))
     end) then
-        return "服务器执行Traceback了"
+        return "服务器执行TRACEBACK了"
     end
     return ret or "执行成功"
 end
