@@ -357,4 +357,12 @@ end
 function util.callee()
     return debug.getinfo(2, "f").func
 end
+
+function util.printbuff(buff)
+    local str = ""
+    for i=1,#buff do
+        str = str .. string.format("%x", string.byte(buff, i))
+    end
+    print(str)
+end
 return util

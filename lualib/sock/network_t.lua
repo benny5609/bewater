@@ -51,6 +51,7 @@ function M:send(op, tbl)
             self._crypt_type, self._crypt_key, buffer, bufferlen)
     end)
 	socket.write(self._fd, data, len + 2)
+    --skynet.sleep(1)
 end
 
 function M:recv(op, csn, ssn, crypt_type, crypt_key, buff, sz)
@@ -58,7 +59,7 @@ function M:recv(op, csn, ssn, crypt_type, crypt_key, buff, sz)
     local modulename = opcode.tomodule(op)
     local simplename = opcode.tosimplename(op)
     if opcode.has_session(op) then
-        skynet.error("recv package, 0x%x %s, csn:%d", op, opname, csn)
+        skynet.error(string.format("recv package, 0x%x %s, csn:%d sz:%d", op, opname, csn, sz))
     end
 
     local data = protobuf.decode(opname, buff, sz)

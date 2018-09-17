@@ -115,8 +115,8 @@ function M:send(op, tbl)
             self._crypt_type, self._crypt_key, buffer, bufferlen)
     end)
 
-    --print(string.format("send %s, csn:%d", opcode.toname(op), self._csn))
-    socket.write(self._fd, data, len+2)
+    print(string.format("send %s, csn:%d, sz:%s", opcode.toname(op), self._csn, len))
+    socket.write(self._fd, data, len)
 end
 
 function M:ping()
@@ -136,7 +136,7 @@ function M:_recv(sock_buff)
     local ssn       = data:read_ushort()
     local crypt_type= data:read_ubyte()
     local crypt_key = data:read_ubyte()
-    local sz        = #sock_buff - 10 - 2
+    local sz        = total - 8
     local buff      = data:read_bytes(sz)
     --local op, csn, ssn, crypt_type, crypt_key, buff, sz = packet.unpack(sock_buff)
     self._ssn = ssn
@@ -145,12 +145,13 @@ function M:_recv(sock_buff)
     local modulename = opcode.tomodule(op)
     local simplename = opcode.tosimplename(op)
     local funcname = modulename .. "_" .. simplename
-    if self[funcname] then
-        self[funcname](self, data) 
-    end
+    
     --print(string.format("recv %s, csn:%d ssn:%d", opname, csn, ssn))
 
     local data = protobuf.decode(opname, buff, sz)
+    if self[funcname] then
+        self[funcname](self, data) 
+    end
 
     local co = self._call_requests[op - 1]
     self._call_requests[op - 1] = nil
