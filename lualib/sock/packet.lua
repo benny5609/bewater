@@ -8,12 +8,12 @@ local core = require "packet.core"
 -- buff sz 要发送的数据和长度
 -- sock_buff sock_sz 缓冲区的数据和长度
 
-local HEADER_SIZE = 10
+local HEADER_SIZE = 8
 
 local M = {}
 function M.pack(opcode, csn, ssn, crypt_type, crypt_key, buff, sz)
     local total = sz + HEADER_SIZE
-    local data = core.new(total)
+    local data = core.new(total + 2)
     data:write_ushort(total)
     data:write_ushort(opcode)
     data:write_ushort(csn)
