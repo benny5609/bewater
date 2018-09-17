@@ -50,8 +50,7 @@ function M:send(op, tbl)
         data, len = packet.pack(op, self._csn, self._ssn, 
             self._crypt_type, self._crypt_key, buffer, bufferlen)
     end)
-	socket.write(self._fd, data, len + 2)
-    --skynet.sleep(1)
+	socket.write(self._fd, data, len)
 end
 
 function M:recv(op, csn, ssn, crypt_type, crypt_key, buff, sz)
