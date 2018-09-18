@@ -55,7 +55,7 @@ function on_message(url, args, body, header, ip)
         end) then
             ret = '{"err":3, "desc":"server traceback"}'
         end
-        return handler:pack(ret or "")
+        return handler:pack(ret or 0)
     else
         return '{"err":1, "desc":"api not exist"}'
     end
