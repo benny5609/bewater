@@ -2,10 +2,13 @@ local skynet = require "skynet"
 package.path = "?.lua;" .. package.path
 
 local function io_popen(cmd)
-    
+    local file = io.popen(cmd) 
+    local ret = file:read(mode or "*a")
+    file:close()
+    return ret
 end
 
-OS = io.popen('uname'):read("*l")
+OS = io_popen('uname', "*l")
 OS = (OS == 'Darwin') and 'osx' or (OS == 'Linux' and 'linux' or 'win32')
 
 function add_lua_search_path(path)
@@ -16,9 +19,7 @@ function add_lua_search_path(path)
 end
 
 function command(cmd, ...)
-    local file = io.popen(string.format(cmd, ...))
-    local data = file:read("*a")
-    file:close()
+    local data = io_popen(string.format(cmd, ...))
     return string.match(data, "(.*)[\n\r]+$") or data
 end
 
@@ -35,10 +36,7 @@ function realpath(path)
             return path
         end
     else
-        local file = io.popen('realpath ' .. path)
-        local data = file:read("*l")
-        file:close()
-        return data
+        return io_popen('realpath ' .. path)
     end
 end
 
@@ -59,10 +57,7 @@ function exist(path)
 end
 
 function wcat(path)
-    local file = io.popen("lynx -source " .. path)
-    local data = file:read("*a")
-    file:close()
-    return data
+    return io_popen("lynx -source " .. path)
 end
 
 function echo(path, content)
@@ -108,7 +103,7 @@ function bash(expr, ...)
     end
     local cmd = eval(expr)
     --skynet.error(cmd)
-    local ret = io.popen(cmd):read("*a")
+    local ret = io_popen(cmd)
     if ret ~= "" then
         --skynet.error(ret)
     end
