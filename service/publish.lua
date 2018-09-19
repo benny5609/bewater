@@ -10,6 +10,7 @@ local function publish(pconf, confname)
         skynet.error("请在开发模式下发布!")
         return 
     end
+    skynet.error("创建临时目录")
     bash "rm -rf ../tmp"
 
     local tmp = "../tmp/"..confname
@@ -51,23 +52,30 @@ local function publish(pconf, confname)
    
     if string.match(pconf.remote_host, "localhost") then
         -- 发布到本地
+        skynet.error("正在关闭远程服务器")
         bash("sh %s/kill.sh", pconf.remote_path)
         skynet.sleep(100)
         bash("mkdir -p %s", pconf.remote_path)
+        skynet.error("正在推送到远程服务器")
         bash("cp -r %s/* %s ", tmp, pconf.remote_path)
+        skynet.error("正在重新启动远程服务器")
         bash("sh %s/run.sh", pconf.remote_path)
     else
         -- 发布到远程
+        skynet.error("正在关闭远程服务器")
         bash("ssh -p %s %s sh %s/kill.sh", pconf.remote_port, pconf.remote_host, pconf.remote_path)
         skynet.sleep(100)
         bash("ssh -p %s %s mkdir -p %s", pconf.remote_port, pconf.remote_host, pconf.remote_path)
+        skynet.error("正在推送到远程服务器")
         bash("scp -rpB -P %s %s/* %s:%s ", pconf.remote_port, tmp, pconf.remote_host, pconf.remote_path)
+        skynet.error("正在重新启动远程服务器")
         bash("ssh -p %s %s sh %s/run.sh", pconf.remote_port, pconf.remote_host, pconf.remote_path)
         --bash('rsync -e "ssh -i ~/.ssh/id_rsa" -cvropg --copy-unsafe-links %s %s:%s', tmp, pconf.remote_host, pconf.remote_path)
     end
 
     -- 删除临时目录
     bash "rm -rf ../tmp"
+    skynet.error("发布完成")
 end
 
 skynet.start(function()

@@ -136,7 +136,8 @@ function M:_recv(sock_buff)
     local ssn       = data:read_ushort()
     local crypt_type= data:read_ubyte()
     local crypt_key = data:read_ubyte()
-    local sz        = total - 8
+    local sz        = total - 8 
+    print(total, #sock_buff)
     local buff      = data:read_bytes(sz)
     --local op, csn, ssn, crypt_type, crypt_key, buff, sz = packet.unpack(sock_buff)
     self._ssn = ssn
