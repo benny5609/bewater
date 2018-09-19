@@ -26,6 +26,7 @@ function M:ctor(proj)
 
     self._call_requests = {} -- op -> co
     self._waiting = {} -- co -> time
+    self._cache = ""
 end
 
 function M:login(acc)
@@ -55,7 +56,21 @@ function M:start(host, port)
                 self:offline()
                 return
             end
-            self:_recv(buff)
+            self._cache = self._cache .. buff
+            while true do
+                local cache = self._cache
+                if self._cache == "" then
+                    return
+                end
+                local sz = string.unpack(">H", cache)
+                if #cache < sz then
+                    return
+                end
+                local buff = string.sub(cache, 3, 2 + sz)
+                self._cache = string.sub(cache, 3 + sz, -1)
+                self:_recv(buff)
+            end
+
         end
     end)
  
@@ -130,14 +145,13 @@ end
 
 function M:_recv(sock_buff)
     local data      = packetc.new(sock_buff) 
-    local total     = data:read_ushort()
+    --local total     = data:read_ushort()
     local op        = data:read_ushort()
     local csn       = data:read_ushort()
     local ssn       = data:read_ushort()
     local crypt_type= data:read_ubyte()
     local crypt_key = data:read_ubyte()
-    local sz        = total - 8 
-    print(total, #sock_buff)
+    local sz        = #sock_buff - 8 
     local buff      = data:read_bytes(sz)
     --local op, csn, ssn, crypt_type, crypt_key, buff, sz = packet.unpack(sock_buff)
     self._ssn = ssn

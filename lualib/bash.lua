@@ -1,5 +1,10 @@
 local skynet = require "skynet"
 package.path = "?.lua;" .. package.path
+
+local function io_popen(cmd)
+    
+end
+
 OS = io.popen('uname'):read("*l")
 OS = (OS == 'Darwin') and 'osx' or (OS == 'Linux' and 'linux' or 'win32')
 
