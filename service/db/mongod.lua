@@ -35,16 +35,34 @@ end
 
 function CMD.update(name, query_tbl, update_tbl)
     update_tbl = util.num2str(update_tbl)
-    return db[name]:findAndModify({query = query_tbl, update = update_tbl})
+    local ok, err, r = db[name]:findAndModify({query = query_tbl, update = update_tbl})
+    if not ok then
+        skynet.error("mongo update error")
+        util.printdump(r)
+        error(err)
+    end
+    return true
 end
 
 function CMD.insert(name, tbl)
     tbl = util.num2str(tbl)
-    return db[name]:safe_insert(tbl)
+    local ok, err, r = db[name]:safe_insert(tbl)
+    if not ok then
+        skynet.error("mongo update error")
+        util.printdump(r)
+        error(err)
+    end
+    return true
 end
 
 function CMD.delete(name, query_tbl)
-    return db[name]:delete(query_tbl) 
+    local ok, err, r = db[name]:delete(query_tbl) 
+    if not ok then
+        skynet.error("mongo update error")
+        util.printdump(r)
+        error(err)
+    end
+    return true
 end
 
 function CMD.drop(name)
