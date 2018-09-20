@@ -51,7 +51,7 @@ local function publish(pconf, confname)
     bash("chmod 775 %s/kill.sh", tmp)
 
     -- 日志脚本
-    local str = string.format("sh %s/proj/%s/shell/log.sh %s", pconf.remote_path, projname, pconf.etcname)
+    local str = string.format("sh %s/proj/%s/shell/log.sh %s", pconf.remote_path, projname, pconf.clustername)
     bash("echo %s > %s/log.sh", str, tmp)
     bash("chmod 775 %s/log.sh", tmp)
 
