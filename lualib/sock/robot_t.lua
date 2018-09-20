@@ -60,11 +60,11 @@ function M:start(host, port)
             while true do
                 local cache = self._cache
                 if self._cache == "" then
-                    return
+                    break
                 end
                 local sz = string.unpack(">H", cache)
                 if #cache < sz then
-                    return
+                    break
                 end
                 local buff = string.sub(cache, 3, 2 + sz)
                 self._cache = string.sub(cache, 3 + sz, -1)
@@ -161,7 +161,7 @@ function M:_recv(sock_buff)
     local simplename = opcode.tosimplename(op)
     local funcname = modulename .. "_" .. simplename
     
-    --print(string.format("recv %s, csn:%d ssn:%d", opname, csn, ssn))
+    print(string.format("recv %s, csn:%d ssn:%d", opname, csn, ssn))
 
     local data = protobuf.decode(opname, buff, sz)
     if self[funcname] then

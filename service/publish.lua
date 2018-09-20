@@ -49,6 +49,12 @@ local function publish(pconf, confname)
     local str = string.format("sh %s/proj/%s/shell/kill.sh %s", pconf.remote_path, projname, pconf.etcname)
     bash("echo %s > %s/kill.sh", str, tmp)
     bash("chmod 775 %s/kill.sh", tmp)
+
+    -- 日志脚本
+    local str = string.format("sh %s/proj/%s/shell/log.sh %s", pconf.remote_path, projname, pconf.etcname)
+    bash("echo %s > %s/log.sh", str, tmp)
+    bash("chmod 775 %s/log.sh", tmp)
+
    
     if string.match(pconf.remote_host, "localhost") then
         -- 发布到本地
