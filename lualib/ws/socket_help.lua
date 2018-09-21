@@ -22,6 +22,15 @@ function sock_M:write(...)
    return socket.write(id,...)
 end
 
+function sock_M:abandon()
+    return socket.abandon(self.id)
+end
+
+function sock_M:start_id(id)
+    self.id = id
+    socket.start(id)
+end
+
 function sock_M:id(...)
    return self.id
 end

@@ -62,13 +62,16 @@ function CMD.reconnect(fd, uid, csn, ssn)
     if not player then
         return
     end
-    local old_fd = player.net:get_fd()
-    if player.net:reconnect(fd, csn, ssn) then
-        fd2player[old_fd] = nil
-        fd2player[fd] = player
-        return true
-    else
-        fd2player[fd] = nil
+    fd2player[player.net:get_fd()] = nil
+    --fd2player[fd] = player
+    return player.net:reconnect(fd, csn, ssn)
+end
+
+function CMD.kick(uid)
+    local player = uid2player[uid]
+    if player then
+        player:kick(errcode.KICK)
+        uid2player[uid] = nil
     end
 end
 

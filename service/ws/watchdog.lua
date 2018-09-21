@@ -60,6 +60,7 @@ end
 
 -- 上线后agent绑定uid，下线缓存一段时间
 function CMD.player_online(agent, uid)
+    CMD.kick(uid)
     uid2agent[uid] = agent
 end
 
@@ -72,13 +73,17 @@ end
 
 function CMD.reconnect(fd, uid, csn, ssn)
     local agent = uid2agent[uid] 
-    if agent and skynet.call(agent, "lua", "reconnect", fd, uid, csn, ssn) then
-        return agent
+    if agent then
+        return agent, skynet.call(agent, "lua", "reconnect", fd, uid, csn, ssn)
     end
 end
 
 function CMD.kick(uid)
-
+    local agent = uid2agent[uid]
+    if agent then
+        skynet.call(agent, "lua", "kick", uid)
+        uid2agent[uid] = nil
+    end
 end
 
 skynet.start(function()

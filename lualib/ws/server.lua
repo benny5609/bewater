@@ -119,6 +119,14 @@ function _M.new(id,handle,opts)
    return t1
 end
 
+function _M.abandon(self)
+    self.sock:abandon()
+end
+
+function _M.start_fd(self, id)
+    self.sock:start_id(id) 
+end
+
 function _M.recv_frame(self)
 
     local sock = self.sock

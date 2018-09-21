@@ -85,11 +85,11 @@ function M:call(op, data)
     self:send(op, data)
     local ret = coroutine.yield(op)
     local code = ret and ret.err
-    assert(code, string.format("opcode %s no errcode", opcode.toname(op)))
+    --[[assert(code, string.format("opcode %s no errcode", opcode.toname(op)))
     if code ~= 0 then
         skynet.error(string.format("call %s error:0x%x, desc:%s", 
             opcode.toname(op), code, errcode.describe(code)))
-    end
+    end]]
     return ret
 end
 

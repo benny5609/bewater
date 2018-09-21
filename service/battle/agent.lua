@@ -27,7 +27,7 @@ function CMD.call_battle(battle_id, cmd, ...)
     local battle = battles[battle_id]
     if not battle then
         print("battle not exist", battle_id)
-        return errcode.BattleNotExist
+        return errcode.BATTLE_NOT_EXIST
     end
     local f = assert(battle[cmd], cmd)
     return f(battle, ...)

@@ -20,15 +20,19 @@ function M:init(watchdog, agent, fd, ip)
     self._ip = assert(ip)
     self._csn = 0
     self._ssn = 0
+    self._ping_time = os.time()
 
     local handler = {}
     function handler.open()
+        self._ping_time = os.time()
     end
     function handler.text(t)
+        self._ping_time = os.time()
         self.send_type = "text"
         self:_recv_text(t)
     end
     function handler.binary(sock_buff)
+        self._ping_time = os.time()
         self.send_type = "binary"
         self:_recv_binary(sock_buff)
     end
@@ -38,6 +42,19 @@ function M:init(watchdog, agent, fd, ip)
         end
     end
     self._ws = ws_server.new(fd, handler)
+    skynet.fork(function()
+        while true do
+            skynet.sleep(100)
+            if os.time() - self._ping_time > 30 then
+                if self._ws then
+                    self._ws:send_close()
+                    self._ws.sock:close()
+                end
+                return
+                --self.player:offline()
+            end
+        end
+    end)
 end
 
 function M:call_watchdog(...)
@@ -50,6 +67,14 @@ end
 
 function M:get_fd()
     return self._fd
+end
+
+function M:get_csn()
+    return self._csn
+end
+
+function M:get_ssn()
+    return self._ssn
 end
 
 function M:send(...)
@@ -101,6 +126,7 @@ function M:_recv_binary(sock_buff)
     local modulename = opcode.tomodule(op)
     local simplename = opcode.tosimplename(op)
     self._csn = csn
+    self._ssn = ssn
 
     skynet.error(string.format("recv_binary %s %s %s", opname, op, #buff))
     local data = protobuf.decode(opname, buff)
@@ -125,15 +151,19 @@ function M:_recv_binary(sock_buff)
     self:send(op+1, ret)
 end
 
+function M:close()
+    self._ws.sock:close()
+end
 
 function M:reconnect(fd, csn, ssn)
     assert(fd and csn and ssn)
+    --self._ws:send_close()
+    self._ws.sock:close()
     if self._csn ~= csn or self._ssn ~= ssn then
-        return false
+        return errcode.RELOGIN, self.player:base_data()
+    else
+        return errcode.RECONNECTED, self.player:base_data()
     end
-    self._ws:send_close()
-    self:init(self._watchdog, self._agent, fd, self._ip)
-    return true
 end
 
 function M:get_agent()
