@@ -45,7 +45,7 @@ function M:init(watchdog, agent, fd, ip)
     skynet.fork(function()
         while true do
             skynet.sleep(100)
-            if os.time() - self._ping_time > 30 then
+            if os.time() - self._ping_time > 300 then
                 if self._ws then
                     self._ws:send_close()
                     self._ws.sock:close()

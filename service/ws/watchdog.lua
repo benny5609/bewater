@@ -60,7 +60,6 @@ end
 
 -- 上线后agent绑定uid，下线缓存一段时间
 function CMD.player_online(agent, uid)
-    CMD.kick(uid)
     uid2agent[uid] = agent
 end
 
