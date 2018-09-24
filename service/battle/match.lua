@@ -1,5 +1,9 @@
 local skynet        = require "skynet"
 local util          = require "util"
+local log           = require "log"
+
+local print         = log.print("match")
+local trace         = log.trace("match")
 
 local uid2info = {} -- uid -> info {uid, value, agent}
 local values = {} -- value -> uids
@@ -16,7 +20,7 @@ function CMD.init(mode, max_time, max_range)
 end
 
 function CMD.start(uid, value, agent)
-    --print("start match", uid, value)
+    print("start match", uid, value)
     if uid2info[uid] then
         skynet.error(uid, "is matching")
         return
@@ -32,6 +36,7 @@ function CMD.start(uid, value, agent)
 end
 
 function CMD.cancel(uid)
+    print("cancel match", uid)
     local info = uid2info[uid]
     if not info then
         skynet.error(uid, "not matching")
@@ -42,7 +47,10 @@ end
 
 -- 最粗暴的匹配算法
 local function update()
-    --print("match update")
+    if next(uid2info) then
+        print("match update")
+        print(util.dump(uid2info))
+    end
     local cur_time = os.time()
     for uid, info in pairs(uid2info) do
         local value = info.value
@@ -56,7 +64,7 @@ local function update()
             end
             for _, vs in pairs(list) do
                 for u, _ in pairs(vs) do
-                    if uid2info[u].ret < 0 and u ~= uid then
+                    if uid2info[u] and uid2info[u].ret < 0 and u ~= uid then
                         uid2info[u].ret = uid
                         info.ret = u
                         break
@@ -102,7 +110,9 @@ skynet.start(function()
 
     skynet.fork(function()
         while true do
-            update() 
+            util.try(function()
+                update() 
+            end)
             skynet.sleep(10)
         end
     end)
