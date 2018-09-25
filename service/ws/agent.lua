@@ -57,14 +57,13 @@ function CMD.socket_close(fd)
     fd2player[fd] = nil
 end
 
-function CMD.reconnect(fd, uid, csn, ssn)
+function CMD.reconnect(uid, csn, ssn)
     local player = uid2player[uid]
     if not player then
         return
     end
     fd2player[player.net:get_fd()] = nil
-    --fd2player[fd] = player
-    return player.net:reconnect(fd, csn, ssn)
+    return player.net:reconnect(csn, ssn)
 end
 
 function CMD.kick(uid)

@@ -70,10 +70,10 @@ function CMD.player_destroy(agent, uid)
     full_agents[agent] = false
 end
 
-function CMD.reconnect(fd, uid, csn, ssn)
+function CMD.reconnect(uid, csn, ssn)
     local agent = uid2agent[uid] 
     if agent then
-        return agent, skynet.call(agent, "lua", "reconnect", fd, uid, csn, ssn)
+        return agent, skynet.call(agent, "lua", "reconnect", uid, csn, ssn)
     end
 end
 

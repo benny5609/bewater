@@ -35,6 +35,14 @@ function CMD.start(uid, value, agent)
     values[value][uid] = os.time()
 end
 
+function CMD.reconnect(uid, agent)
+    local info = uid2info[uid]
+    if info then
+        info.agent = agent
+        return self.mode
+    end
+end
+
 function CMD.cancel(uid)
     print("cancel match", uid)
     local info = uid2info[uid]

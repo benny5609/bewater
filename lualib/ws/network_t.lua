@@ -155,8 +155,8 @@ function M:close()
     self._ws.sock:close()
 end
 
-function M:reconnect(fd, csn, ssn)
-    assert(fd and csn and ssn)
+function M:reconnect(csn, ssn)
+    assert(csn and ssn)
     --self._ws:send_close()
     self._ws.sock:close()
     if self._csn ~= csn or self._ssn ~= ssn then

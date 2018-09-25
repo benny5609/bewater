@@ -15,6 +15,11 @@ function CMD.match(mode, uid, value, agent)
     skynet.call(addr, "lua", "start", uid, value, agent)
 end
 
+function CMD.reconnect(mode, uid, agent)
+    local addr = assert(addrs[mode])
+    skynet.call(addr, "lua", "reconnect", uid, agent)
+end
+
 function CMD.cancel(mode, uid)
     local addr = assert(addrs[mode])
     skynet.call(addr, "lua", "cancel", uid)
