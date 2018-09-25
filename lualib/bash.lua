@@ -8,9 +8,6 @@ local function io_popen(cmd)
     return ret
 end
 
-OS = io_popen('uname', "*l")
-OS = (OS == 'Darwin') and 'osx' or (OS == 'Linux' and 'linux' or 'win32')
-
 function add_lua_search_path(path)
     if not string.find(package.path, path, 1, true) then
         print("add search path: " .. path)
@@ -21,23 +18,6 @@ end
 function command(cmd, ...)
     local data = io_popen(string.format(cmd, ...))
     return string.match(data, "(.*)[\n\r]+$") or data
-end
-
-function execute(cmd, ...)
-    local cmd = string.format(cmd, ...)
-    os.execute(cmd)
-end
-
-function realpath(path)
-    if not (OS == 'osx' or OS == 'linux') then
-        if path == '`pwd`' then
-            return '.'
-        else
-            return path
-        end
-    else
-        return io_popen('realpath ' .. path)
-    end
 end
 
 function cat(path)
