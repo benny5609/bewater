@@ -128,7 +128,9 @@ function M:_recv_binary(sock_buff)
     self._csn = csn
     self._ssn = ssn
 
-    skynet.error(string.format("recv_binary %s %s %s", opname, op, #buff))
+    if opname ~= "Login.c2s_ping" then
+        skynet.error(string.format("recv_binary %s %s %s", opname, op, #buff))
+    end
     local data = protobuf.decode(opname, buff)
     --util.printdump(data)
 

@@ -167,6 +167,10 @@ function M:_recv_binary(sock_buff)
     self._ssn = ssn
     
     local data = protobuf.decode(opname, buff, sz)
+    if data.err ~= 0 then
+        skynet.error(string.format("recv %s error:0x%x, desc:%s", 
+            opcode.toname(op), data.err, errcode.describe(data.err)))
+    end
     --util.printdump(data)
     self:_dispatch(op, data)
 end

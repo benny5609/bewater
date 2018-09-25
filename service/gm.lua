@@ -16,6 +16,8 @@ function CMD.add_gmcmd(modname, gmcmd_path)
 end
 
 function CMD.run(modname, cmd, ...)
+    modname = string.lower(modname)
+    cmd = string.lower(cmd)
     local mod = gmcmd[modname]
     if not mod then
         return string.format("模块[%s]未初始化", modname)

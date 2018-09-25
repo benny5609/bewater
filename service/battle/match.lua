@@ -56,8 +56,8 @@ end
 -- 最粗暴的匹配算法
 local function update()
     if next(uid2info) then
-        print("match update")
-        print(util.dump(uid2info))
+        print("matching")
+        --print(util.dump(uid2info))
     end
     local cur_time = os.time()
     for uid, info in pairs(uid2info) do
