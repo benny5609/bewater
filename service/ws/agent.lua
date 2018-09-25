@@ -36,6 +36,16 @@ function CMD.init(watchdog, max_count, proto)
     end
 end
 
+function CMD.stop()
+    for _, player in pairs(uid2player) do
+        util.try(function()
+            player:kick(errcode.SERVER_STOP)
+            player:offline() 
+        end)
+    end
+    skynet.call(WATCHDOG, "lua", "free_agent", skynet.self())
+end
+
 -- from player
 function CMD.player_online(uid, fd)
     local player = assert(fd2player[fd])

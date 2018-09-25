@@ -58,6 +58,34 @@ function CMD.start(conf)
     end)
 end
 
+function CMD.stop()
+    for agent, _ in pairs(free_agents) do
+        skynet.send(agent, "lua", "stop")
+    end
+    for agent, _ in pairs(full_agents) do
+        skynet.send(agent, "lua", "stop")
+    end
+    while true do
+        local count = 0
+        for _, v in pairs(free_agents) do
+            count = count + 1
+        end
+        for _, v in pairs(full_agents) do
+            count = count + 1
+        end
+        skynet.error(string.format("left agent:%d", count))
+        if count == 0 then
+            return
+        end
+        skynet.sleep(10)
+    end
+end
+
+function CMD.free_agent(agent)
+    free_agents[agent] = nil
+    full_agents[agent] = nil
+end
+
 -- 上线后agent绑定uid，下线缓存一段时间
 function CMD.player_online(agent, uid)
     uid2agent[uid] = agent
