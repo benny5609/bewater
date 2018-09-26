@@ -29,6 +29,13 @@ setmetatable(M, {
 
 -- 公网ip
 function M._pnet_addr()
+    if conf.host then
+        if conf.port then
+            return conf.host .. ":" .. conf.port
+        else
+            return conf.host
+        end
+    end
     local ret, resp = http.get('http://members.3322.org/dyndns/getip')
     local addr = string.gsub(resp, "\n", "")
     return addr
