@@ -35,7 +35,7 @@ function CMD.traceback(err)
     local str = string.format("服务器TRACEBACK\n项目:%s\n节点:%s\n公网ip:%s\n内网ip:%s\n进程:%s\n路径:%s\n自己上去看log，傻逼!",
         info.proj, info.clustername, info.pnet_addr, info.inet_addr, info.pid, path)
     --print(str)
-    --CMD.test(str) 
+    CMD.test(str) 
 end
 
 function CMD.node_dead(proj, clustername, pnet_addr, inet_addr, pid, cpu, mem)
@@ -59,16 +59,6 @@ function CMD.test(str)
     print(sh)
     bash(sh)
 
-end
-
-function CMD.get_userid(code)
-    local ret, resp = http.get(host.."/user/getuserinfo", {token = get_token(), code = code})
-    if ret then
-        local data = json.decode(resp)
-        return data.userid
-    else
-        skynet.error("userid")
-    end
 end
 
 skynet.start(function()

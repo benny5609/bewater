@@ -97,3 +97,7 @@ function skynet_cmd.publish(nodename)
     trace("publish:%s", nodename)
     skynet.newservice("publish", nodename) 
 end
+
+function skynet_cmd.alert()
+    error("test alert")
+end
