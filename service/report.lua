@@ -1,4 +1,4 @@
--- 向monitor节点报告本节点性能，状态等
+-- 向monitor节点报告本节点性能，状态等(已废置)
 --
 local skynet = require "skynet"
 local cluster = require "skynet.cluster"
