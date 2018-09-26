@@ -60,6 +60,7 @@ function CMD.player_online(uid, fd)
     uid2player[uid] = player
 end
 
+-- from player
 function CMD.free_player(uid)
     uid2player[uid] = nil
     if count == MAX_COUNT then
