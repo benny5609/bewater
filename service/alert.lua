@@ -42,7 +42,7 @@ local function send_traceback()
             content = str,
         } 
     }, host, token)
-    print(sh)
+    --print(sh)
     bash(sh)
     
 end
