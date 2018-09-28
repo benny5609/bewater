@@ -55,8 +55,10 @@ local function next_time(now, ti)
         if t < now.time then
             if ti.month then
                 nt.year = nt.year + 1   -- next year
-            else
+            elseif ti.day then
                 nt.month = nt.month + 1 -- next month
+            else
+                nt.day = nt.day + 1     -- next day
             end
         end
     end
