@@ -1,12 +1,12 @@
 -- 向monitor节点报告本节点性能，状态等(已废置)
 --
-local skynet = require "skynet"
-local cluster = require "skynet.cluster"
-local info = require "clusterinfo"
-local conf = require "conf"
-local util = require "util"
-local log = require "log"
-local print = log.print("report")
+local skynet    = require "skynet"
+local cluster   = require "skynet.cluster"
+local info      = require "util.clusterinfo"
+local conf      = require "conf"
+local util      = require "util"
+local log       = require "log"
+local print     = log.print("report")
 
 require "bash"
 

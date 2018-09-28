@@ -51,7 +51,7 @@ function M:c2s_all_service()
 end
 
 function M:c2s_node_config()
-    local info = require "clusterinfo"
+    local info = require "util.clusterinfo"
     local profile = info.profile
     return {
         proj = conf.proj,

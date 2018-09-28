@@ -25,7 +25,7 @@ end
 local count = 0 -- 一分钟内累计报错次数
 local last = 0  -- 上次报错时间
 local function send_traceback()
-    local info = require "clusterinfo"
+    local info = require "util.clusterinfo"
     local path = string.format("%s/log/%s.log", info.workspace, skynet.getenv("clustername") or "error")
     local str = string.format("服务器TRACEBACK\n项目:%s\n节点:%s\n公网ip:%s\n内网ip:%s\n进程:%s\n路径:%s\n累计报错:%d次",
         conf.desc or conf.proj, info.clustername, info.pnet_addr, info.inet_addr, info.pid, path, count)

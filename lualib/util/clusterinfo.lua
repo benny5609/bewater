@@ -2,9 +2,9 @@
 -- 访问方式 clusterinfo.xxx or clusterinfo.get_xxx()
 --
 local skynet = require "skynet"
-local http = require "web.http_helper"
-local conf = require "conf"
-local util = require "util"
+local http   = require "web.http_helper"
+local conf   = require "conf"
+local util   = require "util"
 require "bash"
 
 local M = {}
