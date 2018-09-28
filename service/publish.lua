@@ -3,13 +3,14 @@ local conf = require "conf"
 local util = require "util"
 require "bash"
 
-local nodename = ...
+local nodename = require "publish.nodename"
 
 local function publish(pconf, confname)
     if conf.remote_host then
         skynet.error("请在开发模式下发布!")
         return 
     end
+    skynet.error("正在发布"..confname)
     skynet.error("创建临时目录")
     bash "rm -rf ../tmp"
 
@@ -60,7 +61,7 @@ local function publish(pconf, confname)
         -- 发布到本地
         skynet.error("正在关闭远程服务器")
         bash("sh %s/kill.sh", pconf.remote_path)
-        skynet.sleep(100)
+        skynet.sleep(200)
         bash("mkdir -p %s", pconf.remote_path)
         skynet.error("正在推送到远程服务器")
         bash("cp -r %s/* %s ", tmp, pconf.remote_path)
@@ -70,13 +71,12 @@ local function publish(pconf, confname)
         -- 发布到远程
         skynet.error("正在关闭远程服务器")
         bash("ssh -p %s %s sh %s/kill.sh", pconf.remote_port, pconf.remote_host, pconf.remote_path)
-        skynet.sleep(100)
+        skynet.sleep(200)
         bash("ssh -p %s %s mkdir -p %s", pconf.remote_port, pconf.remote_host, pconf.remote_path)
         skynet.error("正在推送到远程服务器")
         bash("scp -rpB -P %s %s/* %s:%s ", pconf.remote_port, tmp, pconf.remote_host, pconf.remote_path)
         skynet.error("正在重新启动远程服务器")
         bash("ssh -p %s %s sh %s/run.sh", pconf.remote_port, pconf.remote_host, pconf.remote_path)
-        --bash('rsync -e "ssh -i ~/.ssh/id_rsa" -cvropg --copy-unsafe-links %s %s:%s', tmp, pconf.remote_host, pconf.remote_path)
     end
 
     -- 删除临时目录
@@ -85,15 +85,14 @@ local function publish(pconf, confname)
 end
 
 skynet.start(function()
-    if nodename then
-        local pconf = require("publish."..nodename)
-        publish(pconf, nodename)
-    else
-        local ret = bash("cd %s/script/publish && ls", conf.workspace) 
+    if nodename == "all" then
+        local ret = bash("cd %s/script/publish/conf && ls", conf.workspace) 
         for filename in string.gmatch(ret, "([^\n]+).lua") do
-            local pconf = require("publish."..filename)
+            local pconf = require("publish.conf."..filename)
             publish(pconf, filename)
         end
-
+    else
+        local pconf = require("publish.conf."..nodename)
+        publish(pconf, nodename)
     end
 end)

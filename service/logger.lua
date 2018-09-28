@@ -3,10 +3,10 @@
 -- 玩家log分uid存，一天一份日志
 --
 
-local skynet = require "skynet.manager"
-local date_helper = require "date_helper"
-local conf = require "conf"
-local sname = require "sname"
+local skynet        = require "skynet.manager"
+local date_helper   = require "util.date_helper"
+local conf          = require "conf"
+local sname         = require "sname"
 require "bash"
 
 local errfile = io.open(string.format("%s/log/%s.log", 

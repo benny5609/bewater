@@ -63,7 +63,7 @@ local function update()
     for uid, info in pairs(uid2info) do
         local value = info.value
         if cur_time - values[value][uid] > MAX_TIME then
-            info.ret = skynet.call("usercenter", "lua", "create_robot") -- 这个服务需要自定义
+            info.ret = skynet.call("usercenter", "lua", "create_robot", value) -- 这个服务需要自定义
         else
             local list = {values[value]}
             for i = 1, MAX_RANGE do
@@ -121,7 +121,7 @@ skynet.start(function()
             util.try(function()
                 update() 
             end)
-            skynet.sleep(10)
+            skynet.sleep(100)
         end
     end)
 end)

@@ -1,5 +1,5 @@
 local skynet = require "skynet"
-local def = require "def"
+local def    = require "def"
 
 local assert = assert
 local os = os

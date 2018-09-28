@@ -31,6 +31,9 @@ function _M.new(id,handle,opts)
       return nil , "not valid protocol"
    end
    local req  = wbproto.parse(str.."\r\n\r\n")
+   if not req then
+        return nil, "bad req"
+   end
    local headers = req.headers
    local val = headers.Upgrade or headers.upgrade
    if type(val) == "table" then

@@ -6,7 +6,7 @@ local conf   = require "conf"
 local log    = require "log"
 local json   = require "cjson"
 
-local print  = log.print("print")
+local print  = log.print("alert")
 local trace  = log.trace("alert")
 require "bash"
 
@@ -74,7 +74,7 @@ function CMD.test(str)
             content = str,
         } 
     }, host, token)
-    print(sh)
+    --print(sh)
     bash(sh)
 
 end

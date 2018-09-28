@@ -84,6 +84,16 @@ function CMD.kick(uid)
     end
 end
 
+function CMD.online_count()
+    local count = 0
+    for _, player in pairs(uid2player) do
+        if not player.cache_time then
+            count = count + 1
+        end
+    end
+    return count
+end
+
 skynet.start(function()
     skynet.dispatch("lua", function(_, _, arg1, arg2, arg3, ...)
         local conf = require "conf"

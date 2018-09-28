@@ -95,7 +95,7 @@ end
 function CMD.player_destroy(agent, uid)
     uid2agent[uid] = nil
     free_agents[agent] = true
-    full_agents[agent] = false
+    full_agents[agent] = nil
 end
 
 function CMD.reconnect(uid, csn, ssn)
@@ -111,6 +111,17 @@ function CMD.kick(uid)
         skynet.call(agent, "lua", "kick", uid)
         uid2agent[uid] = nil
     end
+end
+
+function CMD.online_count()
+    local count = 0
+    for v, _ in pairs(free_agents) do
+        count = count + skynet.call(v, "lua", "online_count")
+    end
+    for v, _ in pairs(full_agents) do
+        count = count + skynet.call(v, "lua", "online_count")
+    end
+    return count
 end
 
 skynet.start(function()

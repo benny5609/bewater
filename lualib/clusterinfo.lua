@@ -29,6 +29,13 @@ setmetatable(M, {
 
 -- 公网ip
 function M._pnet_addr()
+    if conf.remote_host then
+        if conf.remote_port then
+            return conf.remote_host .. ":" .. conf.remote_port
+        else
+            return conf.remote_host
+        end
+    end
     if conf.host then
         if conf.port then
             return conf.host .. ":" .. conf.port
