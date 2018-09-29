@@ -33,7 +33,7 @@ local function next_time(now, ti)
         day = now.day,
         hour = ti.hour or 0,
         min = ti.min or 0,
-        sec = ti.sec,
+        sec = ti.sec or 0,
     }
     if ti.wday then
         -- set week
@@ -70,13 +70,9 @@ local function changetime(ti)
     local ct = math.floor(skynet.time())
     local current = os.date("*t", ct)
     current.time = ct
-    if not ti.hour then
-        ti.hour = current.hour
-    end
-    if not ti.min then
-        ti.min = current.min
-    end
-    ti.sec = current.sec
+    ti.hour = ti.hour or current.hour
+    ti.min = ti.min or current.min
+    ti.sec = ti.sec or current.sec
     local nt = next_time(current, ti)
     skynet.error(string.format("Change time to %s", os.date(nil, nt)))
     task.difftime = os.difftime(nt,ct)
@@ -85,7 +81,7 @@ local function changetime(ti)
             skynet.wakeup(v.co)
         end
     end
-    skynet.ret()
+    skynet.ret(skynet.pack(nt))
 end
 
 local function submit(_, addr, ti)

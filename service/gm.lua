@@ -1,7 +1,9 @@
-local skynet    = require "skynet"
-local cluster   = require "skynet.cluster"
-local util      = require "util"
-local log       = require "log"
+local skynet        = require "skynet"
+local cluster       = require "skynet.cluster"
+local log           = require "log"
+local schedule      = require "schedule"
+local util          = require "util"
+local date_helper   = require "util.date_helper"
 
 local trace = log.trace("gm")
 
@@ -101,3 +103,16 @@ end
 function skynet_cmd.alert()
     error("test alert")
 end
+
+function skynet_cmd.time(...)
+    trace("gm time")
+    local args = table.pack(...)
+    local t = {}
+    for i = 1, #args, 2 do
+        t[args[i]] = tonumber(args[i+1])
+    end
+    util.printdump(t)
+    local cur = schedule.changetime(t)
+    return string.format("时间修改至 %s", date_helper.format(cur))
+end
+

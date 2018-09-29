@@ -6,6 +6,27 @@ local os = os
 
 local M = {}
 
+function M.format(t)
+    local str = os.date("%Y-%m-%d %H:%M:%S %w", t)
+    return string.gsub(str, "%d$", function(c)
+        if c == "0" then
+            return "星期日"
+        elseif c == "1" then
+            return "星期一"
+        elseif c == "2" then
+            return "星期二"
+        elseif c == "3" then
+            return "星期三"
+        elseif c == "4" then
+            return "星期四"
+        elseif c == "5" then
+            return "星期五"
+        elseif c == "6" then
+            return "星期六"
+        end
+    end)
+end
+
 function M.hour()
     return os.date("*t", os.time()).hour
 end
