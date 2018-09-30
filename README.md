@@ -126,3 +126,19 @@ gm.add_gmcmd("test_module", "test_cmd")
         proto = conf.workspace.."script/def/proto/package.pb", -- pb文件路径
         send_type = "text", -- websock类型 text/binary
     })
+
+## 发布到远程服务器
+在项目的script/publish/conf目录下创建需要发布的配置，克隆一份conf，修改部分参数，运行shell/publish.sh进行发布，具体参照share节点
+
+## 活动日程
+schedule是一个专门负责定时执行的服务，调试方便，特别适合做活动开放的日程  
+```
+skynet.fork(function()
+    while true do
+        schedule.submit({mon = 10, day = 1})
+        -- todo 国庆活动
+        skynet.sleep(100)
+    end
+end)
+schedule.changetime({mon = 9, day = 30, hour = 23, min = 59, sec = 59})
+```
