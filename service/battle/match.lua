@@ -87,8 +87,11 @@ local function update()
 
     for uid, info in pairs(uid2info) do
         if info.ret >= 0 then
-            local id1 = uid
-            local id2 = info.ret
+            -- 随机位置
+            local list = {uid, info.ret}
+            local r = math.random(2)
+            local id1 = list[r]
+            local id2 = list[r==1 and 2 or 1]
             if uid2info[id1] then
                 util.try(function()
                     skynet.call(uid2info[id1].agent, "lua", id1, "battle", "matched", MODE, id2)
