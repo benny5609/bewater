@@ -90,10 +90,14 @@ local function update()
             local id1 = uid
             local id2 = info.ret
             if uid2info[id1] then
-                skynet.call(uid2info[id1].agent, "lua", id1, "battle", "matched", MODE, id2)
+                util.try(function()
+                    skynet.call(uid2info[id1].agent, "lua", id1, "battle", "matched", MODE, id2)
+                end)
             end
             if uid2info[id2] then
-                skynet.call(uid2info[id2].agent, "lua", id2, "battle", "matched", MODE, id1)
+                util.try(function()
+                    skynet.call(uid2info[id2].agent, "lua", id2, "battle", "matched", MODE, id1)
+                end)
             end
             -- 创建战斗
             local battle_id, battle_agent = skynet.call("battlecenter", "lua", "create_battle")
