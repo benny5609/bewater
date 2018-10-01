@@ -6,6 +6,7 @@ local service_addr
 
 -- { month=, day=, wday=, hour= , min= }
 function schedule.submit(ti)
+    assert(ti)
     return skynet.call(service_addr, "lua", ti)
 end
 
@@ -16,6 +17,12 @@ function schedule.changetime(ti)
     end
     tmp.changetime = true
     return skynet.call(service_addr, "lua", tmp)
+end
+
+-- curtime
+function schedule.time()
+    local difftime = skynet.call(service_addr, "lua")    
+    return skynet.time() + difftime
 end
 
 skynet.init(function()
@@ -85,6 +92,9 @@ local function changetime(ti)
 end
 
 local function submit(_, addr, ti)
+    if not ti then
+        return skynet.ret(skynet.pack(task.difftime))
+    end
     if ti.changetime then
         return changetime(ti)
     end
