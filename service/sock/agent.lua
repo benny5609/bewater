@@ -69,13 +69,13 @@ function CMD.free_player(uid)
     count = count - 1
 end
 
-function CMD.reconnect(fd, uid)
+function CMD.reconnect(fd, uid, csn, ssn, passport)
     local player = uid2player[uid]
     if not player then
         return
     end
     local old_fd = player.net:get_fd()
-    if player.net:reconnect(fd) then
+    if player.net:reconnect(fd, csn, ssn, passport) then
         fd2player[old_fd] = nil
         fd2player[fd] = player
         return true

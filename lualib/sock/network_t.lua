@@ -44,7 +44,9 @@ function M:call_agent(...)
 end
 
 function M:send(op, tbl) 
-    self._ssn = self._ssn + 1
+    if opcode.has_session(op) then
+        self._ssn = self._ssn + 1
+    end
     local data, len
     protobuf.encode(opcode.toname(op), tbl, function(buffer, bufferlen)
         data, len = packet.pack(op, self._csn, self._ssn, 
@@ -81,14 +83,32 @@ function M:recv(op, csn, ssn, crypt_type, crypt_key, buff, sz)
     self:send(op+1, ret)
 end
 
-function M:reconnect(fd)
+function M:close()
     skynet.call(self._gate, "lua", "kick", self._fd)
+end
+
+function M:reconnect(fd, csn, ssn, passport)
+    self:close()
     self._fd = fd
+    self.player.login.passport = passport
+    if csn == self._csn and ssn == self._ssn then
+        self.player.login:reconnect()
+    else
+        self.player.login:relogin()
+    end
     return true
 end
 
 function M:get_fd()
     return self._fd
+end
+
+function M:get_csn()
+    return self._csn
+end
+
+function M:get_ssn()
+    return self._ssn
 end
 
 function M:get_agent()

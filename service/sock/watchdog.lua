@@ -97,6 +97,7 @@ end
 
 -- 上线后agent绑定uid，下线缓存一段时间
 function CMD.player_online(agent, uid, fd)
+    print("&&&&&& player_online", uid)
     uid2agent[uid] = agent
     fd2uid[fd] = uid
 end
@@ -108,9 +109,12 @@ function CMD.free_player(agent, uid)
     full_agents[agent] = false
 end
 
-function CMD.reconnect(fd, uid)
+function CMD.reconnect(fd, uid, csn, ssn, passport)
+    assert(fd)
+    assert(uid)
+    assert(csn and ssn)
     local agent = uid2agent[uid] 
-    if agent and skynet.call(agent, "lua", "reconnect", fd, uid) then
+    if agent and skynet.call(agent, "lua", "reconnect", fd, uid, csn, ssn, passport) then
         return agent
     end
 end
