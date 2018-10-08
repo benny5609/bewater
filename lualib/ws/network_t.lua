@@ -21,19 +21,19 @@ function M:init(watchdog, agent, fd, ip)
     self._ip = assert(ip)
     self._csn = 0
     self._ssn = 0
-    self._ping_time = os.time()
+    self._ping_time = skynet.time()
 
     local handler = {}
     function handler.open()
-        self._ping_time = os.time()
+        self._ping_time = skynet.time()
     end
     function handler.text(t)
-        self._ping_time = os.time()
+        self._ping_time = skynet.time()
         self.send_type = "text"
         self:_recv_text(t)
     end
     function handler.binary(sock_buff)
-        self._ping_time = os.time()
+        self._ping_time = skynet.time()
         self.send_type = "binary"
         self:_recv_binary(sock_buff)
     end
@@ -157,7 +157,9 @@ function M:_recv_binary(sock_buff)
 end
 
 function M:close()
-    self._ws.sock:close()
+    if self._ws then
+        self._ws.sock:close()
+    end
 end
 
 function M:reconnect(csn, ssn)
