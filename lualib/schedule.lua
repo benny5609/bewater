@@ -107,7 +107,7 @@ local function submit(_, addr, ti)
         local nt = next_time(current, ti)
         task[session] = { time = nt, co = coroutine.running(), address = addr }
         local diff = os.difftime(nt , ct)
-        print("sleep", diff)
+        --print("sleep", diff)
     until skynet.sleep(diff * 100) ~= "BREAK"
     task[session] = nil
     skynet.ret()

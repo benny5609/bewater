@@ -3,6 +3,7 @@ local socket    = require "skynet.socket"
 local ws_server = require "ws.server"
 local class     = require "class"
 local util      = require "util"
+local def       = require "def"
 local opcode    = require "def.opcode"
 local errcode   = require "def.errcode"
 local protobuf  = require "protobuf"
@@ -42,19 +43,16 @@ function M:init(watchdog, agent, fd, ip)
         end
     end
     self._ws = ws_server.new(fd, handler)
-    skynet.fork(function()
-        while true do
-            skynet.sleep(100)
-            if os.time() - self._ping_time > 300 then
-                if self._ws then
-                    self._ws:send_close()
-                    self._ws.sock:close()
-                end
-                return
-                --self.player:offline()
-            end
+end
+
+function M:check_timeout()
+    if skynet.time() - self._ping_time > def.PING_TIMEOUT and self._ws then
+        if self._ws then
+            self._ws:send_close()
+            self._ws.sock:close()
         end
-    end)
+        self._ws = nil
+    end
 end
 
 function M:call_watchdog(...)
@@ -88,6 +86,9 @@ function M:send(...)
 end
 
 function M:_send_text(op, msg) -- 兼容text
+    if not self._ws then
+        return
+    end
     self._ws:send_text(json.encode({
         op  = op,
         msg = msg,
@@ -95,14 +96,16 @@ function M:_send_text(op, msg) -- 兼容text
 end
 
 function M:_send_binary(op, tbl)
+    if not self._ws then
+        return
+    end
     local data = protobuf.encode(opcode.toname(op), tbl or {})
     --print("send", #data)
     -- self._ws:send_binary(string.pack(">Hs2", op, data))
     if opcode.has_session(op) then
         self._ssn = self._ssn + 1
     end
-    self._ws:send_binary(string.pack(">HHH", op, self._csn, self._ssn)..data)
-end
+    self._ws:send_binary(string.pack(">HHH", op, self._csn, self._ssn)..data) end
 
 function M:_recv_text(t)
     local data = json.decode(t)

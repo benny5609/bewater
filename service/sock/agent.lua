@@ -85,7 +85,9 @@ end
 local function check_timeout()
     for _, player in pairs(uid2player) do
         if player.check_timeout then
-            player:check_timeout()
+            util.try(function()
+                player:check_timeout()
+            end)
         end
     end
 end

@@ -94,6 +94,16 @@ function CMD.online_count()
     return count
 end
 
+local function check_timeout()
+    for _, player in pairs(uid2player) do
+        if player.check_timeout then
+            util.try(function()
+                player:check_timeout()
+            end)
+        end
+    end
+end
+
 skynet.start(function()
     skynet.dispatch("lua", function(_, _, arg1, arg2, arg3, ...)
         local conf = require "conf"
@@ -108,6 +118,14 @@ skynet.start(function()
             else
                 util.ret(module[arg3](module, ...))
             end
+        end
+    end)
+
+    -- 定时检查超时，一秒误差，如需要精准的触发，使用日程表schedule
+    skynet.fork(function()
+        while true do 
+            check_timeout()           
+            skynet.sleep(100)
         end
     end)
 end)
