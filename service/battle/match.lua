@@ -39,7 +39,7 @@ function CMD.reconnect(uid, agent)
     local info = uid2info[uid]
     if info then
         info.agent = agent
-        return self.mode
+        return MODE
     end
 end
 
