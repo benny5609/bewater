@@ -3,6 +3,7 @@ local class     = require "class"
 local socket    = require "skynet.socket"
 local packet    = require "sock.packet"
 local util      = require "util"
+local def       = require "def"
 local opcode    = require "def.opcode"
 local errcode   = require "def.errcode"
 local protobuf  = require "protobuf"
@@ -24,6 +25,14 @@ function M:init(watchdog, gate, agent, fd, ip)
     self._crypt_key = 0
     self._crypt_type = 0
     self._token = nil
+    self._ping_time = skynet.time()
+end
+
+function M:check_timeout()
+    if skynet.time() - self._ping_time > def.PING_TIMEOUT and self._fd then
+        self:close() 
+        --self.player:offline()
+    end
 end
 
 function M:create_token()
@@ -56,6 +65,8 @@ function M:send(op, tbl)
 end
 
 function M:recv(op, csn, ssn, crypt_type, crypt_key, buff, sz)
+    self._ping_time = skynet.time()
+
     local opname = opcode.toname(op)
     local modulename = opcode.tomodule(op)
     local simplename = opcode.tosimplename(op)
@@ -85,6 +96,7 @@ end
 
 function M:close()
     skynet.call(self._gate, "lua", "kick", self._fd)
+    self._fd = nil
 end
 
 function M:reconnect(fd, csn, ssn, passport)
