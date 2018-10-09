@@ -47,26 +47,22 @@ function M.calc_last_weektime( cur_time, cur_date )
     end
 end
 
-function M.is_sameday(time1, time2)
+function M.is_sameday(time1, time2, zero_point)
+    zero_point = zero_point or 0
     assert(time1 and time2)
 
-    local def = require "def"
-    local ZERO_POINT = def.ZERO_POINT
-
-    time1 = time1 + (8 - ZERO_POINT) * 3600 -- 东八区
-    time2 = time2 + (8 - ZERO_POINT) * 3600
+    time1 = time1 + (8 - zero_point) * 3600 -- 东八区
+    time2 = time2 + (8 - zero_point) * 3600
 
     return  time1 // (60 * 60 * 24) == time2 // (60 * 60 * 24)
 end
 
-function M.is_sameweek(time1, time2)
+function M.is_sameweek(time1, time2, zero_point)
+    zero_point = zero_point or 0
     assert(time1 and time2)
 
-    local def = require "def"
-    local ZERO_POINT = def.ZERO_POINT
-
-    time1 = time1 + (8 - ZERO_POINT) * 3600 -- 东八区
-    time2 = time2 + (8 - ZERO_POINT) * 3600
+    time1 = time1 + (8 - zero_point) * 3600 -- 东八区
+    time2 = time2 + (8 - zero_point) * 3600
 
     return os.date("%Y%W", time1) == os.date("%Y%W", time2)
 end
@@ -87,35 +83,37 @@ function M.get_time_today(time, h)
     return os.time(todayTime)
 end
 
-function M.get_today_zero(cur_time)
+function M.get_today_zero(cur_time, zero_point)
+    zero_point = zero_point or 0
     cur_time = cur_time or os.time()
 
     local def = require "def"
     local t = os.date("*t", cur_time)
-    if t.hour < def.ZERO_POINT then
+    if t.hour < zero_point then
         t = os.date("*t", cur_time-24*3600)
     end
     local zero_date = {  year    = t.year, 
                         month   = t.month , 
                         day     = t.day, 
-                        hour    = def.ZERO_POINT,
+                        hour    = zero_point,
                         min     = 0,
                         sec     = 0,}
     return os.time(zero_date)
 end
 
-function M.get_next_zero(cur_time)
+function M.get_next_zero(cur_time, zero_point)
+    zero_point = zero_point or 0
     cur_time = cur_time or os.time()
 
     local def = require "def"
     local t = os.date("*t", cur_time)
-    if t.hour >= def.ZERO_POINT then
+    if t.hour >= zero_point then
         t = os.date("*t", cur_time + 24*3600)
     end
     local zero_date = {  year   = t.year, 
                         month   = t.month , 
                         day     = t.day, 
-                        hour    = def.ZERO_POINT,
+                        hour    = zero_point,
                         min     = 0,
                         sec     = 0,}
     return os.time(zero_date)

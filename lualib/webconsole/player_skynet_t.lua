@@ -55,7 +55,7 @@ function M:c2s_node_config()
     local profile = info.profile
     return {
         proj = conf.proj,
-        clustername = conf.cluster.name,
+        clustername = conf.cluster and conf.cluster.name,
         pnet_addr = info.pnet_addr,
         inet_addr = info.inet_addr,
         pid = info.pid,
@@ -71,12 +71,18 @@ end
 
 function M:c2s_get_blacklist()
     trace("get_blacklist")
+    if not conf.redis then
+        return {list = "请配置redis数据库"}
+    end
     local list = require "ip.blacklist"
     return {list = table.concat(list.list(), "\n")}
 end
 
 function M:c2s_set_blacklist(data)
     trace("set_blacklist")
+    if not conf.redis then
+        return {list = "请配置redis数据库"}
+    end
     local list = require "ip.blacklist"
     list.clear()
     for ip in string.gmatch(data.list, "[^\n]+") do
@@ -87,12 +93,18 @@ end
 
 function M:c2s_get_whitelist()
     trace("get_blacklist")
+    if not conf.redis then
+        return {list = "请配置redis数据库"}
+    end
     local list = require "ip.whitelist"
     return {list = table.concat(list.list(), "\n")}
 end
 
 function M:c2s_set_whitelist(data)
     trace("set_blacklist")
+    if not conf.redis then
+        return {list = "请配置redis数据库"}
+    end
     local list = require "ip.whitelist"
     list.clear()
     for ip in string.gmatch(data.list, "[^\n]+") do
