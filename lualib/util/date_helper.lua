@@ -1,5 +1,4 @@
 local skynet = require "skynet"
-local def    = require "def"
 
 local assert = assert
 local os = os
@@ -51,6 +50,7 @@ end
 function M.is_sameday(time1, time2)
     assert(time1 and time2)
 
+    local def = require "def"
     local ZERO_POINT = def.ZERO_POINT
 
     time1 = time1 + (8 - ZERO_POINT) * 3600 -- 东八区
@@ -62,6 +62,7 @@ end
 function M.is_sameweek(time1, time2)
     assert(time1 and time2)
 
+    local def = require "def"
     local ZERO_POINT = def.ZERO_POINT
 
     time1 = time1 + (8 - ZERO_POINT) * 3600 -- 东八区
@@ -89,6 +90,7 @@ end
 function M.get_today_zero(cur_time)
     cur_time = cur_time or os.time()
 
+    local def = require "def"
     local t = os.date("*t", cur_time)
     if t.hour < def.ZERO_POINT then
         t = os.date("*t", cur_time-24*3600)
@@ -105,6 +107,7 @@ end
 function M.get_next_zero(cur_time)
     cur_time = cur_time or os.time()
 
+    local def = require "def"
     local t = os.date("*t", cur_time)
     if t.hour >= def.ZERO_POINT then
         t = os.date("*t", cur_time + 24*3600)

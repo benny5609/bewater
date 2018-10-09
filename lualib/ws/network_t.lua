@@ -164,8 +164,7 @@ end
 
 function M:reconnect(csn, ssn)
     assert(csn and ssn)
-    --self._ws:send_close()
-    self._ws.sock:close()
+    self:close()
     if self._csn ~= csn or self._ssn ~= ssn then
         return errcode.RELOGIN, self.player:base_data()
     else
