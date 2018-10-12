@@ -6,7 +6,7 @@ local print         = log.print("match")
 local trace         = log.trace("match")
 
 local uid2info = {} -- uid -> info {uid, value, agent}
-local values = {} -- value -> uids
+local values = {}   -- value -> uids
 
 local MODE       -- 匹配模式
 local MAX_TIME   -- 匹配时长
@@ -128,7 +128,7 @@ skynet.start(function()
             util.try(function()
                 update() 
             end)
-            skynet.sleep(100)
+            skynet.sleep(50)
         end
     end)
 end)
