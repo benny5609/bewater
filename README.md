@@ -1,5 +1,5 @@
 # skynet通用模块
-  方便多个项目一起维护，支持sock,web,websock，目前已经应用到多款小游戏和app中，有兴趣的童鞋一起交流呗，QQ:1013299930
+  方便多个项目一起维护，支持sock,web,websock，目前已经应用到多款小游戏和app中，有兴趣的童鞋一起交流呗。QQ:1013299930
 # 项目结构
 ```
 common(通用模块,本仓库) https://github.com/zhandouxiaojiji/common.git
