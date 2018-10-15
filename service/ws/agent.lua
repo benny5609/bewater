@@ -62,8 +62,10 @@ end
 
 -- from watchdog
 function CMD.socket_close(fd)
-    local player = assert(fd2player[fd])
-    player:offline()
+    local player = fd2player[fd]
+    if player and player.offline then
+        player:offline()
+    end
     fd2player[fd] = nil
 end
 
@@ -90,6 +92,22 @@ function CMD.online_count()
         if not player.cache_time then
             count = count + 1
         end
+    end
+    return count
+end
+
+function CMD.debug_fd2player()
+    local count = 0
+    for k, v in pairs(fd2player) do
+        count = count + 1
+    end
+    return count
+end
+
+function CMD.debug_uid2player()
+    local count = 0
+    for k, v in pairs(uid2player) do
+        count = count + 1
     end
     return count
 end

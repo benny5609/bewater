@@ -55,7 +55,7 @@ function M:c2s_node_config()
     local profile = info.profile
     return {
         proj = conf.proj,
-        clustername = conf.cluster and conf.cluster.name,
+        desc = conf.desc,
         pnet_addr = info.pnet_addr,
         inet_addr = info.inet_addr,
         pid = info.pid,

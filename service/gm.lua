@@ -55,6 +55,16 @@ skynet.start(function()
     end)
 end)
 
+function skynet_cmd.gc()
+    skynet.call(".launcher", "lua", "GC")
+end
+
+function skynet_cmd.call(addr, ...)
+    addr = tonumber(addr, 16) or assert(addr)
+    print("call", addr, ...)
+    return skynet.call(addr, "lua", ...)
+end
+
 function skynet_cmd.list()
     local list = {}
     local all = skynet.call(".launcher", "lua", "LIST")

@@ -55,7 +55,7 @@ function M.get_inet_addr()
 end
 
 function M.get_run_time()
-
+    return skynet.time()
 end
 
 -- 进程pid
