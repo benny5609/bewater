@@ -54,7 +54,11 @@ function CMD.start(conf)
         if not agent then
             agent = create_agent()
         end
-        skynet.call(agent, "lua", "new_player", fd, addr)
+        if skynet.call(agent, "lua", "new_player", fd, addr) then
+            -- agent已经满
+            free_agents[agent] = nil
+            full_agents[agent] = true
+        end
     end)
 end
 
@@ -79,6 +83,11 @@ function CMD.stop()
         end
         skynet.sleep(10)
     end
+end
+
+function CMD.set_free(agent)
+    free_agents[agent] = true
+    full_agents[agent] = nil
 end
 
 function CMD.free_agent(agent)

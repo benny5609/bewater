@@ -8,6 +8,8 @@ local opcode    = require "def.opcode"
 local errcode   = require "def.errcode"
 local protobuf  = require "protobuf"
 local json      = require "cjson"
+local log       = require "log"
+local print     = log.print("network_t")
 
 local M = class("network_t")
 function M:ctor(player)
