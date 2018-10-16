@@ -56,12 +56,12 @@ function M:next()
     --self:dump()
 end
 
-function M:timeout(expire, cb)
+function M:delay(expire, cb)
     assert(type(expire) == "number")
     assert(type(cb) == "function")
     
     local node = {
-        ti = skynet.time() + expire/100,
+        ti = skynet.time() + expire,
         cb = cb,
     }
 
