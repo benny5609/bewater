@@ -31,7 +31,6 @@ end
 function M:check_timeout()
     if skynet.time() - self._ping_time > def.PING_TIMEOUT and self._fd then
         self:close() 
-        --self.player:offline()
     end
 end
 

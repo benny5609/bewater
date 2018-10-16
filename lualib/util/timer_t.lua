@@ -1,5 +1,6 @@
 local skynet = require "skynet"
 local class = require "class"
+local util = require "util"
 
 local M = class("timer_t")
 function M:ctor()
@@ -15,7 +16,11 @@ function M:destroy()
     self._cancel = nil
 end
 
-function M:cancelable_timeout(ti, func)
+function M:cancelable_timeout(delta, func)
+    if delta <= 0 then
+        func()
+        return
+    end
     local function cb()
         if func then
             func()
@@ -24,14 +29,16 @@ function M:cancelable_timeout(ti, func)
     local function cancel()
         func = nil
     end
-    skynet.timeout(ti * 100, cb)
+    skynet.timeout(delta*100//1, cb)
     return cancel
 end
 
 function M:start()
     assert(self._top)
-    self._cancel = cancelable_timeout(self._top.ti - skynet.time(), function()
-        self._top.cb()
+    self._cancel = self:cancelable_timeout(self._top.ti - skynet.time(), function()
+        util.try(function()
+            self._top.cb()
+        end)
         self:next()
     end)
 end
@@ -41,10 +48,12 @@ function M:cancel()
 end
 
 function M:next()
+    --print("next")
     self._top = self._top.next
     if self._top then
         self:start()
     end
+    --self:dump()
 end
 
 function M:timeout(expire, cb)
@@ -52,7 +61,7 @@ function M:timeout(expire, cb)
     assert(type(cb) == "function")
     
     local node = {
-        ti = skynet.time() + expire,
+        ti = skynet.time() + expire/100,
         cb = cb,
     }
 
@@ -69,7 +78,7 @@ function M:timeout(expire, cb)
             local cur = self._top
             local prev
             while cur do 
-                if cur.ti <= node.ti then
+                if prev and prev.ti <= node.ti and cur.ti > node.ti then
                     if prev then
                         prev.next = node
                     end
@@ -79,9 +88,19 @@ function M:timeout(expire, cb)
                 prev = cur
                 cur = cur.next
             end
-            cur.next = node
+            prev.next = node
         end
     end
+end
+
+function M:dump()
+    local str = ""
+    local cur = self._top
+    while cur do
+        str = str .. "," .. cur.ti
+        cur = cur.next
+    end
+    --print("timer:"..str)
 end
 
 return M
