@@ -1,8 +1,7 @@
 local skynet = require "skynet"
-local class = require "class"
 local util = require "util"
 
-local M = class("timer_t")
+local M = {}
 function M:ctor()
     self._top = nil
     self._cancel = nil
@@ -103,5 +102,9 @@ function M:dump()
     --print("timer:"..str)
 end
 
-return M
+local timer = {}
+function timer.create()
+     return setmetatable({}, {__index = M})
+end
+return timer
 
