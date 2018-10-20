@@ -15,6 +15,8 @@ proj
         script(项目的逻辑脚本)
     monitor(监视节点) https://github.com/zhandouxiaojiji/monitor.git
     share(数据共享节点) https://github.com/zhandouxiaojiji/share.git
+    backup(备份节点) https://github.com/zhandouxiaojiji/backup.git
+    test(测试节点) https://github.com/zhandouxiaojiji/test.git
     
 生成项目的脚本:common/tools/workspace.sh
 ```
