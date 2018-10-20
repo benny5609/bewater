@@ -90,7 +90,7 @@ db/mongod     访问mongo
 db/redisd     访问redis
 db/mysqld     访问mysql
 web/webclient http客户端，支持http/https, GET/POST
-web/webclient http服务端，支持http(不支持https，需要nginx转发), GET/POST
+web/webserver http服务端，支持http(不支持https，需要nginx转发), GET/POST
 ws/watchdog   websocket侦听服务(不支持wss，需要nginx转发)
 ws/agent      websocket消息代理，多个玩家共享，可配置
 sock/watchdog socket侦听服务
