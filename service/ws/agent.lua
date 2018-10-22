@@ -129,7 +129,12 @@ skynet.start(function()
         if f then
             util.ret(f(arg2, arg3, ...))
         else
-            local player = assert(uid2player[arg1], string.format("%s %s %s", arg1, arg2, arg3))
+            --local player = assert(uid2player[arg1], string.format("%s %s %s", arg1, arg2, arg3))
+            local player = uid2player[arg1]
+            if not player then
+                -- todo fix this bug
+                return util.ret()
+            end
             local module = assert(player[arg2], arg2)
             if type(module) == "function" then
                 util.ret(module(player, arg3, ...))
