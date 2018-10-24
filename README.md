@@ -144,3 +144,17 @@ skynet.fork(function()
 end)
 schedule.changetime({mon = 9, day = 30, hour = 23, min = 59, sec = 59})
 ```
+
+## 定时器
+skynet的timeout本身不支持取消，而且每个timeout都会新建一条协程，但是游戏通常需要用大量的定时器。所以我对根据云风大神建议对skynet的timeout进行了封装，以单向链表的数据结构记录时间和回调。timer库可以创建大量的定时器，销毁也比较方便，最好是在同个虚拟机或者单个玩家的对象只挂一个timer，这样比较省资源，也比较方便管理。后续会参照日程表schedule加入修改系统时间的方法，让调试更加方便。
+```
+local timer = require "timer"
+local ti = timer.create()
+ti.delay(1, function()
+    -- todo timeout
+end)
+ti.delay(5.5, function()
+    -- todo timeout
+end)
+ti.destroy()
+```
