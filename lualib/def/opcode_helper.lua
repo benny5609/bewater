@@ -7,7 +7,7 @@ local opcode = {}
 local code2name = {}
 local code2module = {}
 local code2simplename = {}
-local code2no_session = {}
+local code2session = {}
 local code2urlrequest = {}
 
 local NOSESSION = true
@@ -24,7 +24,7 @@ local function REG(code, message_name, urlrequest, no_session)
     namespace[string.match(message_name, "[%w_]+$")] = code
     code2name[code] = message_name
     code2urlrequest[code] = urlrequest
-    code2no_session[code] = no_session 
+    code2session[code] = no_session 
     code2module[code] = string.lower(string.match(message_name, "^[^.]+"))
     code2simplename[code] = string.match(message_name, "[^.]+$")
 end
@@ -43,7 +43,7 @@ function opcode.tosimplename(code)
 end
 
 function opcode.has_session(code)
-    return not code2no_session[code]
+    return code2session[code]
 end
 
 function opcode.urlrequest(code)
