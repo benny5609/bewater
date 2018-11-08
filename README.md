@@ -2,7 +2,7 @@
   方便多个项目一起维护，支持sock,web,websock，目前已经应用到多款小游戏、重度手游，还有app中，有兴趣的童鞋一起交流呗。QQ:1013299930
 # 项目结构
 ```
-common(通用模块,本仓库) https://github.com/zhandouxiaojiji/common.git
+water(通用模块,本仓库) https://github.com/zhandouxiaojiji/water.git
     luaclib(编译好的c库)
     lualib-src(c库源码)
     lualib(lua库)
@@ -18,13 +18,13 @@ proj
     backup(备份节点) https://github.com/zhandouxiaojiji/backup.git
     test(测试节点) https://github.com/zhandouxiaojiji/test.git
     
-生成项目的脚本:common/tools/workspace.sh
+生成项目的脚本:water/tools/workspace.sh
 ```
 # 配置
 ```
 mkdir workspace
 cd workspace
-git clone https://github.com/zhandouxiaojiji/common.git
+git clone https://github.com/zhandouxiaojiji/water.git
 git clone https://github.com/zhandouxiaojiji/skynet.git
 mkdir proj #项目目录，参考monitor和share
 cd skynet && make linux
@@ -37,8 +37,8 @@ sh etc.sh monitor monitor monitor #生成启动配置, etc.sh [配置名] [启�
 ```
 # 脚本与库检索优先级
 ```
-项目>common>skynet
-这三个目录下都有luaclib,lualib-src,lualib,service这几个目录，skynet的所有代码不作改动，通用的写到common
+项目>water>skynet
+这三个目录下都有luaclib,lualib-src,lualib,service这几个目录，skynet的所有代码不作改动，通用的写到water
 脚本放到项目下script
 ```
 
