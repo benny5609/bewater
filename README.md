@@ -1,13 +1,13 @@
 # skynet通用模块
-  方便多个项目一起维护，支持sock,web,websock，目前已经应用到多款小游戏、重度手游，还有app中，有兴趣的童鞋一起交流呗。QQ:1013299930
+  方便多个项目一起维护，支持sock,web,websock，目前已经应用到多款小游戏、重度手游、app、web服务等。
 # 项目结构
 ```
-water(通用模块,本仓库) https://github.com/zhandouxiaojiji/water.git
+bewater(通用模块,本仓库) https://github.com/zhandouxiaojiji/bewater.git
     luaclib(编译好的c库)
     lualib-src(c库源码)
     lualib(lua库)
     service(通用服务)
-skynet(fork skynet项目，不作任何改动)
+skynet(fork skynet项目，不作任何改动) https://github.com/zhandouxiaojiji/skynet.git  
 proj
     xxgame(你的项目)
         lualib(项目lua库)
@@ -18,13 +18,13 @@ proj
     backup(备份节点) https://github.com/zhandouxiaojiji/backup.git
     test(测试节点) https://github.com/zhandouxiaojiji/test.git
     
-生成项目的脚本:water/tools/workspace.sh
+生成项目的脚本:bewater/tools/workspace.sh
 ```
 # 配置
 ```
 mkdir workspace
 cd workspace
-git clone https://github.com/zhandouxiaojiji/water.git
+git clone https://github.com/zhandouxiaojiji/bewater.git
 git clone https://github.com/zhandouxiaojiji/skynet.git
 mkdir proj #项目目录，参考monitor和share
 cd skynet && make linux
@@ -37,8 +37,8 @@ sh etc.sh monitor monitor monitor #生成启动配置, etc.sh [配置名] [启�
 ```
 # 脚本与库检索优先级
 ```
-项目>water>skynet
-这三个目录下都有luaclib,lualib-src,lualib,service这几个目录，skynet的所有代码不作改动，通用的写到water
+项目>bewater>skynet
+这三个目录下都有luaclib,lualib-src,lualib,service这几个目录，skynet的所有代码不作改动，通用的写到bewater
 脚本放到项目下script
 ```
 
@@ -158,3 +158,5 @@ ti.delay(5.5, function()
 end)
 ti.destroy()
 ```
+## 关于bewater
+Be water My friend 是在我心目中浩气长存的伟大武术家李小龙先生已经解释过啦，如果你想更加了解多点的话，不妨加我QQ啦。(1013299930)
