@@ -20,6 +20,7 @@ proj
     
 生成项目的脚本:bewater/tools/workspace.sh
 ```
+项目结构可以参照[bewater_sample](https://github.com/zhandouxiaojiji/bewater_sample)，或者以第三方库的形式引入你的项目。
 # 配置
 ```
 mkdir workspace
@@ -159,4 +160,4 @@ end)
 ti.destroy()
 ```
 ## 关于bewater
-Be water My friend 是在我心目中浩气长存的伟大武术家李小龙先生已经解释过啦，如果你想更加了解多点的话，不妨加我QQ啦。(1013299930)
+Be water My friend 是在我心目中浩气长存的伟大武术家李小龙先生已经解释过啦，如果你想更加了解多点的话，不妨一起探讨一下。(QQ:1013299930)
