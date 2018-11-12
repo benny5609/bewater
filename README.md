@@ -1,6 +1,7 @@
 # skynet通用模块
   方便多个项目一起维护，支持sock,web,websock，目前已经应用到多款小游戏、重度手游、app、web服务等。
 # 项目结构
+项目结构可以参照[bewater_sample](https://github.com/zhandouxiaojiji/bewater_sample)，或者以第三方库的形式引入你的项目。
 ```
 bewater(通用模块,本仓库) https://github.com/zhandouxiaojiji/bewater.git
     luaclib(编译好的c库)
@@ -20,7 +21,6 @@ proj
     
 生成项目的脚本:bewater/tools/workspace.sh
 ```
-项目结构可以参照[bewater_sample](https://github.com/zhandouxiaojiji/bewater_sample)，或者以第三方库的形式引入你的项目。
 # 配置
 ```
 mkdir workspace
