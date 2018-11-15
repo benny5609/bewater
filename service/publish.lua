@@ -15,13 +15,13 @@ local function publish(pconf, confname)
     bash "rm -rf ../tmp"
 
     local tmp = "../tmp/"..confname
-    local common = "../common"
+    local bewater = "../bewater"
     local projname = string.match(bash("cd %s && pwd", conf.workspace), "(%w+)\n")
     local proj = tmp.."/proj/"..projname
     bash("mkdir -p %s", tmp)    
-    bash("cd %s && mkdir -p skynet common proj/%s", tmp, projname)
+    bash("cd %s && mkdir -p skynet bewater proj/%s", tmp, projname)
     bash("cp -r skynet luaclib lualib service cservice %s/skynet", tmp)
-    bash("cp -r %s/lualib %s/luaclib %s/service %s/common", common, common, common, tmp)
+    bash("cp -r %s/lualib %s/luaclib %s/service %s/bewater", bewater, bewater, bewater, tmp)
     bash("cp -r %s/etc %s/script %s/service %s/shell %s", 
         conf.workspace, conf.workspace, conf.workspace, conf.workspace, proj)
 

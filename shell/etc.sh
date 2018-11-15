@@ -35,10 +35,10 @@ echo start = \"${start_script}\" >> ${config}
 echo 'bootstrap = "snlua bootstrap"' >> ${config}
 echo 'lualoader = "lualib/loader.lua"' >> ${config}
 echo 'snax = workspace.."service/?.lua"' >> ${config}
-echo 'luaservice = workspace.."service/?.lua;"..workspace.."../../common/service/?.lua;".."./service/?.lua;".."./liblua/?.lua;"' >> ${config}
+echo 'luaservice = workspace.."service/?.lua;"..workspace.."../../bewater/service/?.lua;".."./service/?.lua;".."./liblua/?.lua;"' >> ${config}
 echo 'cpath = workspace.."luaclib/?.so;"..workspace.."../../luaclib/?.so;".."./cservice/?.so;./luaclib/?.so"' >> ${config}
-echo 'lua_path = workspace.."script/?.lua;"..workspace.."lualib/?.lua;"..workspace.."../../common/lualib/?.lua;".."./lualib/?.lua;"' >> ${config}
-echo 'lua_cpath = workspace.."luaclib/?.so;"..workspace.."../../common/luaclib/?.so;".."./luaclib/?.so;"'  >> ${config}
+echo 'lua_path = workspace.."script/?.lua;"..workspace.."lualib/?.lua;"..workspace.."../../bewater/lualib/?.lua;".."./lualib/?.lua;"' >> ${config}
+echo 'lua_cpath = workspace.."luaclib/?.so;"..workspace.."../../bewater/luaclib/?.so;".."./luaclib/?.so;"'  >> ${config}
 echo logger = \"logger\" >> ${config}
 echo logservice = \"snlua\" >> ${config}
 
