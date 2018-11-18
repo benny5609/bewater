@@ -3,7 +3,7 @@ local http = require "web.http_helper"
 local json = require "cjson"
 local util = require "util"
 local M = {}
-function M.verify_receipt(receipt)
+function M.verify_receipt(receipt, product_id)
     --receipt = base64.decode(receipt)
     local ret, resp = http.post("https://buy.itunes.apple.com/verifyReceipt", receipt)
     resp = json.decode(resp)
@@ -15,11 +15,14 @@ function M.verify_receipt(receipt)
     if not ret or resp.status ~= 0 then
         return
     end
-
-    local tid = resp.receipt.in_app[1].original_transaction_id
-    --local item_sn = resp.receipt.in_app[1].product_id
-    local item_sn = 1000
-    return tid, item_sn 
+    if not product_id then
+        return resp.receipt.in_app[1].original_transaction_id
+    end
+    for i, v in pairs(resp.receipt.in_app) do
+        if v.product_id == product_id then
+            return v.original_transaction_id 
+        end
+    end
 end
 return M
 

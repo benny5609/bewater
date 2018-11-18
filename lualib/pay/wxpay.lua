@@ -90,9 +90,9 @@ function M.notify(order, key, param)
     end
     
     if param.result_code ~= "SUCCESS" or param.return_code ~= "SUCCESS" then
-        order.item_state = -1
+        --order.item_state = -1
     else
-        order.item_state = 1
+        --order.item_state = 1
         order.pay_time = os.time()
         order.tid = param.transaction_id
     end
