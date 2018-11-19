@@ -41,7 +41,8 @@ end
 
 function on_message(url, args, body, header, ip)
     local auth = header.authorization
-    if handler.api[url] then
+    local api = handler.api[url]
+    if api then
         local ret, data = util.try(function()
             return handler:unpack(body, url)
         end)
@@ -49,11 +50,14 @@ function on_message(url, args, body, header, ip)
             return '{"err":2, "desc":"body error"}'
         end
         local ret = 0
+        local uid = handler.auth and handler.auth(handler, auth)
+        if api.auth and not uid then
+            return nil, 403
+        end
         if not util.try(function()
-            local uid = handler.auth and handler.auth(handler, auth)
-            ret = handler.api[url](handler, args, data, uid, ip, header)
+            ret = api.cb(handler, args, data, uid, ip, header)
         end) then
-            ret = '{"err":3, "desc":"server traceback"}'
+        ret = '{"err":3, "desc":"server traceback"}'
         end
         return handler:pack(ret or 0)
     else
@@ -82,7 +86,12 @@ skynet.start(function()
                     data = urllib.parse_query(query)
                 end
                 ip = header['x-real-ip'] or string.match(ip, "[^:]+")
-                response(fd, code, on_message(url, data, body, header, ip), {["Access-Control-Allow-Origin"] = "*"})
+                local resp, errcode = on_message(url, data, body, header, ip)
+                if errcode then
+                    response(fd, errcode)
+                    return
+                end
+                response(fd, code, resp, {["Access-Control-Allow-Origin"] = "*"})
             end
         else
             if url == sockethelper.socket_error then
