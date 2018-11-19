@@ -51,13 +51,13 @@ function M:call_agent(...)
     return skynet.call(self._agent, "lua", ...)
 end
 
-function M:send(op, tbl) 
+function M:send(op, tbl, csn) 
     if opcode.has_session(op) then
         self._ssn = self._ssn + 1
     end
     local data, len
     protobuf.encode(opcode.toname(op), tbl, function(buffer, bufferlen)
-        data, len = packet.pack(op, self._csn, self._ssn, 
+        data, len = packet.pack(op, csn or 0, self._ssn, 
             self._crypt_type, self._crypt_key, buffer, bufferlen)
     end)
 	socket.write(self._fd, data, len)
@@ -90,7 +90,7 @@ function M:recv(op, csn, ssn, crypt_type, crypt_key, buff, sz)
     else
         ret = {err = ret} 
     end 
-    self:send(op+1, ret)
+    self:send(op+1, ret, csn)
 end
 
 function M:close()

@@ -9,6 +9,7 @@ local conf          = require "conf"
 local whitelist     = require "ip.whitelist"
 local blacklist     = require "ip.blacklist"
 local hotfix        = require "hotfix"
+local errcode       = require "def.errcode"
 
 local table = table
 local string = string
@@ -52,7 +53,7 @@ function on_message(url, args, body, header, ip)
         local ret = 0
         local uid = handler.auth and handler.auth(handler, auth)
         if api.auth and not uid then
-            return nil, 403
+            ret = string.format('{"err":%d}', errcode.AUTH_FAIL)
         end
         if not util.try(function()
             ret = api.cb(handler, args, data, uid, ip, header)
@@ -75,7 +76,7 @@ skynet.start(function()
         -- limit request body size to 8192 (you can pass nil to unlimit)
         local code, url, method, header, body = httpd.read_request(sockethelper.readfunc(fd), nil)
         --util.printdump(header)
-        --print(string.format("recv code:%s, url:%s, method:%s, header:%s, body:%s", code, url, method, header, body))
+        skynet.error(string.format("recv code:%s, url:%s, method:%s, header:%s, body:%s", code, url, method, header, body))
         if code then
             if code ~= 200 then
                 response(fd, code)
@@ -86,12 +87,7 @@ skynet.start(function()
                     data = urllib.parse_query(query)
                 end
                 ip = header['x-real-ip'] or string.match(ip, "[^:]+")
-                local resp, errcode = on_message(url, data, body, header, ip)
-                if errcode then
-                    response(fd, errcode)
-                    return
-                end
-                response(fd, code, resp, {["Access-Control-Allow-Origin"] = "*"})
+                response(fd, code, on_message(url, data, body, header, ip), {["Access-Control-Allow-Origin"] = "*"})
             end
         else
             if url == sockethelper.socket_error then
