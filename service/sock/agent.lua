@@ -82,6 +82,14 @@ function CMD.reconnect(fd, uid, csn, ssn, passport)
     end
 end
 
+function CMD.kick(uid)
+    local player = uid2player[uid]
+    if player then
+        player:kickout()
+        uid2player[uid] = nil
+    end
+end
+
 local function check_timeout()
     for _, player in pairs(uid2player) do
         if player.check_timeout then

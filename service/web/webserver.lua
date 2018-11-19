@@ -53,7 +53,7 @@ function on_message(url, args, body, header, ip)
         local ret = 0
         local uid = handler.auth and handler.auth(handler, auth)
         if api.auth and not uid then
-            ret = string.format('{"err":%d}', errcode.AUTH_FAIL)
+            return string.format('{"err":%d}', errcode.AUTH_FAIL)
         end
         if not util.try(function()
             ret = api.cb(handler, args, data, uid, ip, header)
@@ -76,7 +76,7 @@ skynet.start(function()
         -- limit request body size to 8192 (you can pass nil to unlimit)
         local code, url, method, header, body = httpd.read_request(sockethelper.readfunc(fd), nil)
         --util.printdump(header)
-        skynet.error(string.format("recv code:%s, url:%s, method:%s, header:%s, body:%s", code, url, method, header, body))
+        skynet.error(string.format("recv code:%s, url:%s, method:%s, header:%s", code, url, method, header))
         if code then
             if code ~= 200 then
                 response(fd, code)

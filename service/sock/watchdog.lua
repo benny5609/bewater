@@ -119,6 +119,15 @@ function CMD.reconnect(fd, uid, csn, ssn, passport)
     end
 end
 
+function CMD.kick(uid)
+    local agent = uid2agent[uid]
+    if agent then
+        skynet.call(agent, "lua", "kick", uid)
+        uid2agent[uid] = nil
+    end
+end
+
+
 skynet.start(function()
 	skynet.dispatch("lua", function(session, source, cmd, subcmd, ...)
         if cmd == "socket" then
