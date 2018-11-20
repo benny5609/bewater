@@ -1,5 +1,5 @@
-local skynet  = require "skynet"
-local cluster = require "skynet.cluster"
+local Skynet  = require "skynet"
+local Cluster = require "skynet.cluster"
 
 local M = {}
 setmetatable(M, {__index = function(t, k)
@@ -8,7 +8,7 @@ setmetatable(M, {__index = function(t, k)
         return v
     else
         return function(...)
-            return cluster.call("share", "passport", k, ...)
+            return Cluster.call("share", "passport", k, ...)
         end
     end
 end})
