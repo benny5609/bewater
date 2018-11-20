@@ -101,10 +101,26 @@ local function check_timeout()
 end
 
 skynet.start(function()
-	skynet.dispatch("lua", function(_,_, command, ...)
-		local f = assert(CMD[command])
-		util.ret(f(...))
-	end)
+    skynet.dispatch("lua", function(_, _, arg1, arg2, arg3, ...)
+        local conf = require "conf"
+        local f = CMD[arg1]
+        if f then
+            util.ret(f(arg2, arg3, ...))
+        else
+            --local player = assert(uid2player[arg1], string.format("%s %s %s", arg1, arg2, arg3))
+            local player = uid2player[arg1]
+            if not player then
+                -- todo fix this bug
+                return util.ret()
+            end
+            local module = assert(player[arg2], arg2)
+            if type(module) == "function" then
+                util.ret(module(player, arg3, ...))
+            else
+                util.ret(module[arg3](module, ...))
+            end
+        end
+    end)
 
     -- 定时检查超时，一秒误差，如需要精准的触发，使用日程表schedule
     skynet.fork(function()

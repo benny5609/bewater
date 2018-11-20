@@ -110,7 +110,7 @@ function M:operate(uid, code, ...)
     end
     if player.agent then
         local ret = Util.try(function()
-            cluster.call(player.cname, player.agent, uid, "operate", "operate", code, table.unpack(params))
+            Cluster.call(player.cname, player.agent, uid, "operate", "operate", code, table.unpack(params))
             player.time = os.time()
             self:save_player(uid)
         end)
