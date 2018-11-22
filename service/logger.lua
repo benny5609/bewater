@@ -3,20 +3,20 @@
 -- 玩家log分uid存，一天一份日志
 --
 
-local skynet        = require "skynet.manager"
-local date_helper   = require "util.date_helper"
-local conf          = require "conf"
-local sname         = require "sname"
+local Skynet        = require "skynet.manager"
+local DateHelper    = require "util.date_helper"
+local Conf          = require "conf"
+local Sname         = require "sname"
 require "bash"
 
 local errfile = io.open(string.format("%s/log/%s.log", 
-    conf.workspace, conf.clustername or "error"), "w+")
+    Conf.workspace, Conf.clustername or "error"), "w+")
 
 local function write_log(file, addr, str)
     local str = string.format("[%08x][%s] %s", addr, os.date("%Y-%m-%d %H:%M:%S", os.time()), str) 
     if string.match(str, "\n(%w+ %w+)") == "stack traceback" then
-        if conf.alert and conf.alert.enable then
-            skynet.send(sname.ALERT, "lua", "traceback", str)
+        if Conf.alert and Conf.alert.enable then
+            Skynet.send(Sname.ALERT, "lua", "traceback", str)
         end
     end
 
@@ -33,13 +33,13 @@ local CMD = {}
 function CMD.trace(addr, sys, str)
     local str = string.format("[%s] %s", sys, str) 
     local log = logs[sys]
-    if not log or date_helper.is_sameday(os.time(), log.last_time) then
+    if not log or DateHelper.is_sameday(os.time(), log.last_time) then
         if log then
             log.file:close()
         end
-        bash("mkdir -p %s/log/%s", conf.workspace, sys)
+        bash("mkdir -p %s/log/%s", Conf.workspace, sys)
         local filename = string.format("%s/log/%s/%s.log", 
-            conf.workspace, sys, os.date("%Y%m%d", os.time()))
+            Conf.workspace, sys, os.date("%Y%m%d", os.time()))
         local file = io.open(filename, "a+")
         log = {file = file}
         logs[sys] = log
@@ -53,14 +53,14 @@ end
 function CMD.player(addr, uid, str)
     local str = string.format("[%d] %s", uid, str) 
     local log = logs[uid]
-    if not log or date_helper.is_sameday(os.time(), log.last_time) then
+    if not log or DateHelper.is_sameday(os.time(), log.last_time) then
         if log then
             log.file:close()
         end
         local dir = string.format("%d/%d/%d", uid//1000000, uid%1000000//1000, uid%1000)
-        bash("mkdir -p %s/log/player/%s", conf.workspace, dir)
+        bash("mkdir -p %s/log/player/%s", Conf.workspace, dir)
         local filename = string.format("%s/log/player/%s/%s.log", 
-            conf.workspace, dir, os.date("%Y%m%d", os.time()))
+            Conf.workspace, dir, os.date("%Y%m%d", os.time()))
         local file = io.open(filename, "a+")
         log = {file = file}
         logs[uid] = log
@@ -77,38 +77,38 @@ function CMD.register_sighup(addr)
     sighup_addr = addr
 end
 
-skynet.register_protocol {
+Skynet.register_protocol {
     name = "text",
-    id = skynet.PTYPE_TEXT,
-    unpack = skynet.tostring,
+    id = Skynet.PTYPE_TEXT,
+    unpack = Skynet.tostring,
     dispatch = function(_, addr, str)
         write_log(errfile, addr, str) 
     end
 }
 
 -- 捕捉sighup信号(kill -1)
-skynet.register_protocol {
+Skynet.register_protocol {
     name = "SYSTEM",
-    id = skynet.PTYPE_SYSTEM,
+    id = Skynet.PTYPE_SYSTEM,
     unpack = function(...) return ... end,
     dispatch = function(...)
         -- reopen signal
         if sighup_addr then
-            skynet.send(sighup_addr, "lua", "SIGHUP")
+            Skynet.send(sighup_addr, "lua", "SIGHUP")
         else
-            skynet.error("handle SIGHUP, skynet will be stop")
-            skynet.abort()
+            Skynet.error("handle SIGHUP, skynet will be stop")
+            Skynet.abort()
         end
     end
 }
 
-skynet.start(function()
-    skynet.register ".logger"
-    skynet.dispatch("lua", function(_, _, cmd, ...)
+Skynet.start(function()
+    Skynet.register ".logger"
+    Skynet.dispatch("lua", function(_, _, cmd, ...)
         assert(CMD[cmd], cmd)(...)
         -- no return, don't call this service, use send
     end)
-    skynet.fork(function()
+    Skynet.fork(function()
         while true do
             local cur_time = os.time()
             for k, v in pairs(logs) do
@@ -117,7 +117,7 @@ skynet.start(function()
                     logs[k] = nil
                 end
             end
-            skynet.sleep(100)
+            Skynet.sleep(100)
         end
     end)
 end)

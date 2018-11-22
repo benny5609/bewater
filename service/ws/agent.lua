@@ -1,49 +1,46 @@
-local skynet        = require "skynet"
-local socket        = require "skynet.socket"
-local json          = require "cjson"
-local util          = require "util"
-local opcode        = require "def.opcode"
-local errcode       = require "def.errcode"
-local protobuf      = require "protobuf"
+local Skynet        = require "skynet"
+local Socket        = require "skynet.socket"
+local Util          = require "util"
+local Errcode       = require "def.errcode"
+local Protobuf      = require "protobuf"
 
 local player_path   = ...
-local player_t      = require(player_path)
+local Player        = require(player_path)
 
 local WATCHDOG
 local MAX_COUNT
 
-local send_type -- text/binary
 local CMD = {}
 local fd2player = {}
 local uid2player = {}
-local count = 0
+local player_count = 0
 
 
 function CMD.new_player(fd, ip)
-    socket.start(fd)
-    local player = player_t.new()
-    player.net:init(WATCHDOG, skynet.self(), fd, ip)
+    Socket.start(fd)
+    local player = Player.new()
+    player.net:init(WATCHDOG, Skynet.self(), fd, ip)
     fd2player[fd] = player
-    count = count + 1
-    return count >= MAX_COUNT
+    player_count = player_count + 1
+    return player_count >= MAX_COUNT
 end
 
 function CMD.init(watchdog, max_count, proto)
     WATCHDOG = assert(watchdog)
     MAX_COUNT = max_count or 100
     if proto then
-        protobuf.register_file(proto)
+        Protobuf.register_file(proto)
     end
 end
 
 function CMD.stop()
     for _, player in pairs(uid2player) do
-        util.try(function()
-            player:kick(errcode.SERVER_STOP)
-            player:offline() 
+        Util.try(function()
+            player:kick(Errcode.SERVER_STOP)
+            player:offline()
         end)
     end
-    skynet.call(WATCHDOG, "lua", "free_agent", skynet.self())
+    Skynet.call(WATCHDOG, "lua", "free_agent", Skynet.self())
 end
 
 -- from player
@@ -54,10 +51,10 @@ end
 
 function CMD.free_player(uid)
     uid2player[uid] = nil
-    if count == MAX_COUNT then
-        skynet.call(WATCHDOG, "lua", "set_free", skynet.self())
+    if player_count == MAX_COUNT then
+        Skynet.call(WATCHDOG, "lua", "set_free", Skynet.self())
     end
-    count = count - 1
+    player_count = player_count - 1
 end
 
 -- from watchdog
@@ -81,7 +78,7 @@ end
 function CMD.kick(uid)
     local player = uid2player[uid]
     if player then
-        player:kick(errcode.KICK)
+        player:kick(Errcode.KICK)
         uid2player[uid] = nil
     end
 end
@@ -115,40 +112,39 @@ end
 local function check_timeout()
     for _, player in pairs(uid2player) do
         if player.check_timeout then
-            util.try(function()
+            Util.try(function()
                 player:check_timeout()
             end)
         end
     end
 end
 
-skynet.start(function()
-    skynet.dispatch("lua", function(_, _, arg1, arg2, arg3, ...)
-        local conf = require "conf"
+Skynet.start(function()
+    Skynet.dispatch("lua", function(_, _, arg1, arg2, arg3, ...)
         local f = CMD[arg1]
         if f then
-            util.ret(f(arg2, arg3, ...))
+            Util.ret(f(arg2, arg3, ...))
         else
             --local player = assert(uid2player[arg1], string.format("%s %s %s", arg1, arg2, arg3))
             local player = uid2player[arg1]
             if not player then
                 -- todo fix this bug
-                return util.ret()
+                return Util.ret()
             end
             local module = assert(player[arg2], arg2)
             if type(module) == "function" then
-                util.ret(module(player, arg3, ...))
+                Util.ret(module(player, arg3, ...))
             else
-                util.ret(module[arg3](module, ...))
+                Util.ret(module[arg3](module, ...))
             end
         end
     end)
 
     -- 定时检查超时，一秒误差，如需要精准的触发，使用日程表schedule
-    skynet.fork(function()
-        while true do 
-            check_timeout()           
-            skynet.sleep(100)
+    Skynet.fork(function()
+        while true do
+            check_timeout()
+            Skynet.sleep(100)
         end
     end)
 end)

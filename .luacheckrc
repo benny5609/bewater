@@ -7,3 +7,10 @@ include_files = {
     "lualib/*",
     "service/*",
 }
+
+ignore = {
+    "i",
+    "k",
+    "v",
+    "bash",
+}
