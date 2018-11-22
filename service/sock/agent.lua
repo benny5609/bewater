@@ -1,11 +1,9 @@
-local skynet    = require "skynet"
-local socket    = require "skynet.socket"
-local packet    = require "sock.packet"
-local util      = require "util"
-local opcode    = require "def.opcode"
-local protobuf  = require "protobuf"
+local Skynet    = require "skynet"
+local Packet    = require "sock.packet"
+local Util      = require "util"
+local Protobuf  = require "protobuf"
 
-local player_path, MAX_COUNT = ...
+local player_path = ...
 local player_t = require(player_path)
 
 local WATCHDOG
@@ -17,14 +15,14 @@ local fd2player = {}
 local uid2player = {}
 local count = 0
 
-skynet.register_protocol {
+Skynet.register_protocol {
 	name = "client",
-	id = skynet.PTYPE_CLIENT,
+	id = Skynet.PTYPE_CLIENT,
 	unpack = function (buff, sz)
-		return packet.unpack(buff, sz)
+		return Packet.unpack(buff, sz)
 	end,
 	dispatch = function (fd, _, ...)
-		skynet.ignoreret()	-- session is fd, don't call skynet.ret
+		Skynet.ignoreret()	-- session is fd, don't call Skynet.ret
         local player = assert(fd2player[fd], "player not exist, fd:"..fd)
         player.net:recv(...)
 	end
@@ -34,15 +32,15 @@ function CMD.init(gate, watchdog, max_count, proto)
     GATE = assert(gate)
     WATCHDOG = assert(watchdog)
     MAX_COUNT = max_count or 100
-    protobuf.register_file(proto)
+    Protobuf.register_file(proto)
 end
 
 -- from watchdog
 function CMD.new_player(fd, ip)
     local player = player_t.new()
-    player.net:init(WATCHDOG, GATE, skynet.self(), fd, ip)
+    player.net:init(WATCHDOG, GATE, Skynet.self(), fd, ip)
     fd2player[fd] = player
-	skynet.call(GATE, "lua", "forward", fd)
+	Skynet.call(GATE, "lua", "forward", fd)
     count = count + 1
     return count >= MAX_COUNT
 end
@@ -64,7 +62,7 @@ end
 function CMD.free_player(uid)
     uid2player[uid] = nil
     if count == MAX_COUNT then
-        skynet.call(WATCHDOG, "lua", "set_free", skynet.self())
+        Skynet.call(WATCHDOG, "lua", "set_free", Skynet.self())
     end
     count = count - 1
 end
@@ -93,40 +91,39 @@ end
 local function check_timeout()
     for _, player in pairs(uid2player) do
         if player.check_timeout then
-            util.try(function()
+            Util.try(function()
                 player:check_timeout()
             end)
         end
     end
 end
 
-skynet.start(function()
-    skynet.dispatch("lua", function(_, _, arg1, arg2, arg3, ...)
-        local conf = require "conf"
+Skynet.start(function()
+    Skynet.dispatch("lua", function(_, _, arg1, arg2, arg3, ...)
         local f = CMD[arg1]
         if f then
-            util.ret(f(arg2, arg3, ...))
+            Util.ret(f(arg2, arg3, ...))
         else
             --local player = assert(uid2player[arg1], string.format("%s %s %s", arg1, arg2, arg3))
             local player = uid2player[arg1]
             if not player then
                 -- todo fix this bug
-                return util.ret()
+                return Util.ret()
             end
             local module = assert(player[arg2], arg2)
             if type(module) == "function" then
-                util.ret(module(player, arg3, ...))
+                Util.ret(module(player, arg3, ...))
             else
-                util.ret(module[arg3](module, ...))
+                Util.ret(module[arg3](module, ...))
             end
         end
     end)
 
     -- 定时检查超时，一秒误差，如需要精准的触发，使用日程表schedule
-    skynet.fork(function()
-        while true do 
-            check_timeout()           
-            skynet.sleep(100)
+    Skynet.fork(function()
+        while true do
+            check_timeout()
+            Skynet.sleep(100)
         end
     end)
 end)

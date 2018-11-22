@@ -40,7 +40,7 @@ end
 local hotfix_addrs = {}
 function CMD.reg_hotfix(addr)
     --trace("reg_hotfix:%s", addr)
-    hotfix_addrs[addr] = true 
+    hotfix_addrs[addr] = true
 end
 
 function CMD.unreg_hotfix(addr)
@@ -91,14 +91,14 @@ function skynet_cmd.list()
     end)
     local str = ""
     for i, v in ipairs(list) do
-        str = str .. string.format("地址:%s 内存:%s 消息队列:%s 请求量:%s 启动命令:%s\n", 
+        str = str .. string.format("地址:%s 内存:%s 消息队列:%s 请求量:%s 启动命令:%s\n",
             v.addr, v.mem, v.mqlen, v.task, v.desc)
     end
     return str
 end
 
 function skynet_cmd.hotfix()
-    trace("gm hotfix")    
+    trace("gm hotfix")
     for addr, _ in pairs(hotfix_addrs) do
         Skynet.send(addr, "lua", "hotfix")
     end
@@ -106,7 +106,7 @@ end
 
 function skynet_cmd.publish(nodename)
     trace("publish:%s", nodename)
-    Skynet.newservice("publish", nodename) 
+    Skynet.newservice("publish", nodename)
 end
 
 function skynet_cmd.alert()

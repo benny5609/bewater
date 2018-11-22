@@ -9,11 +9,11 @@ local Conf          = require "conf"
 local Sname         = require "sname"
 require "bash"
 
-local errfile = io.open(string.format("%s/log/%s.log", 
+local errfile = io.open(string.format("%s/log/%s.log",
     Conf.workspace, Conf.clustername or "error"), "w+")
 
 local function write_log(file, addr, str)
-    local str = string.format("[%08x][%s] %s", addr, os.date("%Y-%m-%d %H:%M:%S", os.time()), str) 
+    str = string.format("[%08x][%s] %s", addr, os.date("%Y-%m-%d %H:%M:%S", os.time()), str)
     if string.match(str, "\n(%w+ %w+)") == "stack traceback" then
         if Conf.alert and Conf.alert.enable then
             Skynet.send(Sname.ALERT, "lua", "traceback", str)
@@ -31,14 +31,14 @@ end
 local logs = {} -- key(sys or uid) -> {last_time, file}
 local CMD = {}
 function CMD.trace(addr, sys, str)
-    local str = string.format("[%s] %s", sys, str) 
+    str = string.format("[%s] %s", sys, str)
     local log = logs[sys]
     if not log or DateHelper.is_sameday(os.time(), log.last_time) then
         if log then
             log.file:close()
         end
         bash("mkdir -p %s/log/%s", Conf.workspace, sys)
-        local filename = string.format("%s/log/%s/%s.log", 
+        local filename = string.format("%s/log/%s/%s.log",
             Conf.workspace, sys, os.date("%Y%m%d", os.time()))
         local file = io.open(filename, "a+")
         log = {file = file}
@@ -47,11 +47,11 @@ function CMD.trace(addr, sys, str)
     log.last_time = os.time()
 
     write_log(log.file, addr, str)
-    write_log(errfile, addr, str) 
+    write_log(errfile, addr, str)
 end
 
 function CMD.player(addr, uid, str)
-    local str = string.format("[%d] %s", uid, str) 
+    str = string.format("[%d] %s", uid, str)
     local log = logs[uid]
     if not log or DateHelper.is_sameday(os.time(), log.last_time) then
         if log then
@@ -59,7 +59,7 @@ function CMD.player(addr, uid, str)
         end
         local dir = string.format("%d/%d/%d", uid//1000000, uid%1000000//1000, uid%1000)
         bash("mkdir -p %s/log/player/%s", Conf.workspace, dir)
-        local filename = string.format("%s/log/player/%s/%s.log", 
+        local filename = string.format("%s/log/player/%s/%s.log",
             Conf.workspace, dir, os.date("%Y%m%d", os.time()))
         local file = io.open(filename, "a+")
         log = {file = file}
@@ -68,7 +68,7 @@ function CMD.player(addr, uid, str)
     log.last_time = os.time()
 
     write_log(log.file, addr, str)
-    write_log(errfile, addr, str) 
+    write_log(errfile, addr, str)
 end
 
 local sighup_addr = nil
@@ -82,7 +82,7 @@ Skynet.register_protocol {
     id = Skynet.PTYPE_TEXT,
     unpack = Skynet.tostring,
     dispatch = function(_, addr, str)
-        write_log(errfile, addr, str) 
+        write_log(errfile, addr, str)
     end
 }
 
@@ -91,7 +91,7 @@ Skynet.register_protocol {
     name = "SYSTEM",
     id = Skynet.PTYPE_SYSTEM,
     unpack = function(...) return ... end,
-    dispatch = function(...)
+    dispatch = function()
         -- reopen signal
         if sighup_addr then
             Skynet.send(sighup_addr, "lua", "SIGHUP")

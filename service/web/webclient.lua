@@ -13,9 +13,9 @@ local function resopnd(request, result)
         return
     end
 
-    local content, errmsg = webclient:get_respond(request.req) 
-    local info = webclient:get_info(request.req) 
-     
+    local content, errmsg = webclient:get_respond(request.req)
+    local info = webclient:get_info(request.req)
+
     if result == 0 then
         request.response(true, true, content, info)
     else
@@ -37,7 +37,7 @@ local function query()
         else
             skynet.sleep(1)
         end
-    end 
+    end
     requests = nil
 end
 
@@ -45,7 +45,7 @@ end
 -- @function request
 -- @string url url
 -- @tab[opt] get get的参数
--- @param[opt] post post参数，table or string类型 
+-- @param[opt] post post参数，table or string类型
 -- @bool[opt] no_reply 使用skynet.call则要设置为nil或false，使用skynet.send则要设置为true
 -- @treturn bool 请求是否成功
 -- @treturn string 当成功时，返回内容，当失败时，返回出错原因
@@ -70,9 +70,9 @@ local function request(url, get, post, header, no_reply)
             v = webclient:url_encoding(v)
 
             table.insert(data, string.format("%s=%s", k, v))
-        end   
+        end
         post = table.concat(data , "&")
-    end   
+    end
 
     local req, key = webclient:request(url, post)
     if not req then
@@ -98,14 +98,14 @@ local function request(url, get, post, header, no_reply)
     end
 
     requests[key] = {
-        url = url, 
+        url = url,
         req = req,
         response = response,
     }
 end
 
 skynet.start(function()
-    skynet.dispatch("lua", function(session, source, command, ...)
+    skynet.dispatch("lua", function(_, _, command, ...)
         assert(command == "request")
         request(...)
     end)

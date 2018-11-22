@@ -14,7 +14,7 @@ end
 
 function M:save_batch()
     Mongo.set("batch_operate", self.batch_list)
-end 
+end
 
 function M:save_player(uid)
     local player = self.players[uid]
@@ -38,7 +38,7 @@ function M:get_player(uid)
             uid = uid,
             time = os.time(),
             operate_list = {},
-        }) 
+        })
         player = {
             uid = data.uid,
             time = data.time,
@@ -54,13 +54,13 @@ function M:online(uid, cname, agent)
     local player = self:get_player(uid)
     player.cname = cname
     player.agent = agent
-    
+
     local operate_list = player.operate_list or {}
     player.operate_list = {}
-    
+
     for k, v in ipairs(self.batch_list) do
         if v.time > player.time then
-            table.insert(operate_list, v) 
+            table.insert(operate_list, v)
         end
     end
     player.time = os.time()
@@ -133,14 +133,14 @@ function M:operate(uid, code, ...)
 end
 
 Skynet.start(function()
-    Skynet.dispatch("lua", function(session, source, cmd, ...)
+    Skynet.dispatch("lua", function(_, _, cmd, ...)
         local f = assert(M[cmd], cmd)
         Util.ret(f(M, ...))
     end)
 
-    M:init()    
+    M:init()
 
     trace("start operate")
-    
+
     Skynet.register "operate"
 end)

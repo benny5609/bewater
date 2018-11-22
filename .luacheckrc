@@ -13,4 +13,5 @@ ignore = {
     "k",
     "v",
     "bash",
+    "SERVICE_NAME",
 }

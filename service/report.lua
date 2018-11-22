@@ -1,64 +1,64 @@
 -- 向monitor节点报告本节点性能，状态等(已废置)
 --
-local skynet    = require "skynet"
-local cluster   = require "skynet.cluster"
-local info      = require "util.clusterinfo"
-local conf      = require "conf"
-local util      = require "util"
-local log       = require "log"
-local print     = log.print("report")
+local Skynet    = require "skynet"
+local Cluster   = require "skynet.cluster"
+local Info      = require "util.clusterInfo"
+local Conf      = require "Conf"
+local Util      = require "util"
+local Log       = require "log"
+local print     = Log.print("report")
 
 require "bash"
 
 local function send(...)
-    --print("send", conf.clustername.monitor, ...)
-    cluster.send("monitor", "svr", ...) 
+    print("send", Conf.clustername.monitor, ...)
+    Cluster.send("monitor", "svr", ...)
 end
 
 local function call(...)
-    --print("call", conf.clustername.monitor, ...)
-    cluster.call("monitor", "svr", ...)
+    print("call", Conf.clustername.monitor, ...)
+    Cluster.call("monitor", "svr", ...)
 end
 
-local name = info.clustername
-local addr = conf.cluster[name]
+local name = Info.clustername
+local addr = Conf.cluster[name]
 
 local CMD = {}
 function CMD.start()
-    util.try(function()
-        call("node_start", name, addr, conf.proj, info.pnet_addr, info.inet_addr, 
-            info.pid, string.format("%s:%s", conf.webconsole.host, conf.webconsole.port))
-        cluster.call("share", "svr", "node_start", name, addr) -- 向share上报集群配置
+    Util.try(function()
+        call("node_start", name, addr, Conf.proj, Info.pnet_addr, Info.inet_addr,
+            Info.pid, string.format("%s:%s", Conf.webconsole.host, Conf.webconsole.port))
+        Cluster.call("share", "svr", "node_start", name, addr) -- 向share上报集群配置
     end)
-    skynet.fork(function()
+    Skynet.fork(function()
         while true do
-            CMD.ping() 
-            skynet.sleep(100)
+            CMD.ping()
+            Skynet.sleep(100)
         end
     end)
 end
 
 function CMD.ping()
-    if not info.pid then
+    if not Info.pid then
         send("node_ping", addr, 0, 0)
         return
     end
-    
-    local profile = info.profile 
-    util.try(function()
+
+    local profile = Info.profile
+    Util.try(function()
         send("node_ping", addr, profile.cpu, profile.mem)
     end)
 end
 
 function CMD.stop()
-    util.try(function()
+    Util.try(function()
         send("node_stop", addr)
     end)
 end
 
-skynet.start(function()
-    skynet.dispatch("lua", function(_,_, cmd, ...)
+Skynet.start(function()
+    Skynet.dispatch("lua", function(_,_, cmd, ...)
         local f = assert(CMD[cmd], cmd)
-        util.ret(f(...))
+        Util.ret(f(...))
     end)
 end)
