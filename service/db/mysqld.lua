@@ -1,51 +1,50 @@
-local skynet = require "skynet.manager"
-local mysql = require "skynet.db.mysql"
-local sname = require "sname"
-local util = require "util"
-local conf = require "conf"
+local Skynet    = require "skynet.manager"
+local Mysql     = require "skynet.db.mysql"
+local Util      = require "util"
+local Conf      = require "conf"
 
 local mod = ...
 
 if mod == "agent" then
 
 local db
-skynet.start(function()
-    local function on_connect(db)
-        db:query("set charset utf8");
+Skynet.start(function()
+    local function on_connect()
+        db:query("set charset utf8")
     end
-    db=mysql.connect({
-        host=conf.mysql.host,
-        port=conf.mysql.port,
-        database=conf.mysql.name,
-        user=conf.mysql.user,
-        password=conf.mysql.password,
+    db=Mysql.connect({
+        host=Conf.mysql.host,
+        port=Conf.mysql.port,
+        database=Conf.mysql.name,
+        user=Conf.mysql.user,
+        password=Conf.mysql.password,
         max_packet_size = 1024 * 1024,
         on_connect = on_connect
     })
-    skynet.dispatch("lua", function(_, _, cmd, ...)
+    Skynet.dispatch("lua", function(_, _, cmd, ...)
         local f = assert(db[cmd])
         local ret = f(db, ...)
-        assert(not ret.err,string.format("mysql error:%s\n%s", table.pack(...)[1], util.dump(ret)))
-        util.ret(ret)
+        assert(not ret.err,string.format("mysql error:%s\n%s", table.pack(...)[1], Util.dump(ret)))
+        Util.ret(ret)
     end)
 end)
 
 else
 
-skynet.start(function()
-    local preload = conf.preload or 10
+Skynet.start(function()
+    local preload = Conf.preload or 10
     local agent = {}
     for i = 1, preload do
-        agent[i] = skynet.newservice(SERVICE_NAME, "agent")
+        agent[i] = Skynet.newservice(SERVICE_NAME, "agent")
     end
     local balance = 1
-    skynet.dispatch("lua", function(_,source, ...)
+    Skynet.dispatch("lua", function(_,_, ...)
         balance = balance + 1
         if balance > #agent then
             balance = 1
         end
-        local ret = skynet.call(agent[balance], "lua", ...)
-        util.ret(ret)
+        local ret = Skynet.call(agent[balance], "lua", ...)
+        Util.ret(ret)
     end)
 end)
 

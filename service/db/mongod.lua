@@ -1,8 +1,7 @@
-local skynet = require "skynet.manager"
-local mongo  = require "skynet.db.mongo"
-local sname  = require "sname"
-local util   = require "util"
-local conf   = require "conf"
+local Skynet = require "skynet.manager"
+local Mongo  = require "skynet.db.mongo"
+local Util   = require "util"
+local Conf   = require "conf"
 
 local mod = ...
 
@@ -12,7 +11,7 @@ local db
 local CMD = {}
 function CMD.find_one(name, query, selector)
     local data = db[name]:findOne(query, selector)
-    return util.str2num(data)
+    return Util.str2num(data)
 end
 
 function CMD.find_one_with_default(name, query, default, selector)
@@ -21,7 +20,7 @@ function CMD.find_one_with_default(name, query, default, selector)
         CMD.insert(name, default)
         return default
     end
-    return util.str2num(data)
+    return Util.str2num(data)
 end
 
 function CMD.find(name, query, selector)
@@ -30,36 +29,36 @@ function CMD.find(name, query, selector)
     while ret:hasNext() do
         table.insert(data, ret:next())
     end
-    return util.str2num(data)
+    return Util.str2num(data)
 end
 
 function CMD.update(name, query_tbl, update_tbl)
-    update_tbl = util.num2str(update_tbl)
+    update_tbl = Util.num2str(update_tbl)
     local ok, err, r = db[name]:findAndModify({query = query_tbl, update = update_tbl})
     if not ok then
-        skynet.error("mongo update error")
-        util.printdump(r)
+        Skynet.error("mongo update error")
+        Util.printdump(r)
         error(err)
     end
     return true
 end
 
 function CMD.insert(name, tbl)
-    tbl = util.num2str(tbl)
+    tbl = Util.num2str(tbl)
     local ok, err, r = db[name]:safe_insert(tbl)
     if not ok then
-        skynet.error("mongo update error")
-        util.printdump(r)
+        Skynet.error("mongo update error")
+        Util.printdump(r)
         error(err)
     end
     return true
 end
 
 function CMD.delete(name, query_tbl)
-    local ok, err, r = db[name]:delete(query_tbl) 
+    local ok, err, r = db[name]:delete(query_tbl)
     if not ok then
-        skynet.error("mongo update error")
-        util.printdump(r)
+        Skynet.error("mongo update error")
+        Util.printdump(r)
         error(err)
     end
     return true
@@ -72,7 +71,7 @@ end
 function CMD.get(key, default)
     local ret = db.global:findOne({key = key})
     if ret then
-        return util.str2num(ret.value)
+        return Util.str2num(ret.value)
     else
         db.global:safe_insert({key = key, value = default})
         return default
@@ -86,30 +85,30 @@ function CMD.set(key, value)
     })
 end
 
-skynet.start(function()
-    db = mongo.client(conf.mongo)[conf.mongo.name]
-    skynet.dispatch("lua", function(_, _, cmd, ...)
+Skynet.start(function()
+    db = Mongo.client(Conf.mongo)[Conf.mongo.name]
+    Skynet.dispatch("lua", function(_, _, cmd, ...)
         local f = assert(CMD[cmd], ...)
-        util.ret(f(...))
+        Util.ret(f(...))
     end)
 end)
 
 else
 
-skynet.start(function()
-    local preload = conf.preload or 10
+Skynet.start(function()
+    local preload = Conf.preload or 10
     local agent = {}
     for i = 1, preload do
-        agent[i] = skynet.newservice(SERVICE_NAME, "agent")
+        agent[i] = Skynet.newservice(SERVICE_NAME, "agent")
     end
     local balance = 1
-    skynet.dispatch("lua", function(_,source, ...)
+    Skynet.dispatch("lua", function(_,_, ...)
         balance = balance + 1
         if balance > #agent then
             balance = 1
         end
-        local ret = skynet.call(agent[balance], "lua", ...)
-        util.ret(ret)
+        local ret = Skynet.call(agent[balance], "lua", ...)
+        Util.ret(ret)
     end)
 end)
 

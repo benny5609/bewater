@@ -6,7 +6,6 @@ local Conf   = require "conf"
 local Log    = require "log"
 local Json   = require "cjson"
 
-local print  = Log.print("alert")
 local trace  = Log.trace("alert")
 require "bash"
 
@@ -18,7 +17,7 @@ local function get_token()
         return data.access_token
     else
         Skynet.error("cannot get token")
-    end 
+    end
 end
 
 
@@ -34,17 +33,17 @@ local function send_traceback()
     last = os.time()
 
     local token = get_token()
-    local sh = string.format('curl -H "Content-Type:application/json" -X POST -d \'%s\' %s/chat/send?access_token=%s', Json.encode {
+    local sh = string.format('curl -H "Content-Type:application/json" -X POST -d \'%s\' %s/chat/send?access_token=%s',
+    Json.encode {
         sender = Conf.alert.sender,
         chatid = Conf.alert.chatid,
         msgtype = "text",
-        text = { 
+        text = {
             content = str,
-        } 
+        }
     }, host, token)
-    --print(sh)
     bash(sh)
-    
+
 end
 
 local CMD = {}
@@ -53,12 +52,12 @@ function CMD.traceback(err)
     if os.time() - last < 60 then
         return
     end
-    send_traceback() 
+    send_traceback(err)
 end
 
 function CMD.node_dead(proj, clustername, pnet_addr, inet_addr, pid, cpu, mem)
     local str = string.format("救命啊，有节点挂掉了!\n项目:%s\n节点:%s\n公网ip:%s\n内网ip:%s\n进程: pid:%s CPU:%s MEM:%.1fM",
-        proj, clustername, pnet_addr, inet_addr, pid, cpu, mem/1024) 
+        proj, clustername, pnet_addr, inet_addr, pid, cpu, mem/1024)
     trace(str)
     CMD.test(str)
 end
@@ -66,15 +65,15 @@ end
 function CMD.test(str)
     -- 暂时先用curl发https post
     local token = get_token()
-    local sh = string.format('curl -H "Content-Type:application/json" -X POST -d \'%s\' %s/chat/send?access_token=%s', Json.encode {
+    local sh = string.format('curl -H "Content-Type:application/json" -X POST -d \'%s\' %s/chat/send?access_token=%s',
+    Json.encode {
         sender = Conf.alert.sender,
         chatid = Conf.alert.chatid,
         msgtype = "text",
-        text = { 
+        text = {
             content = str,
-        } 
+        }
     }, host, token)
-    --print(sh)
     bash(sh)
 
 end

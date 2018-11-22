@@ -1,6 +1,6 @@
-local skynet = require "skynet"
-local autoid = require "share.autoid"
-local util   = require "util"
+local Skynet = require "skynet"
+local Autoid = require "share.autoid"
+local Util   = require "util"
 
 local agents = {}
 local id2agent = {} -- battle_id -> agent
@@ -10,7 +10,7 @@ local CMD = {}
 function CMD.init(battle_path, preload)
     preload = preload or 10
     for i = 1, preload do
-        agents[i] = skynet.newservice("battle/agent", battle_path)
+        agents[i] = Skynet.newservice("battle/agent", battle_path)
     end
 end
 
@@ -19,7 +19,7 @@ function CMD.create_battle()
     if balance > #agents then
         balance = 1
     end
-    local battle_id = autoid.create()
+    local battle_id = Autoid.create()
     local agent = agents[balance]
     id2agent[battle_id] = agent
     return battle_id, agent
@@ -27,14 +27,14 @@ end
 
 function CMD.destroy_battle(battle_id)
     local agent = id2agent[battle_id]
-    skynet.call(agent, "lua", "destroy", battle_id)
+    Skynet.call(agent, "lua", "destroy", battle_id)
     id2agent[battle_id] = nil
 end
 
-skynet.start(function()
-    skynet.dispatch("lua", function(_,_, cmd, ...)
+Skynet.start(function()
+    Skynet.dispatch("lua", function(_,_, cmd, ...)
         local f = assert(CMD[cmd], cmd)
-        util.ret(f(...))
+        Util.ret(f(...))
     end)
 end)
 

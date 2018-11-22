@@ -1,9 +1,8 @@
-local skynet        = require "skynet"
-local util          = require "util"
-local log           = require "log"
+local Skynet        = require "skynet"
+local Util          = require "util"
+local Log           = require "log"
 
-local print         = log.print("match")
-local trace         = log.trace("match")
+local print         = Log.print("match")
 
 local uid2info = {} -- uid -> info {uid, value, agent}
 local values = {}   -- value -> uids
@@ -22,7 +21,7 @@ end
 function CMD.start(uid, value, agent)
     print("start match", uid, value)
     if uid2info[uid] then
-        skynet.error(uid, "is matching")
+        Skynet.error(uid, "is matching")
         return
     end
     uid2info[uid] = {
@@ -47,7 +46,7 @@ function CMD.cancel(uid)
     print("cancel match", uid)
     local info = uid2info[uid]
     if not info then
-        skynet.error(uid, "not matching")
+        Skynet.error(uid, "not matching")
         return
     end
     uid2info[uid] = nil
@@ -57,13 +56,13 @@ end
 local function update()
     if next(uid2info) then
         print("matching")
-        --print(util.dump(uid2info))
+        --print(Util.dump(uid2info))
     end
     local cur_time = os.time()
     for uid, info in pairs(uid2info) do
         local value = info.value
         if cur_time - values[value][uid] > MAX_TIME then
-            info.ret = skynet.call("usercenter", "lua", "create_robot", value) -- 这个服务需要自定义
+            info.ret = Skynet.call("usercenter", "lua", "create_robot", value) -- 这个服务需要自定义
         else
             local list = {values[value]}
             for i = 1, MAX_RANGE do
@@ -93,42 +92,43 @@ local function update()
             local id1 = list[r]
             local id2 = list[r==1 and 2 or 1]
             if uid2info[id1] then
-                util.try(function()
-                    skynet.call(uid2info[id1].agent, "lua", id1, "battle", "matched", MODE, id2)
+                Util.try(function()
+                    Skynet.call(uid2info[id1].agent, "lua", id1, "battle", "matched", MODE, id2)
                 end)
             end
             if uid2info[id2] then
-                util.try(function()
-                    skynet.call(uid2info[id2].agent, "lua", id2, "battle", "matched", MODE, id1)
+                Util.try(function()
+                    Skynet.call(uid2info[id2].agent, "lua", id2, "battle", "matched", MODE, id1)
                 end)
             end
             -- 创建战斗
-            local battle_id, battle_agent = skynet.call("battlecenter", "lua", "create_battle")
-            skynet.call(battle_agent, "lua", "create", battle_id, MODE)
-            for idx, uid in pairs({id1, id2}) do
-                local info = uid2info[uid]
-                skynet.call(battle_agent, "lua", "call_battle", battle_id, "join", uid, idx, info and info.agent or nil)
-                if uid2info[uid] then
-                    uid2info[uid] = nil
-                    values[info.value][uid] = nil
+            local battle_id, battle_agent = Skynet.call("battlecenter", "lua", "create_battle")
+            Skynet.call(battle_agent, "lua", "create", battle_id, MODE)
+            for idx, id in pairs({id1, id2}) do
+                local matched = uid2info[id]
+                Skynet.call(battle_agent, "lua", "call_battle", battle_id, "join",
+                    id, idx, matched and matched.agent or nil)
+                if uid2info[id] then
+                    uid2info[id] = nil
+                    values[matched.value][id] = nil
                 end
             end
         end
     end
 end
 
-skynet.start(function()
-    skynet.dispatch("lua", function(_, _, cmd, ...)
+Skynet.start(function()
+    Skynet.dispatch("lua", function(_, _, cmd, ...)
         local f = assert(CMD[cmd], cmd)
-        util.ret(f(...))
+        Util.ret(f(...))
     end)
 
-    skynet.fork(function()
+    Skynet.fork(function()
         while true do
-            util.try(function()
-                update() 
+            Util.try(function()
+                update()
             end)
-            skynet.sleep(50)
+            Skynet.sleep(50)
         end
     end)
 end)
