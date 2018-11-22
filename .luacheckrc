@@ -8,10 +8,16 @@ include_files = {
     "service/*",
 }
 
+exclude_files = {
+    "lualib/xml/*",
+    "lualib/ws/*",
+}
+
 ignore = {
     "i",
     "k",
     "v",
     "bash",
     "SERVICE_NAME",
+    "self",
 }

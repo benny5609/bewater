@@ -1,4 +1,3 @@
-local string_format = string.format
 local M = {}
 -- 不带属性的key-value, CDATA标签用于说明数据不被XML解析器解析
 function M.encode(k, v, cdata)
@@ -19,7 +18,7 @@ function M.encode(k, v, cdata)
 end
 
 -- 带属性的key-value
-function M.attr_encode(t)
-    -- todo 
+function M.attr_encode()
+    -- todo
 end
 return M
