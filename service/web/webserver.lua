@@ -3,7 +3,7 @@ local Socket        = require "skynet.socket"
 local Httpd         = require "http.httpd"
 local Sockethelper  = require "http.sockethelper"
 local Url           = require "http.url"
-local Util          = require "Util"
+local Util          = require "util"
 local Conf          = require "conf"
 local Whitelist     = require "ip.whitelist"
 local Blacklist     = require "ip.blacklist"
@@ -56,7 +56,7 @@ local function on_message(url, args, body, header, ip)
         end) then
         ret = '{"err":3, "desc":"server traceback"}'
         end
-        return handler:pack(ret or 0)
+        return handler:pack(ret or 0, url)
     else
         return '{"err":1, "desc":"api not exist"}'
     end
@@ -137,8 +137,8 @@ Skynet.start(function()
             Socket.close(fd)
             return
         end
-        --Skynet.error(string.format("%s connected, pass it to agent :%08x", addr, agent[balance]))
-        Skynet.send(agent[balance], "lua", fd, ip)
+        Skynet.error(string.format("%s connected, pass it to agent :%08x", _fd, agent[balance]))
+        Skynet.send(agent[balance], "lua", _fd, ip)
         balance = balance + 1
         if balance > #agent then
             balance = 1

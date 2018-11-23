@@ -10,7 +10,6 @@ local skynet_cmd = {}
 local gmcmd = {
     skynet = skynet_cmd,
 }
-
 local CMD = {}
 function CMD.add_gmcmd(modname, gmcmd_path)
     gmcmd[modname] = require(gmcmd_path)
@@ -123,4 +122,3 @@ function skynet_cmd.time(...)
     local cur = Schedule.changetime(t)
     return string.format("时间修改至 %s", DateHelper.format(cur))
 end
-

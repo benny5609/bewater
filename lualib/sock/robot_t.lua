@@ -28,20 +28,6 @@ function M:ctor(proj)
     self._cache = ""
 end
 
-function M:login()
-    --local ret, resp = Http.get("http://www.kaizhan8.com:8888/login/req_login", {
-    local _, resp = Http.get("http://huangjx.top/login/req_login", {
-        proj = self._proj
-    })
-    if resp == "error" then
-        return
-    end
-    --print(ret, resp)
-    local data = Json.decode(resp)
-    self._host = data.host
-    self._port = data.port
-end
-
 function M:start(host, port)
     self._host = assert(host)
     self._port = assert(port)
@@ -160,14 +146,15 @@ function M:_recv(sock_buff)
     local simplename = Opcode.tosimplename(op)
     local funcname = modulename .. "_" .. simplename
 
-    print(string.format("recv %s, csn:%d ssn:%d", opname, csn, ssn))
-
     data = Protobuf.decode(opname, buff, sz)
     if self[funcname] then
         self[funcname](self, data)
     end
 
     local co = self._call_requests[op - 1]
+
+    print(string.format("recv %s, csn:%d ssn:%d co:%s", opname, csn, ssn, co))
+
     self._call_requests[op - 1] = nil
     if co and coroutine.status(co) == "suspended" then
         self:_suspended(co, op, data)

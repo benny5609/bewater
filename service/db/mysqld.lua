@@ -9,8 +9,8 @@ if mod == "agent" then
 
 local db
 Skynet.start(function()
-    local function on_connect()
-        db:query("set charset utf8")
+    local function on_connect(_db)
+        _db:query("set charset utf8")
     end
     db=Mysql.connect({
         host=Conf.mysql.host,

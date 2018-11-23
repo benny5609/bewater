@@ -38,4 +38,29 @@ function M.url_encoding(tbl, encode)
     end
 end
 
+--[[
+{
+    "code":0,
+    "data":{
+        "ip":"202.104.71.210",
+        "country":"中国",
+        "area":"",
+        "region":"广东",
+        "city":"广州",
+        "county":"XX",
+        "isp":"电信",
+        "country_id":"CN",
+        "area_id":"",
+        "region_id":"440000",
+        "city_id":"440100",
+        "county_id":"xx",
+        "isp_id":"100017"
+    }
+}
+]]
+function M.ip_info(ip)
+    local _, resp = M.get("http://ip.taobao.com/service/getIpInfo.php", {ip = ip})
+    return resp.data or {}
+end
+
 return M

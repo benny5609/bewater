@@ -12,6 +12,7 @@ exclude_files = {
     "lualib/xml/*",
     "lualib/ws/*",
     "lualib/bash.lua",
+    "lualib/schedule.lua",
 }
 
 ignore = {

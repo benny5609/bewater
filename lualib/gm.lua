@@ -1,12 +1,12 @@
-local skynet = require "skynet"
-local sname = require "sname"
+local Skynet = require "skynet"
+local Sname = require "sname"
 
 local M = {}
 function M.add_gmcmd(modname, gmcmd_path)
-    skynet.call(sname.GM, "lua", "add_gmcmd", modname, gmcmd_path)
+    Skynet.call(Sname.GM, "lua", "add_gmcmd", modname, gmcmd_path)
 end
 
 function M.run(...)
-    return skynet.call(sname.GM, "lua", "run", ...)
+    return Skynet.call(Sname.GM, "lua", "run", ...)
 end
 return M

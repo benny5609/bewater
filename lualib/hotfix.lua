@@ -1,9 +1,9 @@
-local skynet = require "skynet"
-local sname = require "sname"
+local Skynet = require "skynet"
+local Sname = require "sname"
 
 local M = {}
 local function new_module(modname)
-    skynet.cache.clear()
+    Skynet.cache.clear()
     local module = package.loaded[modname]
     if module then
         package.loaded[modname] = nil
@@ -58,11 +58,11 @@ end
 
 -- 注册热更,由GM服务托管，需要处理hotfix这个消息
 function M.reg()
-    skynet.send(sname.GM, "lua", "reg_hotfix", skynet.self())
+    Skynet.send(Sname.GM, "lua", "reg_hotfix", Skynet.self())
 end
 
 function M.unreg()
-    skynet.send(sname.GM, "lua", "unreg_hotfix", skynet.self())
+    Skynet.send(Sname.GM, "lua", "unreg_hotfix", Skynet.self())
 end
 
 return M
