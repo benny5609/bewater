@@ -1,8 +1,8 @@
-local skynet = require "skynet"
+--local skynet = require "skynet"
 package.path = "?.lua;" .. package.path
 
-local function io_popen(cmd)
-    local file = io.popen(cmd) 
+local function io_popen(cmd, mode)
+    local file = io.popen(cmd)
     local ret = file:read(mode or "*a")
     file:close()
     return ret

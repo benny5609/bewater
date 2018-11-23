@@ -1,24 +1,19 @@
-local skynet = require "skynet"
-local mongo = require "db.mongo_helper"
-local mysql = require "db.mysql_helper"
-local http = require "web.http_helper"
-local conf = require "conf"
-local util = require "util"
-local sign = require "auth.sign"
+local Conf = require "conf"
+local Sign = require "auth.sign"
 local codec = require "codec"
 
 local M = {}
 function M.create_order(param)
     local order_no      = assert(param.order_no)
-    local uid           = assert(param.uid)
-    local partner       = assert(param.partner)
     local private_key   = assert(param.private_key)
-    local item_sn       = assert(param.item_sn)
     local item_desc     = assert(param.item_desc)
-    local pay_channel   = assert(param.pay_channel)
-    local pay_method    = assert(param.pay_method)
     local pay_price     = assert(param.pay_price)
-    
+    local partner       = assert(param.partner)
+    assert(param.uid)
+    assert(param.item_sn)
+    assert(param.pay_channel)
+    assert(param.pay_method)
+
     local args = {
         partner = partner,
         seller_id = partner,
@@ -26,7 +21,7 @@ function M.create_order(param)
         subject = item_desc,
         body = item_desc,
         total_fee = pay_price,
-        notify_url = string.format("%s:%s/api/payment/alipay_notify", conf.pay.host, conf.pay.port),
+        notify_url = string.format("%s:%s/api/payment/alipay_notify", Conf.pay.host, Conf.pay.port),
         service = "mobile.securitypay.pay",
         payment_type = '1',
         anti_phishing_key = '',
@@ -35,15 +30,15 @@ function M.create_order(param)
         it_b_pay = '30m',
         return_url = 'm.alipay.com',
     }
-    args.sign = sign.rsa_private_sign(args, private_key, true)
+    args.sign = Sign.rsa_private_sign(args, private_key, true)
     args.sign_type = "RSA"
     return {
         order_no = order_no,
-        order = sign.concat_args(args, true),
+        order = Sign.concat_args(args, true),
     }
 end
 
-function M.notify(partner, public_key, param)
+function M.notify(public_key, param)
     if param.trade_status ~= "TRADE_SUCCESS" then
         return
     end
@@ -54,7 +49,7 @@ function M.notify(partner, public_key, param)
         end
     end
 
-    local src = sign.concat_args(args)
+    local src = Sign.concat_args(args)
     local bs = codec.base64_decode(param.sign)
     local pem = public_key
     return codec.rsa_public_verify(src, bs, pem, 2)

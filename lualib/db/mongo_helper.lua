@@ -1,5 +1,5 @@
-local skynet    = require "skynet"
-local sname     = require "sname"
+local Skynet    = require "skynet"
+local Sname     = require "sname"
 local M = {}
 setmetatable(M, {__index = function(t, k)
     local v = rawget(t, k)
@@ -7,7 +7,7 @@ setmetatable(M, {__index = function(t, k)
         return v
     else
         return function(...)
-            return skynet.call(sname.MONGO, "lua", k, ...)
+            return Skynet.call(Sname.MONGO, "lua", k, ...)
         end
     end
 end})

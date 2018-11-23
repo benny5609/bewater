@@ -1,44 +1,44 @@
-local skynet = require "skynet.manager"
+local Skynet = require "skynet.manager"
 
 local util = {}
--- 处理skynet.send的消息
+-- 处理Skynet.send的消息
 util.NORET = "NORET"
 function util.ret(noret, ...)
     if noret ~= "NORET" then
-        skynet.ret(skynet.pack(noret, ...))
+        Skynet.ret(Skynet.pack(noret, ...))
     end
 end
 
 -- 有需要的节点在启动时调用
 function util.init_proto_env(path)
     local sname = require "sname"
-    skynet.call(sname.PROTO, "lua", "register_file", path)
+    Skynet.call(sname.PROTO, "lua", "register_file", path)
 end
 
 -- 获取节点内的protobuf
 function util.get_protobuf()
     local sname = require "sname"
-    local protobuf_env = skynet.call(sname.PROTO, "lua", "get_protobuf_env")
+    local protobuf_env = Skynet.call(sname.PROTO, "lua", "get_protobuf_env")
     assert(type(protobuf_env) == "userdata")
     assert(not package.loaded["protobuf"])
     debug.getregistry().PROTOBUF_ENV = protobuf_env
     return require "protobuf"
 end
 
-function __TRACEBACK__(errmsg) 
+local function __TRACEBACK__(errmsg)
     local track_text = debug.traceback(tostring(errmsg), 2)
-    skynet.error("---------------------------------------- TRACKBACK ----------------------------------------")
-    skynet.error(track_text, "LUA ERROR")
-    skynet.error("---------------------------------------- TRACKBACK ----------------------------------------")
-    local exception_text = "LUA EXCEPTION\n" .. track_text;
+    Skynet.error("---------------------------------------- TRACKBACK ----------------------------------------")
+    Skynet.error(track_text, "LUA ERROR")
+    Skynet.error("---------------------------------------- TRACKBACK ----------------------------------------")
+    --local exception_text = "LUA EXCEPTION\n" .. track_text
     return false
 end
 
 -- 尝试调一个function 这个function可以带可变参数, 如果被调用的函数有异常 返回false，
 -- 退出此方法继续执行其他代码并打印出异常信息
-function util.try(func, ...) 
+function util.try(func, ...)
     return xpcall(func, __TRACEBACK__, ...)
-end    
+end
 
 function util.to_version_num(version)
     local v1, v2, v3 = string.match(version, "(%d+)%.(%d+)%.(%d+)")
@@ -49,32 +49,20 @@ function util.to_version_num(version)
 end
 
 function util.to_version_str(num)
-    return string.format("%d.%d.%d", num//1000000, num%1000000//1000, num%1000) 
+    return string.format("%d.%d.%d", num//1000000, num%1000000//1000, num%1000)
 end
 
 function util.shell(cmd, ...)
-    local cmd = string.format(cmd, ...)
-    skynet.error(cmd)
+    cmd = string.format(cmd, ...)
+    Skynet.error(cmd)
     return io.popen(cmd):read("*all")
 end
 
 function util.run_cluster(clustername)
     local config = require "config"
     local cmd = string.format("cd %s/shell && sh start.sh %s", config.workspace, clustername)
-    skynet.error(cmd)
+    Skynet.error(cmd)
     os.execute(cmd)
-end
-
-function util.trace(prefix, ...)
-    local config = require "config"
-    if config.debug then
-        prefix = "["..prefix.."] "
-        return function(...)
-            skynet.error(prefix .. string.format(...))
-        end
-    else
-        return function() end
-    end
 end
 
 function util.gc()
@@ -145,7 +133,7 @@ function util.dump(root, ...)
 end
 
 function util.printdump(root, ...)
-    skynet.error(util.dump(root, ...))
+    Skynet.error(util.dump(root, ...))
 end
 
 function util.is_in_list(list, obj)
@@ -166,7 +154,7 @@ function util.str2num(tbl)
         v = type(v) == "table" and util.str2num(v) or v
         data[k] = v
     end
-    return data 
+    return data
 end
 
 function util.num2str(tbl)
@@ -177,19 +165,18 @@ function util.num2str(tbl)
         v = type(v) == "table" and util.num2str(v) or v
         data[k] = v
     end
-    return data 
+    return data
 end
 
-
-function new_module(modname)
-    skynet.cache.clear()
+local function new_module(modname)
+    Skynet.cache.clear()
     local module = package.loaded[modname]
     if module then
         package.loaded[modname] = nil
     end
-    local new_module = require(modname) 
+    local new_mod = require(modname)
     package.loaded[modname] = module
-    return new_module
+    return new_mod
 end
 
 local class_prop = {
@@ -225,18 +212,18 @@ function util.reload_module(modname)
         require(modname)
         return require(modname)
     end
-    local old_module = require(modname)
-    local new_module = new_module(modname)
+    local old_mod = require(modname)
+    local new_mod = new_module(modname)
 
-    for k,v in pairs(new_module) do
+    for k,v in pairs(new_mod) do
         if type(k) == "function" then
-            old_class[k] = v
+            old_mod[k] = v
         end
     end
-    return old_module
+    return old_mod
 end
 
-function util.clone(obj, deep)
+function util.clone(_obj, _deep)
     local lookup = {}
     local function _clone(obj, deep)
         if type(obj) ~= "table" then
@@ -258,7 +245,7 @@ function util.clone(obj, deep)
         return setmetatable(new, getmetatable(obj))
     end
 
-    return _clone(obj, deep)
+    return _clone(_obj, _deep)
 end
 
 function util.short_name(name)
@@ -270,7 +257,7 @@ function util.merge_list(list1, list2)
     for _, v in ipairs(list1) do
         table.insert(list, v)
     end
-    for _, v in ipairs(list1) do
+    for _, v in ipairs(list2) do
         table.insert(list, v)
     end
     return list

@@ -1,5 +1,3 @@
-local skynet = require "skynet"
-
 local assert = assert
 local os = os
 
@@ -33,7 +31,7 @@ end
 --  计算自然天的最后时刻点秒数(每日0点)
 function M.calc_last_daytime( cur_time, cur_date )
     local last_time = cur_time
-    return ( last_time + ((23 - cur_date.hour)*3600 + (59 - cur_date.min)*60 + (59 - cur_date.sec)) ) 
+    return ( last_time + ((23 - cur_date.hour)*3600 + (59 - cur_date.min)*60 + (59 - cur_date.sec)) )
 end
 
 --  计算自然周的最后时刻点秒数(周一0点)
@@ -41,9 +39,10 @@ function M.calc_last_weektime( cur_time, cur_date )
     local last_time = cur_time
     --周日特殊处理
     if cur_date.wday == 1 then
-        return calc_last_daytime( cur_time, cur_date )
+        return M.calc_last_daytime( cur_time, cur_date )
     else
-        return ( last_time + (8 - cur_date.wday)*24*3600 + ((23 - cur_date.hour)*3600 + (59 - cur_date.min)*60 + (59 - cur_date.sec)) ) 
+        return ( last_time + (8 - cur_date.wday)*24*3600 + ((23 - cur_date.hour)*3600
+            + (59 - cur_date.min)*60 + (59 - cur_date.sec)) )
     end
 end
 
@@ -69,7 +68,7 @@ end
 
 -- 计算是否是同天
 function M.is_today(time)
-    return M.is_sameday(time, os.time()) 
+    return M.is_sameday(time, os.time())
 end
 
 function M.is_this_week(time)
@@ -87,14 +86,13 @@ function M.get_today_zero(cur_time, zero_point)
     zero_point = zero_point or 0
     cur_time = cur_time or os.time()
 
-    local def = require "def"
     local t = os.date("*t", cur_time)
     if t.hour < zero_point then
         t = os.date("*t", cur_time-24*3600)
     end
-    local zero_date = {  year    = t.year, 
-                        month   = t.month , 
-                        day     = t.day, 
+    local zero_date = {  year    = t.year,
+                        month   = t.month,
+                        day     = t.day,
                         hour    = zero_point,
                         min     = 0,
                         sec     = 0,}
@@ -105,14 +103,13 @@ function M.get_next_zero(cur_time, zero_point)
     zero_point = zero_point or 0
     cur_time = cur_time or os.time()
 
-    local def = require "def"
     local t = os.date("*t", cur_time)
     if t.hour >= zero_point then
         t = os.date("*t", cur_time + 24*3600)
     end
-    local zero_date = {  year   = t.year, 
-                        month   = t.month , 
-                        day     = t.day, 
+    local zero_date = {  year   = t.year,
+                        month   = t.month,
+                        day     = t.day,
                         hour    = zero_point,
                         min     = 0,
                         sec     = 0,}

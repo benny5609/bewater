@@ -1,12 +1,11 @@
-local skynet = require "skynet"
-local conf   = require "conf"
-local log    = require "log"
+local Conf   = require "conf"
+local Log    = require "log"
 
-local trace = log.trace("webconsole")
+local trace = Log.trace("webconsole")
 
 local M = {}
 function M:start()
-    trace("后台地址: %s:%d", conf.webconsole.host, conf.webconsole.port) 
+    trace("后台地址: %s:%d", Conf.webconsole.host, Conf.webconsole.port)
 end
 
 return M

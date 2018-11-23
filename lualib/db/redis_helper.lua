@@ -1,5 +1,5 @@
-local skynet    = require "skynet"
-local sname     = require "sname"
+local Skynet    = require "skynet"
+local Sname     = require "sname"
 
 local M = {}
 setmetatable(M, {
@@ -9,14 +9,14 @@ setmetatable(M, {
             return v
         else
             return function(...)
-                return skynet.call(sname.REDIS, "lua", k, ...)
+                return Skynet.call(Sname.REDIS, "lua", k, ...)
             end
         end
     end
 })
 
 function M.auto_id()
-    local auto_id = M.get("auto_id") or "10000" 
+    local auto_id = M.get("auto_id") or "10000"
     auto_id = tonumber(auto_id)//1 + 1
     M.set("auto_id", auto_id)
     return auto_id

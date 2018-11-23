@@ -11,6 +11,7 @@ include_files = {
 exclude_files = {
     "lualib/xml/*",
     "lualib/ws/*",
+    "lualib/bash.lua",
 }
 
 ignore = {

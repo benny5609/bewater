@@ -7,7 +7,6 @@ local assert = assert
 local pairs = pairs
 local ipairs = ipairs
 local string = string
-local print = print
 local io = io
 local tinsert = table.insert
 local rawget = rawget
@@ -148,11 +147,11 @@ end
 #define PBC_REPEATED 128
 ]]
 
-_reader[1] = function(msg) return _reader.int end
-_reader[2] = function(msg) return _reader.real end
-_reader[3] = function(msg) return _reader.bool end
-_reader[4] = function(msg) return _reader.string end
-_reader[5] = function(msg) return _reader.string end
+_reader[1] = function() return _reader.int end
+_reader[2] = function() return _reader.real end
+_reader[3] = function() return _reader.bool end
+_reader[4] = function() return _reader.string end
+_reader[5] = function() return _reader.string end
 _reader[6] = function(msg)
 	local message = _reader.message
 	return	function(self,key)
@@ -165,11 +164,11 @@ _reader[9] = _reader[5]
 _reader[10] = _reader[7]
 _reader[11] = _reader[7]
 
-_reader[128+1] = function(msg) return _reader.int_repeated end
-_reader[128+2] = function(msg) return _reader.real_repeated end
-_reader[128+3] = function(msg) return _reader.bool_repeated end
-_reader[128+4] = function(msg) return _reader.string_repeated end
-_reader[128+5] = function(msg) return _reader.string_repeated end
+_reader[128+1] = function() return _reader.int_repeated end
+_reader[128+2] = function() return _reader.real_repeated end
+_reader[128+3] = function() return _reader.bool_repeated end
+_reader[128+4] = function() return _reader.string_repeated end
+_reader[128+5] = function() return _reader.string_repeated end
 _reader[128+6] = function(msg)
 	local message = _reader.message_repeated
 	return	function(self,key)
@@ -216,9 +215,9 @@ end
 local encode_type_cache = {}
 
 local function encode_message(CObj, message_type, t)
-	local type = encode_type_cache[message_type]
+	local tt = encode_type_cache[message_type]
 	for k,v in pairs(t) do
-		local func = type[k]
+		local func = tt[k]
 		func(CObj, k , v)
 	end
 end
@@ -277,11 +276,11 @@ function _writer:int_repeated(k,v)
 	end
 end
 
-_writer[1] = function(msg) return _writer.int end
-_writer[2] = function(msg) return _writer.real end
-_writer[3] = function(msg) return _writer.bool end
-_writer[4] = function(msg) return _writer.string end
-_writer[5] = function(msg) return _writer.string end
+_writer[1] = function() return _writer.int end
+_writer[2] = function() return _writer.real end
+_writer[3] = function() return _writer.bool end
+_writer[4] = function() return _writer.string end
+_writer[5] = function() return _writer.string end
 _writer[6] = function(msg)
 	local message = _writer.message
 	return	function(self,key , v)
@@ -294,11 +293,11 @@ _writer[9] = _writer[5]
 _writer[10] = _writer[7]
 _writer[11] = _writer[7]
 
-_writer[128+1] = function(msg) return _writer.int_repeated end
-_writer[128+2] = function(msg) return _writer.real_repeated end
-_writer[128+3] = function(msg) return _writer.bool_repeated end
-_writer[128+4] = function(msg) return _writer.string_repeated end
-_writer[128+5] = function(msg) return _writer.string_repeated end
+_writer[128+1] = function() return _writer.int_repeated end
+_writer[128+2] = function() return _writer.real_repeated end
+_writer[128+3] = function() return _writer.bool_repeated end
+_writer[128+4] = function() return _writer.string_repeated end
+_writer[128+5] = function() return _writer.string_repeated end
 _writer[128+6] = function(msg)
 	local message = _writer.message_repeated
 	return	function(self,key, v)

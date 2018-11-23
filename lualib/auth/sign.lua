@@ -1,6 +1,5 @@
-local md5 = require "md5"
-local crypt = require "skynet.crypt"
-local codec = require "codec"
+local Md5 = require "md5"
+local Codec = require "codec"
 
 local string_format = string.format
 local string_upper  = string.upper
@@ -8,8 +7,8 @@ local table_sort    = table.sort
 local table_concat  = table.concat
 
 local function encode_uri(s)
-    s = string.gsub(s, "([^A-Za-z0-9])", function(c) 
-        return string.format("%%%02X", string.byte(c)) 
+    s = string.gsub(s, "([^A-Za-z0-9])", function(c)
+        return string.format("%%%02X", string.byte(c))
     end)
     return s
 end
@@ -17,7 +16,7 @@ end
 local M = {}
 -- mark 参数是否加引号
 function M.concat_args(args, mark)
-    local list = {} 
+    local list = {}
     for k, v in pairs(args) do
         if v ~= '' then
             list[#list+1] = string_format(mark and '%s="%s"' or '%s=%s', k, v)
@@ -31,17 +30,17 @@ function M.concat_args(args, mark)
 end
 
 function M.md5_args(args, key, mark)
-    local str = M.concat_args(args, mark) 
+    local str = M.concat_args(args, mark)
     if key then
         str = str .. "&key=" .. key
     end
-    return string_upper(md5.sumhexa(str))
+    return string_upper(Md5.sumhexa(str))
 end
 
 function M.rsa_private_sign(args, private_key, mark)
     local str = M.concat_args(args, mark)
-    local bs = codec.rsa_private_sign(str, private_key)
-    return encode_uri(codec.base64_encode(bs))
+    local bs = Codec.rsa_private_sign(str, private_key)
+    return encode_uri(Codec.base64_encode(bs))
 end
 --[[
 function M.rsa_public_verify(args, public_key, mark)

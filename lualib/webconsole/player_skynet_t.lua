@@ -1,33 +1,27 @@
-local skynet = require "skynet"
-local class = require "class"
-local util = require "util"
-local conf = require "conf"
-local log = require "log"
-local gm = require "gm"
+local Skynet    = require "skynet"
+local Class     = require "class"
+local Conf      = require "conf"
+local Log       = require "log"
+local Gm        = require "gm"
 
-local trace = log.trace("webconsole")
+local trace = Log.trace("webconsole")
 
-local M = class("player_skynet_t")
+local M = Class("PlayerSkynet")
 function M:ctor(player)
     self.player = player
 end
 
 local function debug_call(addr, cmd, ...)
-    return skynet.call(addr, "debug", cmd, ...)
-end
-
-local function debug_send(addr, cmd, ...)
-    return skynet.send(addr, "debug", cmd, ...)
+    return Skynet.call(addr, "debug", cmd, ...)
 end
 
 function M:c2s_all_service()
-    local list = {} 
-    
-    local all = skynet.call(".launcher", "lua", "LIST")
+    local list = {}
+
+    local all = Skynet.call(".launcher", "lua", "LIST")
     for addr, desc in pairs(all) do
         table.insert(list, {addr = addr, desc = desc})
     end
-    
 
     for i, v in ipairs(list) do
         local addr = v.addr
@@ -42,7 +36,7 @@ function M:c2s_all_service()
         v.task = stat.task
         v.mqlen = stat.mqlen
         v.id = i
-        v.address = skynet.address(addr)
+        v.address = Skynet.address(addr)
     end
     table.sort(list, function(a, b)
         return a.addr < b.addr
@@ -50,28 +44,28 @@ function M:c2s_all_service()
     return {service_list = list}
 end
 
-function M:c2s_node_config()
+function M:c2s_node_Config()
     local info = require "util.clusterinfo"
     local profile = info.profile
     return {
-        proj = conf.proj,
-        desc = conf.desc,
+        proj = Conf.proj,
+        desc = Conf.desc,
         pnet_addr = info.pnet_addr,
         inet_addr = info.inet_addr,
         pid = info.pid,
         profile = profile and string.format("CPU:%sMEM:%.fM", profile.cpu, profile.mem/1024),
-        gate = conf.gate and string.format("%s:%s", conf.gate.host, conf.gate.port),
-        webconsole = conf.webconsole and string.format("%s:%s", conf.webconsole.host, conf.webconsole.port),
-        mongo = conf.mongo and string.format("%s:%s[%s]", conf.mongo.host, conf.mongo.port, conf.mongo.name),
-        redis = conf.redis and string.format("%s:%s", conf.redis.host, conf.redis.port),
-        mysql = conf.mysql and string.format("%s:%s[%s]", conf.mysql.host, conf.mysql.port, conf.mysql.name),
-        alert_enable = conf.alert and conf.alert.enable,
+        gate = Conf.gate and string.format("%s:%s", Conf.gate.host, Conf.gate.port),
+        webconsole = Conf.webconsole and string.format("%s:%s", Conf.webconsole.host, Conf.webconsole.port),
+        mongo = Conf.mongo and string.format("%s:%s[%s]", Conf.mongo.host, Conf.mongo.port, Conf.mongo.name),
+        redis = Conf.redis and string.format("%s:%s", Conf.redis.host, Conf.redis.port),
+        mysql = Conf.mysql and string.format("%s:%s[%s]", Conf.mysql.host, Conf.mysql.port, Conf.mysql.name),
+        alert_enable = Conf.alert and Conf.alert.enable,
     }
 end
 
 function M:c2s_get_blacklist()
     trace("get_blacklist")
-    if not conf.redis then
+    if not Conf.redis then
         return {list = "请配置redis数据库"}
     end
     local list = require "ip.blacklist"
@@ -80,7 +74,7 @@ end
 
 function M:c2s_set_blacklist(data)
     trace("set_blacklist")
-    if not conf.redis then
+    if not Conf.redis then
         return {list = "请配置redis数据库"}
     end
     local list = require "ip.blacklist"
@@ -93,7 +87,7 @@ end
 
 function M:c2s_get_whitelist()
     trace("get_blacklist")
-    if not conf.redis then
+    if not Conf.redis then
         return {list = "请配置redis数据库"}
     end
     local list = require "ip.whitelist"
@@ -102,7 +96,7 @@ end
 
 function M:c2s_set_whitelist(data)
     trace("set_blacklist")
-    if not conf.redis then
+    if not Conf.redis then
         return {list = "请配置redis数据库"}
     end
     local list = require "ip.whitelist"
@@ -126,7 +120,7 @@ function M:c2s_run_gm(data)
     end
     table.remove(args, 1)
     table.remove(args, 1)
-    return {ret = time_str..gm.run(modname, cmd, table.unpack(args))}
+    return {ret = time_str..Gm.run(modname, cmd, table.unpack(args))}
 end
 
 return M

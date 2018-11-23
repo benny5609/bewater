@@ -1,15 +1,11 @@
-local skynet    = require "skynet"
-local random_c  = require "random.core"
-local log       = require "log"
-local trace     = log.trace("random")
+local Random  = require "random.core"
 
 local M = {}
 local table_insert = table.insert
 local table_remove = table.remove
-local MAX_PROB = 100000000 --掉落概率随机数上限
 
 function M.prob(value)
-    return random_c.prob(value * 10)
+    return Random.prob(value * 10)
 end
 
 --从数组中选出不重复的数，len为数组大小，num为选出数量，
@@ -19,11 +15,10 @@ function M.random_unrepeat(len, num)
     for i=1,len do
         table_insert(arr, i)
     end
-    
+
     local ret = {}
-    
     for i=1, num do
-        local len = #arr
+        len = #arr
         if len <= 0 then
             return ret
         end
@@ -37,7 +32,6 @@ function M.random_unrepeat(len, num)
     end
 
     return ret
-
 end
 
 --根据随机表,返回随机到的物品属性
@@ -49,7 +43,7 @@ function M.random_item_attr(tbl)
         table.insert(t, v[2])
     end
     --return tbl[1][1]
-    local idx = random_c.range_prob(t)
+    local idx = Random.range_prob(t)
     assert(tbl[idx], string.format("tbl len:%s, idx:%d", table.concat(t, ','), idx))
     return tbl[idx][1]
 end
@@ -57,7 +51,7 @@ end
 -- 一维表随机函数
 -- tbl = { chanceA, chanceB, ... }
 function M.random_item_attr_1d( tbl )
-    return random_c.range_prob(tbl)
+    return Random.range_prob(tbl)
 end
 
 return M

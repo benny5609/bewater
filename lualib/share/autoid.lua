@@ -1,4 +1,3 @@
-local Skynet = require "skynet.manager"
 local Cluster = require "skynet.cluster"
 
 local M = {}

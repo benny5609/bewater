@@ -1,20 +1,20 @@
-local db = require "db.redis_helper"
+local Redis = require "db.redis_helper"
 
 local M = {}
 function M.add(ip)
-    db.sadd("blacklist", ip)
+    Redis.sadd("blacklist", ip)
 end
 
 function M.remove(ip)
-    db.srem("blacklist", ip)
+    Redis.srem("blacklist", ip)
 end
 
 function M.check(ip)
-    return db.sismember("blacklist", string.match(ip, "([^:]+)"))
+    return Redis.sismember("blacklist", string.match(ip, "([^:]+)"))
 end
 
 function M.list()
-    return db.smembers("blacklist")
+    return Redis.smembers("blacklist")
 end
 
 function M.import(filepath)
@@ -39,7 +39,7 @@ function M.export(filepath)
 end
 
 function M.clear()
-    return db.del "blacklist"
+    return Redis.del "blacklist"
 end
 
 return M

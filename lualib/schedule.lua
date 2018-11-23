@@ -21,7 +21,7 @@ end
 
 -- curtime
 function schedule.time()
-    local difftime = skynet.call(service_addr, "lua")    
+    local difftime = skynet.call(service_addr, "lua")
     return skynet.time() + difftime
 end
 
@@ -29,7 +29,7 @@ skynet.init(function()
     local schedule_service = function()
 -- schedule service
 
-local skynet = require "skynet"
+--local Skynet = require "skynet"
 
 local task = { session = 0, difftime = 0 }
 
@@ -123,8 +123,8 @@ skynet.start(function()
                     time = os.date(nil, v.time),
                     address = skynet.address(v.address),
                 })
+                return info
             end
-            return info
         end
     end)
 end)

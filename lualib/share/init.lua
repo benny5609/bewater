@@ -1,5 +1,4 @@
 -- 向share节点上报集群配置
-local Skynet = require "skynet"
 local Cluster = require "skynet.cluster"
 local Conf = require "conf"
 

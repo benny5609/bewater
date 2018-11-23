@@ -1,17 +1,16 @@
-local skynet   = require "skynet"
-local schedule = require "schedule"
-local util     = require "util"
+local Skynet   = require "skynet"
+local Schedule = require "schedule"
 
 local M = {}
 -- t:{month=, day=, wday=, hour= , min=} wday
 function M.schedule(t, cb)
     assert(type(t) == "table")
     assert(cb)
-    skynet.fork(function()
+    Skynet.fork(function()
         while true do
-            schedule.submit(t) 
+            Schedule.submit(t)
             cb()
-            skynet.sleep(100)
+            Skynet.sleep(100)
         end
     end)
 end

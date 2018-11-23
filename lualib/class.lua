@@ -3,7 +3,6 @@
 --
 
 local type = type
-local rawset = rawset
 local setmetatable = setmetatable
 
 local trace_count = 0
@@ -17,28 +16,28 @@ local function class(classname, super)
     cls.__index = cls
 
     if super then
-        -- copy super method 
+        -- copy super method
         for key, value in pairs(super) do
             if type(value) == "function" and key ~= "ctor" then
                 cls[key] = value
             end
         end
-        
+
         cls.super = super
     end
 
     function cls.new(...)
         local self = setmetatable({}, cls)
-        local function create(cls, ...)
-            if cls.super then
-                create(cls.super, ...)
+        local function create(_cls, ...)
+            if _cls.super then
+                create(_cls.super, ...)
             end
-            if cls.ctor then
-                cls.ctor(self, ...)
+            if _cls.ctor then
+                _cls.ctor(self, ...)
             end
         end
         create(cls, ...)
-        
+
         -- debug
         trace_count = trace_count + 1
         tracebacks[self] = trace_count

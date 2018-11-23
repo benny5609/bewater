@@ -1,5 +1,5 @@
 local meta = {
-    __newindex = function(t, k) 
+    __newindex = function(_, k)
         error(string.format("readonly:%s", k), 2)
     end
 }

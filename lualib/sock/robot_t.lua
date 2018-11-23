@@ -1,19 +1,18 @@
-local skynet    = require "skynet"
-local socket    = require "skynet.socket"
+local Skynet    = require "skynet"
+local Socket    = require "skynet.socket"
+local Http      = require "web.http_helper"
+local Packet    = require "sock.packet"
+local Packetc   = require "packet.core"
+local Protobuf  = require "protobuf"
+local Opcode    = require "def.opcode"
+local Errcode   = require "def.errcode"
+local Util      = require "util"
+local Json      = require "cjson"
+local Class     = require "class"
+
 local coroutine = require "skynet.coroutine"
-local http      = require "web.http_helper"
-local packet    = require "sock.packet"
-local packetc   = require "packet.core"
-local protobuf  = require "protobuf"
-local opcode    = require "def.opcode"
-local errcode   = require "def.errcode"
-local util      = require "util"
-local json      = require "cjson"
-local class     = require "class"
 
-local fd
-
-local M = class("robot_t")
+local M = Class("robot_t")
 function M:ctor(proj)
     self._proj = proj
     self._host = nil
@@ -29,16 +28,16 @@ function M:ctor(proj)
     self._cache = ""
 end
 
-function M:login(acc)
-    --local ret, resp = http.get("http://www.kaizhan8.com:8888/login/req_login", {
-    local ret, resp = http.get("http://huangjx.top/login/req_login", {
-        proj = self._proj 
+function M:login()
+    --local ret, resp = Http.get("http://www.kaizhan8.com:8888/login/req_login", {
+    local _, resp = Http.get("http://huangjx.top/login/req_login", {
+        proj = self._proj
     })
     if resp == "error" then
         return
     end
     --print(ret, resp)
-    local data = json.decode(resp)
+    local data = Json.decode(resp)
     self._host = data.host
     self._port = data.port
 end
@@ -46,12 +45,12 @@ end
 function M:start(host, port)
     self._host = assert(host)
     self._port = assert(port)
-    self._fd = socket.open(self._host, self._port)
+    self._fd = Socket.open(self._host, self._port)
     assert(self._fd)
 
-    skynet.fork(function()
+    Skynet.fork(function()
         while true do
-            local buff = socket.read(self._fd)
+            local buff = Socket.read(self._fd)
             if not buff then
                 self:offline()
                 return
@@ -66,28 +65,28 @@ function M:start(host, port)
                 if #cache < sz then
                     break
                 end
-                local buff = string.sub(cache, 3, 2 + sz)
+                buff = string.sub(cache, 3, 2 + sz)
                 self._cache = string.sub(cache, 3 + sz, -1)
                 self:_recv(buff)
             end
 
         end
     end)
- 
+
     -- ping
-    skynet.fork(function()
+    Skynet.fork(function()
         while true do
             self:ping()
-            skynet.sleep(100*30)
+            Skynet.sleep(100*30)
         end
     end)
 
     -- tick
     self.tick = 0
-    skynet.fork(function()
+    Skynet.fork(function()
         while true do
             self.tick = self.tick + 1
-            skynet.sleep(1)
+            Skynet.sleep(1)
             for co, time in pairs(self._waiting) do
                 if time <= 0 then
                     self:_suspended(co)
@@ -101,7 +100,7 @@ end
 
 function M:test(func)
     local co = coroutine.create(function()
-        util.try(func)  
+        Util.try(func)
     end)
     self:_suspended(co)
 end
@@ -111,8 +110,8 @@ function M:call(op, data)
     local ret = coroutine.yield(op)
     local code = ret and ret.err
     if code ~= 0 then
-        skynet.error(string.format("call %s error:0x%x, desc:%s", 
-            opcode.toname(op), code, errcode.describe(code)))
+        Skynet.error(string.format("call %s error:0x%x, desc:%s",
+            Opcode.toname(op), code, Errcode.describe(code)))
     end
     return ret
 end
@@ -123,15 +122,15 @@ end
 
 function M:send(op, tbl)
     self._csn = self._csn + 1
-    
+
     local data, len
-    protobuf.encode(opcode.toname(op), tbl or {}, function(buffer, bufferlen)
-        data, len = packet.pack(op, self._csn, self._ssn, 
+    Protobuf.encode(Opcode.toname(op), tbl or {}, function(buffer, bufferlen)
+        data, len = Packet.pack(op, self._csn, self._ssn,
             self._crypt_type, self._crypt_key, buffer, bufferlen)
     end)
 
-    print(string.format("send %s, csn:%d, sz:%s", opcode.toname(op), self._csn, len))
-    socket.write(self._fd, data, len)
+    print(string.format("send %s, csn:%d, sz:%s", Opcode.toname(op), self._csn, len))
+    Socket.write(self._fd, data, len)
 end
 
 function M:ping()
@@ -144,28 +143,28 @@ end
 
 
 function M:_recv(sock_buff)
-    local data      = packetc.new(sock_buff) 
+    local data      = Packetc.new(sock_buff)
     --local total     = data:read_ushort()
-    local op        = data:read_ushort()
-    local csn       = data:read_ushort()
-    local ssn       = data:read_ushort()
-    local crypt_type= data:read_ubyte()
-    local crypt_key = data:read_ubyte()
-    local sz        = #sock_buff - 8 
-    local buff      = data:read_bytes(sz)
-    --local op, csn, ssn, crypt_type, crypt_key, buff, sz = packet.unpack(sock_buff)
+    local op    = data:read_ushort()
+    local csn   = data:read_ushort()
+    local ssn   = data:read_ushort()
+    data:read_ubyte() -- crypt_type
+    data:read_ubyte() -- crypt_key
+    local sz    = #sock_buff - 8
+    local buff  = data:read_bytes(sz)
+    --local op, csn, ssn, crypt_type, crypt_key, buff, sz = Packet.unpack(sock_buff)
     self._ssn = ssn
 
-    local opname = opcode.toname(op)
-    local modulename = opcode.tomodule(op)
-    local simplename = opcode.tosimplename(op)
+    local opname = Opcode.toname(op)
+    local modulename = Opcode.tomodule(op)
+    local simplename = Opcode.tosimplename(op)
     local funcname = modulename .. "_" .. simplename
-    
+
     print(string.format("recv %s, csn:%d ssn:%d", opname, csn, ssn))
 
-    local data = protobuf.decode(opname, buff, sz)
+    data = Protobuf.decode(opname, buff, sz)
     if self[funcname] then
-        self[funcname](self, data) 
+        self[funcname](self, data)
     end
 
     local co = self._call_requests[op - 1]
@@ -177,8 +176,8 @@ end
 
 function M:_suspended(co, op, ...)
     assert(op == nil or op >= 0)
-    local status, op, wait = coroutine.resume(co, ...)
-    if coroutine.status(co) == "suspended" then                                                                                                                                                                                  
+    local _, _, wait = coroutine.resume(co, ...)
+    if coroutine.status(co) == "suspended" then
         if op then
             self._call_requests[op] = co
         end

@@ -2,7 +2,7 @@
 -- 0x0000 ~ 0x0fff 通用错误码
 -- 0x1000 ~ 0xffff 项目自定错误码
 
-local errcode = {}                                                                                                                                                                                                                       
+local errcode = {}
 local code2describe = {}
 local name2errcode = {}
 

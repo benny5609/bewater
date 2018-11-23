@@ -36,7 +36,7 @@ function mt:unlock()
     self.locked = false
     self.lock_count = nil
 
-    local co = table.remove(self.lock_waiter, 1)
+    co = table.remove(self.lock_waiter, 1)
     if co then
         self:_lock(co)
         Skynet.wakeup(co)

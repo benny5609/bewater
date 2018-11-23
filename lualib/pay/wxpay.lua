@@ -1,13 +1,9 @@
-local skynet = require "skynet"
-local mongo = require "db.mongo_helper"
-local mysql = require "db.mysql_helper"
-local sign = require "auth.sign"
-local lua2xml = require "xml.lua2xml"
-local xml2lua = require "xml.xml2lua"
-local http = require "web.http_helper"
-local conf = require "conf"
-
-local orders = {}
+local Sign      = require "auth.sign"
+local Lua2xml   = require "xml.lua2xml"
+local Xml2lua   = require "xml.xml2lua"
+local Http      = require "web.http_helper"
+local Conf      = require "conf"
+local Errcode   = require "def.errcode"
 
 local M = {}
 function M.create_order(param)
@@ -16,34 +12,34 @@ function M.create_order(param)
     local appid         = assert(param.appid)
     local mch_id        = assert(param.mch_id)
     local key           = assert(param.key)
-    local item_sn       = assert(param.item_sn)
     local item_desc     = assert(param.item_desc)
-    local pay_channel   = assert(param.pay_channel)
     local pay_method    = assert(param.pay_method)
     local pay_price     = assert(param.pay_price)
-    
+    assert(param.pay_channel)
+    assert(param.item_sn)
+
     local args = {
         appid           = appid,
         mch_id          = mch_id,
         nonce_str       = math.random(10000)..uid,
         trade_type      = pay_method == "wxpay" and "APP" or "NATIVE",
-        body            = item_desc,    
+        body            = item_desc,
         out_trade_no    = order_no..'-'..os.time(),
         total_fee       = pay_price*100//1 >> 0,
         spbill_create_ip= '127.0.0.1',
-        notify_url      = string.format("%s:%s/api/payment/wxpay_notify", conf.pay.host, conf.pay.port),
+        notify_url      = string.format("%s:%s/api/payment/wxpay_notify", Conf.pay.host, Conf.pay.port),
     }
-    args.sign = sign.md5_args(args, key)
-    local xml = lua2xml.encode("xml", args, true)
-    local ret, resp = http.post("https://api.mch.weixin.qq.com/pay/unifiedorder", xml)
-    local data = xml2lua.decode(resp).xml
+    args.sign = Sign.md5_args(args, key)
+    local xml = Lua2xml.encode("xml", args, true)
+    local _, resp = Http.post("https://api.mch.weixin.qq.com/pay/unifiedorder", xml)
+    local data = Xml2lua.decode(resp).xml
 
     if data.return_code ~= "SUCCESS" and data.return_msg ~= "OK" then
-        return errcode.WXORDER_FAIL
+        return Errcode.WXORDER_FAIL
     end
-    
+
     local ret
-    if data.trade_type == "APP" then 
+    if data.trade_type == "APP" then
         ret = {
             appid = appid,
             partnerid = mch_id,
@@ -52,7 +48,7 @@ function M.create_order(param)
             prepayid = data.prepay_id,
             timestamp = os.time(),
         }
-        ret.sign = sign.md5_args(ret, key)
+        ret.sign = Sign.md5_args(ret, key)
     else
         ret = {
             code_url = data.code_url
@@ -82,15 +78,16 @@ function M.notify(order, key, param)
             args[k] = v
         end
     end
-    
-    local sign1 = sign.md5_args(args, key)
+
+    local sign1 = Sign.md5_args(args, key)
     local sign2 = param.sign
     if sign1 ~= sign2 then
         return WX_FAIL
     end
-    
+
     if param.result_code ~= "SUCCESS" or param.return_code ~= "SUCCESS" then
         --order.item_state = -1
+        print("wxpay fail")
     else
         --order.item_state = 1
         order.pay_time = os.time()

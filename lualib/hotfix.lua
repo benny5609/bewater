@@ -2,15 +2,15 @@ local skynet = require "skynet"
 local sname = require "sname"
 
 local M = {}
-function new_module(modname)
+local function new_module(modname)
     skynet.cache.clear()
     local module = package.loaded[modname]
     if module then
         package.loaded[modname] = nil
     end
-    local new_module = require(modname) 
+    local new_mod = require(modname)
     package.loaded[modname] = module
-    return new_module
+    return new_mod
 end
 
 local class_prop = {
@@ -45,15 +45,15 @@ function M.module(modname)
     if not package.loaded[modname] then
         return require(modname)
     end
-    local old_module = require(modname)
-    local new_module = new_module(modname)
+    local old_mod = require(modname)
+    local new_mod = new_module(modname)
 
-    for k,v in pairs(new_module) do
+    for k,v in pairs(new_mod) do
         if type(v) == "function" then
-            old_module[k] = v
+            old_mod[k] = v
         end
     end
-    return old_module
+    return old_mod
 end
 
 -- 注册热更,由GM服务托管，需要处理hotfix这个消息

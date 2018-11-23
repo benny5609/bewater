@@ -1,4 +1,4 @@
-local skynet = require "skynet"
+local Skynet = require "skynet"
 
 local tostring = tostring
 local select   = select
@@ -6,7 +6,7 @@ local select   = select
 local M = {}
 function M.trace(sys)
     return function(fmt, ...)
-        skynet.send(".logger", "lua", "trace", skynet.self(), sys, string.format(fmt, ...))
+        Skynet.send(".logger", "lua", "trace", Skynet.self(), sys, string.format(fmt, ...))
     end
 end
 
@@ -17,18 +17,18 @@ function M.print(sys)
             args[i] = tostring(select(i, ...))
         end
         local str = table.concat(args, " ")
-        skynet.send(".logger", "lua", "trace", skynet.self(), sys, str)
+        Skynet.send(".logger", "lua", "trace", Skynet.self(), sys, str)
     end
 end
 
 function M.player(uid)
     return function(fmt, ...)
-        skynet.send(".logger", "lua", "player", skynet.self(), uid, string.format(fmt, ...))
+        Skynet.send(".logger", "lua", "player", Skynet.self(), uid, string.format(fmt, ...))
     end
 end
 
 function M.sighup()
-    skynet.send(".logger", "lua", "register_sighup", skynet.self())
+    Skynet.send(".logger", "lua", "register_sighup", Skynet.self())
 end
 
 return M
