@@ -161,9 +161,9 @@ function M:_recv(sock_buff)
     end
 end
 
-function M:_suspended(co, op, ...)
-    assert(op == nil or op >= 0)
-    local _, _, wait = coroutine.resume(co, ...)
+function M:_suspended(co, _op, ...)
+    assert(_op == nil or _op >= 0)
+    local _, op, wait = coroutine.resume(co, ...)
     if coroutine.status(co) == "suspended" then
         if op then
             self._call_requests[op] = co

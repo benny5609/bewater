@@ -50,7 +50,7 @@ end
 
 -- 内网ip
 function M.get_inet_addr()
-    local ret = bash "ifConfig eth0"
+    local ret = bash "ifconfig eth0"
     return string.match(ret, "inet addr:([^%s]+)") or string.match(ret, "inet ([^%s]+)")
 end
 
