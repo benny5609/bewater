@@ -4,6 +4,7 @@ local Xml2lua   = require "xml.xml2lua"
 local Http      = require "web.http_helper"
 local Conf      = require "conf"
 local Errcode   = require "def.errcode"
+local Def       = require "def"
 
 local M = {}
 function M.create_order(param)
@@ -69,7 +70,7 @@ local WX_FAIL = {
 }
 
 function M.notify(order, key, param)
-    if order.item_state == 1 then
+    if order.item_state == def.PayState.SUCCESS then
         return WX_OK
     end
     local args = {}
@@ -86,10 +87,8 @@ function M.notify(order, key, param)
     end
 
     if param.result_code ~= "SUCCESS" or param.return_code ~= "SUCCESS" then
-        --order.item_state = -1
         print("wxpay fail")
     else
-        --order.item_state = 1
         order.pay_time = os.time()
         order.tid = param.transaction_id
     end
