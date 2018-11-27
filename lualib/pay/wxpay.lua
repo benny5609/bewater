@@ -5,6 +5,8 @@ local Http      = require "web.http_helper"
 local Conf      = require "conf"
 local Errcode   = require "def.errcode"
 local Def       = require "def"
+local Log       = require "log"
+local trace     = Log.trace("wxpay")
 
 local M = {}
 function M.create_order(param)
@@ -70,7 +72,7 @@ local WX_FAIL = {
 }
 
 function M.notify(order, key, param)
-    if order.item_state == def.PayState.SUCCESS then
+    if order.item_state == Def.PayState.SUCCESS then
         return WX_OK
     end
     local args = {}
@@ -87,7 +89,7 @@ function M.notify(order, key, param)
     end
 
     if param.result_code ~= "SUCCESS" or param.return_code ~= "SUCCESS" then
-        print("wxpay fail")
+        trace("wxpay fail %s", util.dump(param))
     else
         order.pay_time = os.time()
         order.tid = param.transaction_id

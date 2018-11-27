@@ -1,28 +1,28 @@
-local mt = {}                                                                                                                                        
+local mt = {}
 mt.__index = mt
 
 function mt:add(obj)
     if self._hash[obj] then
         return
-    end 
-    self._array[#self._array + 1] = obj 
+    end
+    self._array[#self._array + 1] = obj
     self._hash[obj] = #self._array
 end
 
 function mt:remove(obj)
     local idx = self._hash[obj]
     if not idx then
-        return idx 
-    end 
+        return idx
+    end
     local tail_obj = self._array[#self._array]
     self._array[idx] = tail_obj
-    self._array[#self._array] = nil 
-    self._hash[obj] = nil 
-    self._hash[tail_obj] = idx 
+    self._array[#self._array] = nil
+    self._hash[obj] = nil
+    self._hash[tail_obj] = idx
 end
 
 function mt:has(obj)
-    return self._hash[obj] ~= nil 
+    return self._hash[obj] ~= nil
 end
 
 function mt:random_one()
@@ -52,6 +52,6 @@ function M.new()
         _array = {},
         _hash  = {},
     }
-    return setmetatable(obj, mt) 
+    return setmetatable(obj, mt)
 end
 return M

@@ -1,13 +1,11 @@
 local Skynet    = require "skynet"
 local Socket    = require "skynet.socket"
-local Http      = require "web.http_helper"
 local Packet    = require "sock.packet"
 local Packetc   = require "packet.core"
 local Protobuf  = require "protobuf"
 local Opcode    = require "def.opcode"
 local Errcode   = require "def.errcode"
 local Util      = require "util"
-local Json      = require "cjson"
 local Class     = require "class"
 
 local coroutine = require "skynet.coroutine"
