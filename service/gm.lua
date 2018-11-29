@@ -4,6 +4,8 @@ local Schedule      = require "schedule"
 local Util          = require "util"
 local DateHelper    = require "util.date_helper"
 
+require "skynet.cluster"
+
 local trace = Log.trace("gm")
 
 local skynet_cmd = {}

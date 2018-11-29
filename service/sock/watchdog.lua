@@ -11,6 +11,7 @@ local GATE
 local fd2uid = {}
 local uid2agent = {}    -- 每个玩家对应的agent
 local free_agents = {}  -- 空闲的agent addr -> true
+local full_agents = {}  -- 满员的agent addr -> true
 
 local PLAYER_PER_AGENT  -- 每个agent支持player最大值
 local PROTO
@@ -32,16 +33,20 @@ function SOCKET.open(fd, addr)
 	local is_full = Skynet.call(agent, "lua", "new_player", fd, addr)
     if is_full then
         free_agents[agent] = nil
+        full_agents[agent] = true
     end
 end
 
 local function close_socket(fd)
+    Skynet.error("close_socket", fd)
     local uid = fd2uid[fd]
     if not uid then
+        Skynet.error("&&&& uid not exist")
         return
     end
     local agent = uid2agent[uid]
     if not agent then
+        Skynet.error("&&&& agent not exist")
         return
     end
     Skynet.call(agent, "lua", "socket_close", uid, fd)
@@ -81,8 +86,38 @@ function CMD.start(conf)
         free_agents[agent] = true
     end
 end
+
+function CMD.stop()
+    for agent, _ in pairs(free_agents) do
+        Skynet.send(agent, "lua", "stop")
+    end
+    for agent, _ in pairs(full_agents) do
+        Skynet.send(agent, "lua", "stop")
+    end
+    while true do
+        local count = 0
+        for _, v in pairs(free_agents) do
+            count = count + 1
+        end
+        for _, v in pairs(full_agents) do
+            count = count + 1
+        end
+        Skynet.error(string.format("left agent:%d", count))
+        if count == 0 then
+            return
+        end
+        Skynet.sleep(10)
+    end
+end
+
 function CMD.set_free(agent)
     free_agents[agent] = true
+    full_agents[agent] = nil
+end
+
+function CMD.free_agent(agent)
+    free_agents[agent] = nil
+    full_agents[agent] = nil
 end
 
 -- 上线后agent绑定uid，下线缓存一段时间
@@ -95,15 +130,16 @@ end
 function CMD.free_player(agent, uid)
     uid2agent[uid] = nil
     free_agents[agent] = true
+    full_agents[agent] = nil
 end
 
-function CMD.reconnect(fd, uid, csn, ssn, passport)
+function CMD.reconnect(fd, uid, csn, ssn)
     assert(fd)
     assert(uid)
     assert(csn and ssn)
     local agent = uid2agent[uid]
-    if agent and Skynet.call(agent, "lua", "reconnect", fd, uid, csn, ssn, passport) then
-        return agent
+    if agent then
+        return Skynet.call(agent, "lua", "reconnect", fd, uid, csn, ssn)
     end
 end
 
