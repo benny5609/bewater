@@ -2,7 +2,6 @@ local Skynet    = require "skynet"
 local Packet    = require "sock.packet"
 local Util      = require "util"
 local Protobuf  = require "protobuf"
-local Errcode   = require "def.errcode"
 
 local player_path = ...
 local player_t = require(player_path)
@@ -56,9 +55,9 @@ function CMD.new_player(fd, ip)
 end
 
 -- from watchdog
-function CMD.socket_close(uid, fd)
+function CMD.socket_close(_, fd)
     local player = assert(fd2player[fd], fd)
-    Skynet.error("&&&&&&&& socket_close", player, player.net:get_fd(), fd)    
+    Skynet.error("&&&&&&&& socket_close", player, player.net:get_fd(), fd)
     if player.net:get_fd() == fd then
         player:offline()
     end
@@ -82,13 +81,13 @@ function CMD.free_player(uid)
     count = count - 1
 end
 
-function CMD.reconnect(fd, uid, csn, ssn)
+function CMD.reconnect(fd, uid, csn, ssn, passport, user_info)
     local player = uid2player[uid]
     if not player then
         return
     end
-    local old_fd = player.net:get_fd()
-    if player.net:reconnect(fd, csn, ssn) then
+    --local old_fd = player.net:get_fd()
+    if player.net:reconnect(fd, csn, ssn, passport, user_info) then
         --fd2player[old_fd] = nil
         fd2player[fd] = player
 	    Skynet.call(GATE, "lua", "forward", fd)

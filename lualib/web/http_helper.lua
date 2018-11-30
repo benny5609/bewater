@@ -3,7 +3,7 @@
 local Skynet    = require "skynet"
 local Sname     = require "sname"
 local Json      = require "cjson.safe"
-local Util      = require "util"
+--local Util      = require "util"
 require "bash"
 
 local M = {}
@@ -62,7 +62,7 @@ end
 ]]
 function M.ip_info(ip)
     assert(ip)
-    local ret, resp = M.get("http://ip.taobao.com/service/getIpInfo.php", {ip = ip})
+    local _, resp = M.get("http://ip.taobao.com/service/getIpInfo.php", {ip = ip})
     resp = Json.decode(resp)
     if not resp then
         Skynet.error("get ip_info error", ip, resp)

@@ -133,13 +133,13 @@ function CMD.free_player(agent, uid)
     full_agents[agent] = nil
 end
 
-function CMD.reconnect(fd, uid, csn, ssn)
+function CMD.reconnect(fd, uid, csn, ssn, passport, user_info)
     assert(fd)
     assert(uid)
     assert(csn and ssn)
     local agent = uid2agent[uid]
     if agent then
-        return Skynet.call(agent, "lua", "reconnect", fd, uid, csn, ssn)
+        return Skynet.call(agent, "lua", "reconnect", fd, uid, csn, ssn, passport, user_info)
     end
 end
 

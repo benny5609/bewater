@@ -98,13 +98,15 @@ function M:close()
     Skynet.call(self._gate, "lua", "kick", self._fd)
 end
 
-function M:reconnect(fd, csn, ssn, passport)
+-- fd, csn, ssn, passport
+function M:reconnect(fd, csn, ssn, passport, user_info)
     Skynet.error("&&&&&& reconnect")
     self:send(Opcode.user.s2c_kickout)
     self:close()
     self._fd = fd
     --self.player:online()
     self.player.is_cache = false
+    self.player.user:init_by_data(user_info)
     self:call_watchdog("player_online", self:get_agent(), self.player.uid, fd)
     self.player:sync_all()
     return true
