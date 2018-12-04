@@ -1,5 +1,4 @@
 local skynet = require "skynet"
-local service = require "skynet.service"
 
 require "ip.ip_country"
 require "schedule"

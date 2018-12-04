@@ -13,6 +13,7 @@ exclude_files = {
     "lualib/ws/*",
     "lualib/bash.lua",
     "lualib/schedule.lua",
+    "lualib/ip/ip_country.lua",
 }
 
 ignore = {
