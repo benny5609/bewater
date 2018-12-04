@@ -134,11 +134,11 @@ Skynet.start(function()
         end
     end)
 
-    -- 定时检查超时，一秒误差，如需要精准的触发，使用日程表schedule
+    -- 定时检查超时，一分钟误差，如需要精准的触发，使用日程表schedule
     Skynet.fork(function()
         while true do
             check_timeout()
-            Skynet.sleep(100)
+            Skynet.sleep(60*100)
         end
     end)
 end)
