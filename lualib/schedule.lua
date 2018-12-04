@@ -1,5 +1,5 @@
-local Skynet = require "skynet"
-local Service = require "skynet.service"
+local skynet = require "skynet"
+local service = require "skynet.service"
 
 local schedule = {}
 local service_addr
@@ -7,7 +7,7 @@ local service_addr
 -- { month=, day=, wday=, hour= , min= }
 function schedule.submit(ti)
     assert(ti)
-    return Skynet.call(service_addr, "lua", ti)
+    return skynet.call(service_addr, "lua", ti)
 end
 
 function schedule.changetime(ti)
@@ -16,20 +16,20 @@ function schedule.changetime(ti)
         tmp[k] = v
     end
     tmp.changetime = true
-    return Skynet.call(service_addr, "lua", tmp)
+    return skynet.call(service_addr, "lua", tmp)
 end
 
 -- curtime
 function schedule.time()
-    local difftime = Skynet.call(service_addr, "lua")
-    return Skynet.time() + difftime
+    local difftime = skynet.call(service_addr, "lua")
+    return skynet.time() + difftime
 end
 
-Skynet.init(function()
+skynet.init(function()
     local schedule_service = function()
 -- schedule service
 
-local Skynet = require "skynet"
+local skynet = require "skynet"
 
 local task = { session = 0, difftime = 0 }
 
@@ -74,26 +74,26 @@ local function next_time(now, ti)
 end
 
 local function changetime(ti)
-    local ct = math.floor(Skynet.time())
+    local ct = math.floor(skynet.time())
     local current = os.date("*t", ct)
     current.time = ct
     ti.hour = ti.hour or current.hour
     ti.min = ti.min or current.min
     ti.sec = ti.sec or current.sec
     local nt = next_time(current, ti)
-    Skynet.error(string.format("Change time to %s", os.date(nil, nt)))
+    skynet.error(string.format("Change time to %s", os.date(nil, nt)))
     task.difftime = os.difftime(nt,ct)
     for k,v in pairs(task) do
         if type(v) == "table" then
-            Skynet.wakeup(v.co)
+            skynet.wakeup(v.co)
         end
     end
-    Skynet.ret(Skynet.pack(nt))
+    skynet.ret(skynet.pack(nt))
 end
 
 local function submit(_, addr, ti)
     if not ti then
-        return Skynet.ret(Skynet.pack(task.difftime))
+        return skynet.ret(skynet.pack(task.difftime))
     end
     if ti.changetime then
         return changetime(ti)
@@ -101,27 +101,27 @@ local function submit(_, addr, ti)
     local session = task.session + 1
     task.session = session
     repeat
-        local ct = math.floor(Skynet.time()) + task.difftime
+        local ct = math.floor(skynet.time()) + task.difftime
         local current = os.date("*t", ct)
         current.time = ct
         local nt = next_time(current, ti)
         task[session] = { time = nt, co = coroutine.running(), address = addr }
         local diff = os.difftime(nt , ct)
         --print("sleep", diff)
-    until Skynet.sleep(diff * 100) ~= "BREAK"
+    until skynet.sleep(diff * 100) ~= "BREAK"
     task[session] = nil
-    Skynet.ret()
+    skynet.ret()
 end
 
-Skynet.start(function()
-    Skynet.dispatch("lua", submit)
-    Skynet.info_func(function()
+skynet.start(function()
+    skynet.dispatch("lua", submit)
+    skynet.info_func(function()
         local info = {}
         for k, v in pairs(task) do
             if type(v) == "table" then
                 table.insert( info, {
                     time = os.date(nil, v.time),
-                    address = Skynet.address(v.address),
+                    address = skynet.address(v.address),
                 })
                 return info
             end
@@ -132,7 +132,7 @@ end)
 -- end of schedule service
     end
 
-    service_addr = Service.new("schedule", schedule_service)
+    service_addr = service.new("schedule", schedule_service)
 end)
 
 return schedule

@@ -6,14 +6,9 @@ then
     exit
 fi
 
-cd ../../
-rootspace=$(cd $(dirname $0); pwd)
-root_name=$(basename $rootspace)
-cd -
-
 cd ../
 workspace=$(cd $(dirname $0); pwd)
-proj_name=$(basename $workspace)
+root_name=$(basename $workspace)
 cd -
 
 etc_name=$1 #master
@@ -23,11 +18,12 @@ is_deamon=$4 #true
 
 config=${etc_name}.cfg
 
+echo $workspace
 mkdir -p ${workspace}/log
 mkdir -p ${workspace}/etc
 cd ${workspace}/etc
 
-echo workspace = \"../${root_name}/${proj_name}/\" > ${config}
+echo workspace = \"../${root_name}/\" > ${config}
 echo thread = 8 >> ${config}
 echo logpath = \".\" >> ${config}
 echo harbor = 0 >> ${config}
@@ -35,10 +31,10 @@ echo start = \"${start_script}\" >> ${config}
 echo 'bootstrap = "snlua bootstrap"' >> ${config}
 echo 'lualoader = "lualib/loader.lua"' >> ${config}
 echo 'snax = workspace.."service/?.lua"' >> ${config}
-echo 'luaservice = workspace.."service/?.lua;"..workspace.."../../bewater/service/?.lua;".."./service/?.lua;".."./liblua/?.lua;"' >> ${config}
-echo 'cpath = workspace.."luaclib/?.so;"..workspace.."../../luaclib/?.so;".."./cservice/?.so;./luaclib/?.so"' >> ${config}
-echo 'lua_path = workspace.."script/?.lua;"..workspace.."lualib/?.lua;"..workspace.."../../bewater/lualib/?.lua;".."./lualib/?.lua;"' >> ${config}
-echo 'lua_cpath = workspace.."luaclib/?.so;"..workspace.."../../bewater/luaclib/?.so;".."./luaclib/?.so;"'  >> ${config}
+echo 'luaservice = workspace.."examples/?.lua;"..workspace.."service/?.lua;"..workspace.."service/?.lua;".."./service/?.lua;".."./liblua/?.lua;"' >> ${config}
+echo 'cpath = workspace.."luaclib/?.so;"..workspace.."luaclib/?.so;".."./cservice/?.so;./luaclib/?.so"' >> ${config}
+echo 'lua_path = workspace.."script/?.lua;"..workspace.."lualib/?.lua;"..workspace.."lualib/?.lua;".."./lualib/?.lua;"' >> ${config}
+echo 'lua_cpath = workspace.."luaclib/?.so;"..workspace.."luaclib/?.so;".."./luaclib/?.so;"'  >> ${config}
 echo logger = \"logger\" >> ${config}
 echo logservice = \"snlua\" >> ${config}
 
