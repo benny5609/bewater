@@ -22,8 +22,6 @@ proj
     share(数据共享节点) https://github.com/zhandouxiaojiji/share.git
     backup(备份节点) https://github.com/zhandouxiaojiji/backup.git
     test(测试节点) https://github.com/zhandouxiaojiji/test.git
-    
-生成项目的脚本:bewater/tools/workspace.sh
 ```
 # 配置
 ```
@@ -35,10 +33,10 @@ mkdir proj #项目目录，参考monitor和share
 cd skynet && make linux
 cd ../proj
 git clone https://github.com/zhandouxiaojiji/share.git
-git clone https://github.com/zhandouxiaojiji/monitor.git
-cd monitor/shell
-sh etc.sh monitor monitor monitor #生成启动配置, etc.sh [配置名] [启动脚本] [集群名] [是否以进程的方式启动]
-./run.sh monitor #启动进程, run.sh [配置名]
+git clone https://github.com/zhandouxiaojiji/test.git
+cd test/shell
+./etc.sh test test #生成启动配置, etc.sh [配置名] [启动脚本] [集群名] [是否以进程的方式启动]
+./run.sh test #启动进程, run.sh [配置名]
 ```
 # 脚本与库检索优先级
 ```
