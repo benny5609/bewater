@@ -1,5 +1,5 @@
 -- 一些通用服务名, 第一次引用的自动创建
-local Skynet = require "skynet.manager"
+local skynet = require "skynet.manager"
 local reg = {
     WEB = "web/webclient",
     PROTO = "proto_env",
@@ -15,7 +15,7 @@ local M = {}
 setmetatable(M, {
     __index = function (_, k)
         local name = assert(reg[k], string.format("sname %s not exist", k))
-        return Skynet.uniqueservice(name)
+        return skynet.uniqueservice(name)
     end,
     __newindex = function ()
         assert("cannot overwrite sname")

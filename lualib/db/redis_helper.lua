@@ -1,5 +1,5 @@
-local Skynet    = require "skynet"
-local Sname     = require "sname"
+local skynet    = require "skynet"
+local sname     = require "sname"
 
 local M = {}
 setmetatable(M, {
@@ -9,7 +9,7 @@ setmetatable(M, {
             return v
         else
             return function(...)
-                return Skynet.call(Sname.REDIS, "lua", k, ...)
+                return skynet.call(sname.REDIS, "lua", k, ...)
             end
         end
     end

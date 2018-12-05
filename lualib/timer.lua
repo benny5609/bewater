@@ -1,5 +1,5 @@
-local Skynet = require "skynet"
-local Util = require "util"
+local skynet = require "skynet"
+local bewater = require "bewater"
 
 local M = {}
 function M:ctor()
@@ -28,14 +28,14 @@ function M:cancelable_timeout(delta, func)
     local function cancel()
         func = nil
     end
-    Skynet.timeout(delta*100//1, cb)
+    skynet.timeout(delta*100//1, cb)
     return cancel
 end
 
 function M:start()
     assert(self._top)
-    self._cancel = self:cancelable_timeout(self._top.ti - Skynet.time(), function()
-        Util.try(function()
+    self._cancel = self:cancelable_timeout(self._top.ti - skynet.time(), function()
+        bewater.try(function()
             self._top.cb()
         end)
         self:next()
@@ -60,7 +60,7 @@ function M:delay(expire, cb)
     assert(type(cb) == "function")
 
     local node = {
-        ti = Skynet.time() + expire,
+        ti = skynet.time() + expire,
         cb = cb,
     }
 

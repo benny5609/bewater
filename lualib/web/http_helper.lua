@@ -1,26 +1,26 @@
 -- Http 请求 get post
 --
-local Skynet    = require "skynet"
-local Sname     = require "sname"
-local Json      = require "cjson.safe"
+local skynet    = require "skynet"
+local sname     = require "sname"
+local json      = require "cjson.safe"
 --local Util      = require "util"
 require "bash"
 
 local M = {}
 function M.get(url, get, header, no_reply)
     if no_reply then
-        return Skynet.send(Sname.WEB, "lua", "request", url, get, nil, header, no_reply)
+        return skynet.send(sname.WEB, "lua", "request", url, get, nil, header, no_reply)
     else
-        return Skynet.call(Sname.WEB, "lua", "request", url, get, nil, header, no_reply)
+        return skynet.call(sname.WEB, "lua", "request", url, get, nil, header, no_reply)
     end
 end
 
 function M.post(url, post, header, no_reply)
-    --Skynet.error("http post:", url, post)
+    --skynet.error("http post:", url, post)
     if no_reply then
-        return Skynet.send(Sname.WEB, "lua", "request", url, nil, post, header, no_reply)
+        return skynet.send(sname.WEB, "lua", "request", url, nil, post, header, no_reply)
     else
-        return Skynet.call(Sname.WEB, "lua", "request", url, nil, post, header, no_reply)
+        return skynet.call(sname.WEB, "lua", "request", url, nil, post, header, no_reply)
     end
 end
 
@@ -63,9 +63,9 @@ end
 function M.ip_info(ip)
     assert(ip)
     local _, resp = M.get("http://ip.taobao.com/service/getIpInfo.php", {ip = ip})
-    resp = Json.decode(resp)
+    resp = json.decode(resp)
     if not resp then
-        Skynet.error("get ip_info error", ip, resp)
+        skynet.error("get ip_info error", ip, resp)
         resp = {}
     end
     return resp.data or {}

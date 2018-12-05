@@ -1,15 +1,15 @@
 --local base64 = require "auth.base64"
-local Http = require "web.http_helper"
-local Json = require "cjson"
+local http = require "web.http_helper"
+local json = require "cjson.safe"
 local M = {}
 function M.verify_receipt(receipt, product_id)
     --receipt = base64.decode(receipt)
-    local ret, resp = Http.post("https://buy.itunes.apple.com/verifyReceipt", receipt)
-    resp = Json.decode(resp)
+    local ret, resp = http.post("https://buy.itunes.apple.com/verifyReceipt", receipt)
+    resp = json.decode(resp)
     if resp.status ~= 0 then
-        ret, resp = Http.post("https://sandbox.itunes.apple.com/verifyReceipt", receipt)
+        ret, resp = http.post("https://sandbox.itunes.apple.com/verifyReceipt", receipt)
     end
-    resp = Json.decode(resp)
+    resp = json.decode(resp)
     if not ret or resp.status ~= 0 then
         return
     end

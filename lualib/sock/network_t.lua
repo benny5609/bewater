@@ -1,15 +1,16 @@
-local Skynet    = require "skynet"
-local Class     = require "class"
-local Socket    = require "skynet.socket"
-local Packet    = require "sock.packet"
-local Util      = require "util"
-local Def       = require "def"
-local Opcode    = require "def.opcode"
-local Errcode   = require "def.errcode"
-local Protobuf  = require "protobuf"
-local Md5       = require "md5"
+local skynet    = require "skynet"
+local class     = require "class"
+local socket    = require "skynet.socket"
+local packet    = require "sock.packet"
+local bewater   = require "bewater"
+local def       = require "def"
+local opcode    = require "def.opcode"
+local errcode   = require "def.errcode"
+local protobuf  = require "protobuf"
+local md5       = require "md5"
+--local util      = require "util"
 
-local M = Class("network_t")
+local M = class("network_t")
 function M:ctor(player)
     self.player = assert(player, "network need player")
 end
@@ -25,66 +26,66 @@ function M:init(watchdog, gate, agent, fd, ip)
     self._crypt_key = 0
     self._crypt_type = 0
     self._token = nil
-    self._ping_time = Skynet.time()
+    self._ping_time = skynet.time()
 end
 
 function M:check_timeout()
-    if Skynet.time() - self._ping_time > Def.PING_TIMEOUT and self._fd then
+    if skynet.time() - self._ping_time > def.PING_TIMEOUT and self._fd then
         self:close()
     end
 end
 
 function M:create_token()
-    self._token = Md5.crypt(string.format("%d%d", self.player.uid, os.time()), "Stupid")
+    self._token = md5.crypt(string.format("%d%d", self.player.uid, os.time()), "Stupid")
     return self._token
 end
 
 function M:call_watchdog(...)
-    return Skynet.call(self._watchdog, "lua", ...)
+    return skynet.call(self._watchdog, "lua", ...)
 end
 
 function M:call_gate(...)
-    return Skynet.call(self._gate, "lua", ...)
+    return skynet.call(self._gate, "lua", ...)
 end
 
 function M:call_agent(...)
-    return Skynet.call(self._agent, "lua", ...)
+    return skynet.call(self._agent, "lua", ...)
 end
 
 function M:send(op, tbl, csn)
-    if Opcode.has_session(op) then
+    if opcode.has_session(op) then
         self._ssn = self._ssn + 1
     end
     local data, len
-    Protobuf.encode(Opcode.toname(op), tbl or {}, function(buffer, bufferlen)
-        data, len = Packet.pack(op, csn or 0, self._ssn,
+    protobuf.encode(opcode.toname(op), tbl or {}, function(buffer, bufferlen)
+        data, len = packet.pack(op, csn or 0, self._ssn,
             self._crypt_type, self._crypt_key, buffer, bufferlen)
     end)
-	Socket.write(self._fd, data, len)
+	socket.write(self._fd, data, len)
 end
 
 function M:recv(op, csn, ssn, crypt_type, crypt_key, buff, sz)
-    self._ping_time = Skynet.time()
+    self._ping_time = skynet.time()
 
-    local opname = Opcode.toname(op)
-    local modulename = Opcode.tomodule(op)
-    local simplename = Opcode.tosimplename(op)
-    if Opcode.has_session(op) then
-        Skynet.error(string.format("recv package, 0x%x %s, csn:%d, ssn:%d, crypt_type:%s, crypt_key:%s, sz:%d",
+    local opname = opcode.toname(op)
+    local modulename = opcode.tomodule(op)
+    local simplename = opcode.tosimplename(op)
+    if opcode.has_session(op) then
+        skynet.error(string.format("recv package, 0x%x %s, csn:%d, ssn:%d, crypt_type:%s, crypt_key:%s, sz:%d",
             op, opname, csn, ssn, crypt_type, crypt_key, sz))
     end
 
-    local data = Protobuf.decode(opname, buff, sz)
+    local data = protobuf.decode(opname, buff, sz)
     assert(type(data) == "table", data)
-    --Util.printdump(data)
+    --util.printdump(data)
 
     local ret = 0 -- 返回整数为错误码，table为返回客户端数据
     local mod = assert(self.player[modulename], modulename)
     local f = assert(mod[simplename], simplename)
-    if not Util.try(function()
+    if not bewater.try(function()
         ret = f(mod, data) or 0
     end) then
-        ret = Errcode.TRACEBACK
+        ret = errcode.TRACEBACK
     end
     if type(ret) == "table" then
         ret.err = ret.err or 0
@@ -95,13 +96,13 @@ function M:recv(op, csn, ssn, crypt_type, crypt_key, buff, sz)
 end
 
 function M:close()
-    Skynet.call(self._gate, "lua", "kick", self._fd)
+    skynet.call(self._gate, "lua", "kick", self._fd)
 end
 
 -- fd, csn, ssn, passport
 function M:reconnect(fd, _, _, _, user_info)
     self.player.log("reconnect")
-    self:send(Opcode.user.s2c_kickout)
+    self:send(opcode.user.s2c_kickout)
     self:close()
     self._fd = fd
     --self.player:online()

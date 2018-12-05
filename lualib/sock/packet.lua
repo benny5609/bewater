@@ -1,4 +1,4 @@
-local Core = require "packet.core"
+local core = require "packet.core"
 
 -- op 协议号
 -- csn 客户端session
@@ -13,7 +13,7 @@ local HEADER_SIZE = 8
 local M = {}
 function M.pack(opcode, csn, ssn, crypt_type, crypt_key, buff, sz)
     local total = sz + HEADER_SIZE
-    local data = Core.new(total + 2)
+    local data = core.new(total + 2)
     data:write_ushort(total)
     data:write_ushort(opcode)
     data:write_ushort(csn)
@@ -26,7 +26,7 @@ end
 function M.unpack(sock_buff, sock_sz)
     assert(type(sock_buff) == "userdata")
     assert(type(sock_sz) == "number")
-    local data      = Core.new(sock_buff, sock_sz)
+    local data      = core.new(sock_buff, sock_sz)
     --local total     = data:read_ushort() -- skynet抠掉了这2个字节
     local opcode    = data:read_ushort()
     local csn       = data:read_ushort()

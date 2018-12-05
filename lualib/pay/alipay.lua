@@ -1,5 +1,5 @@
-local Conf = require "conf"
-local Sign = require "auth.sign"
+local conf = require "conf"
+local sign = require "auth.sign"
 local codec = require "codec"
 
 local M = {}
@@ -21,7 +21,7 @@ function M.create_order(param)
         subject = item_desc,
         body = item_desc,
         total_fee = pay_price,
-        notify_url = string.format("%s:%s/api/payment/alipay_notify", Conf.pay.host, Conf.pay.port),
+        notify_url = string.format("%s:%s/api/payment/alipay_notify", conf.pay.host, conf.pay.port),
         service = "mobile.securitypay.pay",
         payment_type = '1',
         anti_phishing_key = '',
@@ -30,11 +30,11 @@ function M.create_order(param)
         it_b_pay = '30m',
         return_url = 'm.alipay.com',
     }
-    args.sign = Sign.rsa_private_sign(args, private_key, true)
+    args.sign = sign.rsa_private_sign(args, private_key, true)
     args.sign_type = "RSA"
     return {
         order_no = order_no,
-        order = Sign.concat_args(args, true),
+        order = sign.concat_args(args, true),
     }
 end
 
@@ -49,7 +49,7 @@ function M.notify(public_key, param)
         end
     end
 
-    local src = Sign.concat_args(args)
+    local src = sign.concat_args(args)
     local bs = codec.base64_decode(param.sign)
     local pem = public_key
     return codec.rsa_public_verify(src, bs, pem, 2)

@@ -1,8 +1,8 @@
-local Class = require "class"
-local Log = require "log"
-local trace = Log.trace("webconsole")
+local class = require "class"
+local log = require "log"
+local trace = log.trace("webconsole")
 
-local M = Class("PlayerLogin")
+local M = class("PlayerLogin")
 function M:ctor(player)
     self.player = player
 end

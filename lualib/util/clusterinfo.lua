@@ -1,10 +1,10 @@
 -- 集群节点相关信息
 -- 访问方式 clusterinfo.xxx or clusterinfo.get_xxx()
 --
-local Skynet = require "skynet"
-local Http   = require "web.http_helper"
-local Conf   = require "conf"
-local Util   = require "util"
+local skynet = require "skynet"
+local http   = require "web.http_helper"
+local conf   = require "conf"
+local util   = require "util"
 require "bash"
 
 local M = {}
@@ -29,21 +29,21 @@ setmetatable(M, {
 
 -- 公网ip
 function M._pnet_addr()
-    if Conf.remote_host then
-        if Conf.remote_port then
-            return Conf.remote_host .. ":" .. Conf.remote_port
+    if conf.remote_host then
+        if conf.remote_port then
+            return conf.remote_host .. ":" .. conf.remote_port
         else
-            return Conf.remote_host
+            return conf.remote_host
         end
     end
-    if Conf.host then
-        if Conf.port then
-            return Conf.host .. ":" .. Conf.port
+    if conf.host then
+        if conf.port then
+            return conf.host .. ":" .. conf.port
         else
-            return Conf.host
+            return conf.host
         end
     end
-    local _, resp = Http.get('http://members.3322.org/dyndns/getip')
+    local _, resp = http.get('http://members.3322.org/dyndns/getip')
     local addr = string.gsub(resp, "\n", "")
     return addr
 end
@@ -55,12 +55,12 @@ function M.get_inet_addr()
 end
 
 function M.get_run_time()
-    return Skynet.time()
+    return skynet.time()
 end
 
 -- 进程pid
 function M._pid()
-    local filename = Skynet.getenv "daemon"
+    local filename = skynet.getenv "daemon"
     if not filename then
         return
     end
@@ -72,7 +72,7 @@ function M.get_profile()
     local pid = M.pid
     if not pid then return end
     local ret = bash(string.format('ps -p %d u', pid))
-    local list = Util.split(string.match(ret, '\n(.+)'), ' ')
+    local list = util.split(string.match(ret, '\n(.+)'), ' ')
     return {
         cpu = tonumber(list[3]),
         mem = tonumber(list[6]),
@@ -80,16 +80,16 @@ function M.get_profile()
 end
 
 function M._proj()
-    return Conf.proj
+    return conf.proj
 end
 
 function M._clustername()
-    return Skynet.getenv "clustername"
+    return skynet.getenv "clustername"
 end
 
 -- 绝对路径
 function M._workspace()
-    local path = bash("cd %s && pwd", Conf.workspace)
+    local path = bash("cd %s && pwd", conf.workspace)
     return string.gsub(path, "\n", "")
 end
 

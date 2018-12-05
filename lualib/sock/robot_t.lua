@@ -1,16 +1,16 @@
-local Skynet    = require "skynet"
-local Socket    = require "skynet.socket"
-local Packet    = require "sock.packet"
-local Packetc   = require "packet.core"
-local Protobuf  = require "protobuf"
-local Opcode    = require "def.opcode"
-local Errcode   = require "def.errcode"
-local Util      = require "util"
-local Class     = require "class"
+local skynet    = require "skynet"
+local socket    = require "skynet.socket"
+local packet    = require "sock.packet"
+local packetc   = require "packet.core"
+local protobuf  = require "protobuf"
+local bewater   = require "bewater"
+local opcode    = require "def.opcode"
+local errcode   = require "def.errcode"
+local class     = require "class"
 
 local coroutine = require "skynet.coroutine"
 
-local M = Class("robot_t")
+local M = class("robot_t")
 function M:ctor(proj)
     self._proj = proj
     self._host = nil
@@ -29,12 +29,12 @@ end
 function M:start(host, port)
     self._host = assert(host)
     self._port = assert(port)
-    self._fd = Socket.open(self._host, self._port)
+    self._fd = socket.open(self._host, self._port)
     assert(self._fd)
 
-    Skynet.fork(function()
+    skynet.fork(function()
         while true do
-            local buff = Socket.read(self._fd)
+            local buff = socket.read(self._fd)
             if not buff then
                 self:offline()
                 return
@@ -58,19 +58,19 @@ function M:start(host, port)
     end)
 
     -- ping
-    Skynet.fork(function()
+    skynet.fork(function()
         while true do
             self:ping()
-            Skynet.sleep(100*30)
+            skynet.sleep(100*30)
         end
     end)
 
     -- tick
     self.tick = 0
-    Skynet.fork(function()
+    skynet.fork(function()
         while true do
             self.tick = self.tick + 1
-            Skynet.sleep(1)
+            skynet.sleep(1)
             for co, time in pairs(self._waiting) do
                 if time <= 0 then
                     self:_suspended(co)
@@ -84,7 +84,7 @@ end
 
 function M:test(func)
     local co = coroutine.create(function()
-        Util.try(func)
+        bewater.try(func)
     end)
     self:_suspended(co)
 end
@@ -94,8 +94,8 @@ function M:call(op, data)
     local ret = coroutine.yield(op)
     local code = ret and ret.err
     if code ~= 0 then
-        Skynet.error(string.format("call %s error:0x%x, desc:%s",
-            Opcode.toname(op), code, Errcode.describe(code)))
+        skynet.error(string.format("call %s error:0x%x, desc:%s",
+            opcode.toname(op), code, errcode.describe(code)))
     end
     return ret
 end
@@ -108,13 +108,13 @@ function M:send(op, tbl)
     self._csn = self._csn + 1
 
     local data, len
-    Protobuf.encode(Opcode.toname(op), tbl or {}, function(buffer, bufferlen)
-        data, len = Packet.pack(op, self._csn, self._ssn,
+    protobuf.encode(opcode.toname(op), tbl or {}, function(buffer, bufferlen)
+        data, len = packet.pack(op, self._csn, self._ssn,
             self._crypt_type, self._crypt_key, buffer, bufferlen)
     end)
 
-    print(string.format("send %s, csn:%d, sz:%s", Opcode.toname(op), self._csn, len))
-    Socket.write(self._fd, data, len)
+    print(string.format("send %s, csn:%d, sz:%s", opcode.toname(op), self._csn, len))
+    socket.write(self._fd, data, len)
 end
 
 function M:ping()
@@ -127,7 +127,7 @@ end
 
 
 function M:_recv(sock_buff)
-    local data      = Packetc.new(sock_buff)
+    local data      = packetc.new(sock_buff)
     --local total     = data:read_ushort()
     local op    = data:read_ushort()
     local csn   = data:read_ushort()
@@ -136,15 +136,15 @@ function M:_recv(sock_buff)
     data:read_ubyte() -- crypt_key
     local sz    = #sock_buff - 8
     local buff  = data:read_bytes(sz)
-    --local op, csn, ssn, crypt_type, crypt_key, buff, sz = Packet.unpack(sock_buff)
+    --local op, csn, ssn, crypt_type, crypt_key, buff, sz = packet.unpack(sock_buff)
     self._ssn = ssn
 
-    local opname = Opcode.toname(op)
-    local modulename = Opcode.tomodule(op)
-    local simplename = Opcode.tosimplename(op)
+    local opname = opcode.toname(op)
+    local modulename = opcode.tomodule(op)
+    local simplename = opcode.tosimplename(op)
     local funcname = modulename .. "_" .. simplename
 
-    data = Protobuf.decode(opname, buff, sz)
+    data = protobuf.decode(opname, buff, sz)
     if self[funcname] then
         self[funcname](self, data)
     end

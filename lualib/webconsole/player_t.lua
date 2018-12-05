@@ -1,12 +1,12 @@
-local Class         = require "class"
-local Network       = require "ws.network_t"
-local PlayerSkynet  = require "webconsole.player_skynet_t"
-local PlayerLogin   = require "webconsole.player_login_t"
+local class             = require "class"
+local network_t         = require "ws.network_t"
+local player_skynet_t   = require "webconsole.player_skynet_t"
+local player_login_t    = require "webconsole.player_login_t"
 
-local M = Class("Player")
+local M = class("Player")
 function M:ctor()
-    self.net = Network.new(self)
-    self.login = PlayerLogin.new(self)
-    self.skynet = PlayerSkynet.new(self)
+    self.net = network_t.new(self)
+    self.login = player_login_t.new(self)
+    self.skynet = player_skynet_t.new(self)
 end
 return M

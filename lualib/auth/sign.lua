@@ -1,5 +1,5 @@
-local Md5 = require "md5"
-local Codec = require "codec"
+local md5 = require "md5"
+local codec = require "codec"
 
 local string_format = string.format
 local string_upper  = string.upper
@@ -34,13 +34,13 @@ function M.md5_args(args, key, mark)
     if key then
         str = str .. "&key=" .. key
     end
-    return string_upper(Md5.sumhexa(str))
+    return string_upper(md5.sumhexa(str))
 end
 
 function M.rsa_private_sign(args, private_key, mark)
     local str = M.concat_args(args, mark)
-    local bs = Codec.rsa_private_sign(str, private_key)
-    return encode_uri(Codec.base64_encode(bs))
+    local bs = codec.rsa_private_sign(str, private_key)
+    return encode_uri(codec.base64_encode(bs))
 end
 --[[
 function M.rsa_public_verify(args, public_key, mark)

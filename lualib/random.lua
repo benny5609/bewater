@@ -1,11 +1,11 @@
-local Random  = require "random.core"
+local random  = require "random.core"
 
 local M = {}
 local table_insert = table.insert
 local table_remove = table.remove
 
 function M.prob(value)
-    return Random.prob(value * 10)
+    return random.prob(value * 10)
 end
 
 --从数组中选出不重复的数，len为数组大小，num为选出数量，
@@ -43,7 +43,7 @@ function M.random_item_attr(tbl)
         table.insert(t, v[2])
     end
     --return tbl[1][1]
-    local idx = Random.range_prob(t)
+    local idx = random.range_prob(t)
     assert(tbl[idx], string.format("tbl len:%s, idx:%d", table.concat(t, ','), idx))
     return tbl[idx][1]
 end
@@ -51,7 +51,7 @@ end
 -- 一维表随机函数
 -- tbl = { chanceA, chanceB, ... }
 function M.random_item_attr_1d( tbl )
-    return Random.range_prob(tbl)
+    return random.range_prob(tbl)
 end
 
 return M

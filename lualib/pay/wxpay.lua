@@ -1,13 +1,13 @@
-local Sign      = require "auth.sign"
-local Lua2xml   = require "xml.lua2xml"
-local Xml2lua   = require "xml.xml2lua"
-local Http      = require "web.http_helper"
-local Conf      = require "conf"
-local Errcode   = require "def.errcode"
-local Def       = require "def"
-local Util      = require "util"
-local Log       = require "log"
-local trace     = Log.trace("wxpay")
+local sign      = require "auth.sign"
+local lua2xml   = require "xml.lua2xml"
+local xml2lua   = require "xml.xml2lua"
+local http      = require "web.http_helper"
+local conf      = require "conf"
+local errcode   = require "def.errcode"
+local def       = require "def"
+local util      = require "util"
+local log       = require "log"
+local trace     = log.trace("wxpay")
 
 local M = {}
 function M.create_order(param)
@@ -31,15 +31,15 @@ function M.create_order(param)
         out_trade_no    = order_no..'-'..os.time(),
         total_fee       = pay_price*100//1 >> 0,
         spbill_create_ip= '127.0.0.1',
-        notify_url      = string.format("%s:%s/api/payment/wxpay_notify", Conf.pay.host, Conf.pay.port),
+        notify_url      = string.format("%s:%s/api/payment/wxpay_notify", conf.pay.host, conf.pay.port),
     }
-    args.sign = Sign.md5_args(args, key)
-    local xml = Lua2xml.encode("xml", args, true)
-    local _, resp = Http.post("https://api.mch.weixin.qq.com/pay/unifiedorder", xml)
-    local data = Xml2lua.decode(resp).xml
+    args.sign = sign.md5_args(args, key)
+    local xml = lua2xml.encode("xml", args, true)
+    local _, resp = http.post("https://api.mch.weixin.qq.com/pay/unifiedorder", xml)
+    local data = xml2lua.decode(resp).xml
 
     if data.return_code ~= "SUCCESS" and data.return_msg ~= "OK" then
-        return Errcode.WXORDER_FAIL
+        return errcode.WXORDER_FAIL
     end
 
     local ret
@@ -48,11 +48,11 @@ function M.create_order(param)
             appid = appid,
             partnerid = mch_id,
             noncestr = data.nonce_str,
-            package = 'Sign=WXPay',
+            package = 'sign=WXPay',
             prepayid = data.prepay_id,
             timestamp = os.time(),
         }
-        ret.sign = Sign.md5_args(ret, key)
+        ret.sign = sign.md5_args(ret, key)
     else
         ret = {
             code_url = data.code_url
@@ -73,7 +73,7 @@ local WX_FAIL = {
 }
 
 function M.notify(order, key, param)
-    if order.item_state == Def.PayState.SUCCESS then
+    if order.item_state == def.PayState.SUCCESS then
         return WX_OK
     end
     local args = {}
@@ -83,14 +83,14 @@ function M.notify(order, key, param)
         end
     end
 
-    local sign1 = Sign.md5_args(args, key)
+    local sign1 = sign.md5_args(args, key)
     local sign2 = param.sign
     if sign1 ~= sign2 then
         return WX_FAIL
     end
 
     if param.result_code ~= "SUCCESS" or param.return_code ~= "SUCCESS" then
-        trace("wxpay fail %s", Util.dump(param))
+        trace("wxpay fail %s", util.dump(param))
     else
         order.pay_time = os.time()
         order.tid = param.transaction_id
