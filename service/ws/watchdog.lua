@@ -1,6 +1,6 @@
-local Skynet        = require "skynet"
-local Socket        = require "skynet.socket"
-local Util          = require "util"
+local skynet        = require "skynet"
+local socket        = require "skynet.socket"
+local bewater       = require "bewater"
 
 local server_path, player_path = ...
 assert(server_path) -- 服务器逻辑(xxx.xxxserver)
@@ -16,8 +16,8 @@ local PLAYER_PER_AGENT  -- 每个agent支持player最大值
 local PROTO
 
 local function create_agent()
-    local agent = Skynet.newservice("ws/agent", player_path)
-    Skynet.call(agent, "lua", "init", Skynet.self(), PLAYER_PER_AGENT, PROTO)
+    local agent = skynet.newservice("ws/agent", player_path)
+    skynet.call(agent, "lua", "init", skynet.self(), PLAYER_PER_AGENT, PROTO)
     free_agents[agent] = true
     return agent
 end
@@ -35,14 +35,14 @@ function CMD.start(conf)
     end
 
     local address = "0.0.0.0:"..conf.port
-    Skynet.error("Listening "..address)
-    local fd = assert(Socket.listen(address))
-    Socket.start(fd , function(_fd, addr)
+    skynet.error("Listening "..address)
+    local fd = assert(socket.listen(address))
+    socket.start(fd , function(_fd, addr)
         local agent = next(free_agents)
         if not agent then
             agent = create_agent()
         end
-        if Skynet.call(agent, "lua", "new_player", _fd, addr) then
+        if skynet.call(agent, "lua", "new_player", _fd, addr) then
             -- agent已经满
             free_agents[agent] = nil
             full_agents[agent] = true
@@ -52,10 +52,10 @@ end
 
 function CMD.stop()
     for agent, _ in pairs(free_agents) do
-        Skynet.send(agent, "lua", "stop")
+        skynet.send(agent, "lua", "stop")
     end
     for agent, _ in pairs(full_agents) do
-        Skynet.send(agent, "lua", "stop")
+        skynet.send(agent, "lua", "stop")
     end
     while true do
         local count = 0
@@ -65,11 +65,11 @@ function CMD.stop()
         for _, v in pairs(full_agents) do
             count = count + 1
         end
-        Skynet.error(string.format("left agent:%d", count))
+        skynet.error(string.format("left agent:%d", count))
         if count == 0 then
             return
         end
-        Skynet.sleep(10)
+        skynet.sleep(10)
     end
 end
 
@@ -98,14 +98,14 @@ end
 function CMD.reconnect(uid, csn, ssn)
     local agent = uid2agent[uid]
     if agent then
-        return agent, Skynet.call(agent, "lua", "reconnect", uid, csn, ssn)
+        return agent, skynet.call(agent, "lua", "reconnect", uid, csn, ssn)
     end
 end
 
 function CMD.kick(uid)
     local agent = uid2agent[uid]
     if agent then
-        Skynet.call(agent, "lua", "kick", uid)
+        skynet.call(agent, "lua", "kick", uid)
         uid2agent[uid] = nil
     end
 end
@@ -113,18 +113,18 @@ end
 function CMD.online_count()
     local count = 0
     for v, _ in pairs(free_agents) do
-        count = count + Skynet.call(v, "lua", "online_count")
+        count = count + skynet.call(v, "lua", "online_count")
     end
     for v, _ in pairs(full_agents) do
-        count = count + Skynet.call(v, "lua", "online_count")
+        count = count + skynet.call(v, "lua", "online_count")
     end
     return count
 end
 
-Skynet.start(function()
-    Skynet.dispatch("lua", function(_, _, cmd1, ...)
+skynet.start(function()
+    skynet.dispatch("lua", function(_, _, cmd1, ...)
         local f = CMD[cmd1] or server[cmd1]
         assert(f, cmd1)
-        Util.ret(f(...))
+        bewater.ret(f(...))
     end)
 end)

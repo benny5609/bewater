@@ -1,5 +1,5 @@
-local Skynet = require "skynet.manager"
-local Util = require "util"
+local skynet = require "skynet.manager"
+local bewater = require "bewater"
 
 local CMD = {}
 function CMD.get_protobuf_env()
@@ -12,10 +12,10 @@ function CMD.register_file(path)
     protobuf.register_file(path)
 end
 
-Skynet.start(function()
-    Skynet.dispatch("lua", function(_,_,cmd, ...)
+skynet.start(function()
+    skynet.dispatch("lua", function(_,_,cmd, ...)
         local f = assert(CMD[cmd])
-        Util.ret(f(...))
+        bewater.ret(f(...))
     end)
 
 end)

@@ -1,8 +1,8 @@
-local Skynet        = require "skynet"
-local Util          = require "util"
-local Log           = require "log"
+local skynet        = require "skynet"
+local bewater       = require "bewater"
+local log           = require "log"
 
-local print         = Log.print("match")
+local print         = log.print("match")
 
 local uid2info = {} -- uid -> info {uid, value, agent}
 local values = {}   -- value -> uids
@@ -21,7 +21,7 @@ end
 function CMD.start(uid, value, agent)
     print("start match", uid, value)
     if uid2info[uid] then
-        Skynet.error(uid, "is matching")
+        skynet.error(uid, "is matching")
         return
     end
     uid2info[uid] = {
@@ -46,7 +46,7 @@ function CMD.cancel(uid)
     print("cancel match", uid)
     local info = uid2info[uid]
     if not info then
-        Skynet.error(uid, "not matching")
+        skynet.error(uid, "not matching")
         return
     end
     uid2info[uid] = nil
@@ -56,13 +56,13 @@ end
 local function update()
     if next(uid2info) then
         print("matching")
-        --print(Util.dump(uid2info))
+        --print(bewater.dump(uid2info))
     end
     local cur_time = os.time()
     for uid, info in pairs(uid2info) do
         local value = info.value
         if cur_time - values[value][uid] > MAX_TIME then
-            info.ret = Skynet.call("usercenter", "lua", "create_robot", value) -- 这个服务需要自定义
+            info.ret = skynet.call("usercenter", "lua", "create_robot", value) -- 这个服务需要自定义
         else
             local list = {values[value]}
             for i = 1, MAX_RANGE do
@@ -92,21 +92,21 @@ local function update()
             local id1 = list[r]
             local id2 = list[r==1 and 2 or 1]
             if uid2info[id1] then
-                Util.try(function()
-                    Skynet.call(uid2info[id1].agent, "lua", id1, "battle", "matched", MODE, id2)
+                bewater.try(function()
+                    skynet.call(uid2info[id1].agent, "lua", id1, "battle", "matched", MODE, id2)
                 end)
             end
             if uid2info[id2] then
-                Util.try(function()
-                    Skynet.call(uid2info[id2].agent, "lua", id2, "battle", "matched", MODE, id1)
+                bewater.try(function()
+                    skynet.call(uid2info[id2].agent, "lua", id2, "battle", "matched", MODE, id1)
                 end)
             end
             -- 创建战斗
-            local battle_id, battle_agent = Skynet.call("battlecenter", "lua", "create_battle")
-            Skynet.call(battle_agent, "lua", "create", battle_id, MODE)
+            local battle_id, battle_agent = skynet.call("battlecenter", "lua", "create_battle")
+            skynet.call(battle_agent, "lua", "create", battle_id, MODE)
             for idx, id in pairs({id1, id2}) do
                 local matched = uid2info[id]
-                Skynet.call(battle_agent, "lua", "call_battle", battle_id, "join",
+                skynet.call(battle_agent, "lua", "call_battle", battle_id, "join",
                     id, idx, matched and matched.agent or nil)
                 if uid2info[id] then
                     uid2info[id] = nil
@@ -117,18 +117,18 @@ local function update()
     end
 end
 
-Skynet.start(function()
-    Skynet.dispatch("lua", function(_, _, cmd, ...)
+skynet.start(function()
+    skynet.dispatch("lua", function(_, _, cmd, ...)
         local f = assert(CMD[cmd], cmd)
-        Util.ret(f(...))
+        bewater.ret(f(...))
     end)
 
-    Skynet.fork(function()
+    skynet.fork(function()
         while true do
-            Util.try(function()
+            bewater.try(function()
                 update()
             end)
-            Skynet.sleep(50)
+            skynet.sleep(50)
         end
     end)
 end)

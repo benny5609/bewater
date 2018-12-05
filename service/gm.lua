@@ -1,12 +1,12 @@
-local Skynet        = require "skynet"
-local Log           = require "log"
-local Schedule      = require "schedule"
-local Util          = require "util"
-local DateHelper    = require "util.date_helper"
+local skynet        = require "skynet"
+local log           = require "log"
+local schedule      = require "schedule"
+local bewater       = require "bewater"
+local date_helper   = require "util.date_helper"
 
 require "skynet.cluster"
 
-local trace = Log.trace("gm")
+local trace = log.trace("gm")
 
 local skynet_cmd = {}
 local gmcmd = {
@@ -30,7 +30,7 @@ function CMD.run(modname, cmd, ...)
     end
     local args = {...}
     local ret
-    if not Util.try(function()
+    if not bewater.try(function()
         ret = f(table.unpack(args))
     end) then
         return "服务器执行TRACEBACK了"
@@ -48,44 +48,44 @@ function CMD.unreg_hotfix(addr)
     hotfix_addrs[addr] = nil
 end
 
-Skynet.start(function()
-    Skynet.dispatch("lua", function(_,_, cmd, ...)
+skynet.start(function()
+    skynet.dispatch("lua", function(_,_, cmd, ...)
         local f = assert(CMD[cmd], cmd)
-        Util.ret(f(...))
+        bewater.ret(f(...))
     end)
 end)
 
 function skynet_cmd.gc()
-    Skynet.call(".launcher", "lua", "GC")
+    skynet.call(".launcher", "lua", "GC")
 end
 
 function skynet_cmd.call(addr, ...)
     addr = tonumber(addr, 16) or assert(addr)
     print("call", addr, ...)
-    return Skynet.call(addr, "lua", ...)
+    return skynet.call(addr, "lua", ...)
 end
 
 function skynet_cmd.list()
     local list = {}
-    local all = Skynet.call(".launcher", "lua", "LIST")
+    local all = skynet.call(".launcher", "lua", "LIST")
     for addr, desc in pairs(all) do
         table.insert(list, {addr = addr, desc = desc})
     end
 
     for i, v in ipairs(list) do
         local addr = v.addr
-        v.mem = Skynet.call(addr, "debug", "MEM")
+        v.mem = skynet.call(addr, "debug", "MEM")
         if v.mem < 1024 then
             v.mem = math.floor(v.mem).." Kb"
         else
             v.mem = math.floor(v.mem/1024).." Mb"
         end
 
-        local stat = Skynet.call(addr, "debug", "STAT")
+        local stat = skynet.call(addr, "debug", "STAT")
         v.task = stat.task
         v.mqlen = stat.mqlen
         v.id = i
-        v.address = Skynet.address(addr)
+        v.address = skynet.address(addr)
     end
     table.sort(list, function(a, b)
         return a.addr < b.addr
@@ -101,13 +101,13 @@ end
 function skynet_cmd.hotfix()
     trace("gm hotfix")
     for addr, _ in pairs(hotfix_addrs) do
-        Skynet.send(addr, "lua", "hotfix")
+        skynet.send(addr, "lua", "hotfix")
     end
 end
 
 function skynet_cmd.publish(nodename)
     trace("publish:%s", nodename)
-    Skynet.newservice("publish", nodename)
+    skynet.newservice("publish", nodename)
 end
 
 function skynet_cmd.alert()
@@ -121,6 +121,6 @@ function skynet_cmd.time(...)
     for i = 1, #args, 2 do
         t[args[i]] = tonumber(args[i+1])
     end
-    local cur = Schedule.changetime(t)
-    return string.format("时间修改至 %s", DateHelper.format(cur))
+    local cur = schedule.changetime(t)
+    return string.format("时间修改至 %s", date_helper.format(cur))
 end

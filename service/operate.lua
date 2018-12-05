@@ -1,25 +1,25 @@
-local Skynet    = require "skynet"
-local Cluster   = require "skynet.cluster"
-local Mongo     = require "db.mongo_helper"
-local Util      = require "util"
-local Log       = require "log"
+local skynet    = require "skynet"
+local cluster   = require "skynet.cluster"
+local mongo     = require "db.mongo_helper"
+local bewater   = require "bewater"
+local log       = require "log"
 
-local trace = Log.trace("operate")
+local trace = log.trace("operate")
 
 local M = {}
 function M:init()
-    self.batch_list = Mongo.get("batch_operate") or {}
-    self.players = Mongo.find("operate", {}) or {}
+    self.batch_list = mongo.get("batch_operate") or {}
+    self.players = mongo.find("operate", {}) or {}
 end
 
 function M:save_batch()
-    Mongo.set("batch_operate", self.batch_list)
+    mongo.set("batch_operate", self.batch_list)
 end
 
 function M:save_player(uid)
     local player = self.players[uid]
     if not player then return end
-    return Mongo.update("operate", {uid = uid}, {
+    return mongo.update("operate", {uid = uid}, {
         uid = player.uid,
         time = player.time,
         operate_list = player.operate_list,
@@ -28,13 +28,13 @@ end
 
 function M:remove_player(uid)
     self.players[uid] = nil
-    Mongo.delete("operate", {uid = uid})
+    mongo.delete("operate", {uid = uid})
 end
 
 function M:get_player(uid)
     local player = self.players[uid]
     if not player then
-        local data = Mongo.find_one_with_default("operate", {uid = uid}, {
+        local data = mongo.find_one_with_default("operate", {uid = uid}, {
             uid = uid,
             time = os.time(),
             operate_list = {},
@@ -109,8 +109,8 @@ function M:operate(uid, code, ...)
         return false
     end
     if player.agent then
-        local ret = Util.try(function()
-            Cluster.call(player.cname, player.agent, uid, "operate", "operate", code, table.unpack(params))
+        local ret = bewater.try(function()
+            cluster.call(player.cname, player.agent, uid, "operate", "operate", code, table.unpack(params))
             player.time = os.time()
             self:save_player(uid)
         end)
@@ -132,15 +132,15 @@ function M:operate(uid, code, ...)
     return true
 end
 
-Skynet.start(function()
-    Skynet.dispatch("lua", function(_, _, cmd, ...)
+skynet.start(function()
+    skynet.dispatch("lua", function(_, _, cmd, ...)
         local f = assert(M[cmd], cmd)
-        Util.ret(f(M, ...))
+        bewater.ret(f(M, ...))
     end)
 
     M:init()
 
     trace("start operate")
 
-    Skynet.register "operate"
+    skynet.register "operate"
 end)

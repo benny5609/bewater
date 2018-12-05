@@ -1,8 +1,8 @@
-local Skynet        = require "skynet"
-local Socket        = require "skynet.socket"
-local Util          = require "util"
-local Errcode       = require "def.errcode"
-local Protobuf      = require "protobuf"
+local skynet        = require "skynet"
+local socket        = require "skynet.socket"
+local bewater       = require "bewater"
+local errcode       = require "def.errcode"
+local protobuf      = require "protobuf"
 
 local player_path   = ...
 local Player        = require(player_path)
@@ -17,9 +17,9 @@ local player_count = 0
 
 
 function CMD.new_player(fd, ip)
-    Socket.start(fd)
+    socket.start(fd)
     local player = Player.new()
-    player.net:init(WATCHDOG, Skynet.self(), fd, ip)
+    player.net:init(WATCHDOG, skynet.self(), fd, ip)
     fd2player[fd] = player
     player_count = player_count + 1
     return player_count >= MAX_COUNT
@@ -29,18 +29,18 @@ function CMD.init(watchdog, max_count, proto)
     WATCHDOG = assert(watchdog)
     MAX_COUNT = max_count or 100
     if proto then
-        Protobuf.register_file(proto)
+        protobuf.register_file(proto)
     end
 end
 
 function CMD.stop()
     for _, player in pairs(uid2player) do
-        Util.try(function()
-            player:kick(Errcode.SERVER_STOP)
+        bewater.try(function()
+            player:kick(errcode.SERVER_STOP)
             player:offline()
         end)
     end
-    Skynet.call(WATCHDOG, "lua", "free_agent", Skynet.self())
+    skynet.call(WATCHDOG, "lua", "free_agent", skynet.self())
 end
 
 -- from player
@@ -52,7 +52,7 @@ end
 function CMD.free_player(uid)
     uid2player[uid] = nil
     if player_count == MAX_COUNT then
-        Skynet.call(WATCHDOG, "lua", "set_free", Skynet.self())
+        skynet.call(WATCHDOG, "lua", "set_free", skynet.self())
     end
     player_count = player_count - 1
 end
@@ -78,7 +78,7 @@ end
 function CMD.kick(uid)
     local player = uid2player[uid]
     if player then
-        player:kick(Errcode.KICK)
+        player:kick(errcode.KICK)
         uid2player[uid] = nil
     end
 end
@@ -112,39 +112,39 @@ end
 local function check_timeout()
     for _, player in pairs(uid2player) do
         if player.check_timeout then
-            Util.try(function()
+            bewater.try(function()
                 player:check_timeout()
             end)
         end
     end
 end
 
-Skynet.start(function()
-    Skynet.dispatch("lua", function(_, _, arg1, arg2, arg3, ...)
+skynet.start(function()
+    skynet.dispatch("lua", function(_, _, arg1, arg2, arg3, ...)
         local f = CMD[arg1]
         if f then
-            Util.ret(f(arg2, arg3, ...))
+            bewater.ret(f(arg2, arg3, ...))
         else
             --local player = assert(uid2player[arg1], string.format("%s %s %s", arg1, arg2, arg3))
             local player = uid2player[arg1]
             if not player then
                 -- todo fix this bug
-                return Util.ret()
+                return bewater.ret()
             end
             local module = assert(player[arg2], arg2)
             if type(module) == "function" then
-                Util.ret(module(player, arg3, ...))
+                bewater.ret(module(player, arg3, ...))
             else
-                Util.ret(module[arg3](module, ...))
+                bewater.ret(module[arg3](module, ...))
             end
         end
     end)
 
     -- 定时检查超时，一秒误差，如需要精准的触发，使用日程表schedule
-    Skynet.fork(function()
+    skynet.fork(function()
         while true do
             check_timeout()
-            Skynet.sleep(100)
+            skynet.sleep(100)
         end
     end)
 end)
