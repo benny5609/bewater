@@ -1,24 +1,24 @@
-local Skynet = require "skynet.manager"
+local skynet = require "skynet.manager"
 
 local util = {}
--- 处理Skynet.send的消息
+-- 处理skynet.send的消息
 util.NORET = "NORET"
 function util.ret(noret, ...)
     if noret ~= "NORET" then
-        Skynet.ret(Skynet.pack(noret, ...))
+        skynet.ret(skynet.pack(noret, ...))
     end
 end
 
 -- 有需要的节点在启动时调用
 function util.init_proto_env(path)
     local sname = require "sname"
-    Skynet.call(sname.PROTO, "lua", "register_file", path)
+    skynet.call(sname.PROTO, "lua", "register_file", path)
 end
 
 -- 获取节点内的protobuf
 function util.get_protobuf()
     local sname = require "sname"
-    local protobuf_env = Skynet.call(sname.PROTO, "lua", "get_protobuf_env")
+    local protobuf_env = skynet.call(sname.PROTO, "lua", "get_protobuf_env")
     assert(type(protobuf_env) == "userdata")
     assert(not package.loaded["protobuf"])
     debug.getregistry().PROTOBUF_ENV = protobuf_env
@@ -27,9 +27,9 @@ end
 
 local function __TRACEBACK__(errmsg)
     local track_text = debug.traceback(tostring(errmsg), 2)
-    Skynet.error("---------------------------------------- TRACKBACK ----------------------------------------")
-    Skynet.error(track_text, "LUA ERROR")
-    Skynet.error("---------------------------------------- TRACKBACK ----------------------------------------")
+    skynet.error("---------------------------------------- TRACKBACK ----------------------------------------")
+    skynet.error(track_text, "LUA ERROR")
+    skynet.error("---------------------------------------- TRACKBACK ----------------------------------------")
     --local exception_text = "LUA EXCEPTION\n" .. track_text
     return false
 end
@@ -54,20 +54,20 @@ end
 
 function util.shell(cmd, ...)
     cmd = string.format(cmd, ...)
-    Skynet.error(cmd)
+    skynet.error(cmd)
     return io.popen(cmd):read("*all")
 end
 
 function util.run_cluster(clustername)
-    local config = require "config"
-    local cmd = string.format("cd %s/shell && sh start.sh %s", config.workspace, clustername)
-    Skynet.error(cmd)
+    local conf = require "conf"
+    local cmd = string.format("cd %s/shell && sh start.sh %s", conf.workspace, clustername)
+    skynet.error(cmd)
     os.execute(cmd)
 end
 
 function util.gc()
-    local config = require "config"
-    if config.debug then
+    local conf = require "conf"
+    if conf.debug then
         collectgarbage("collect")
         return collectgarbage("count")
     end
@@ -133,7 +133,7 @@ function util.dump(root, ...)
 end
 
 function util.printdump(root, ...)
-    Skynet.error(util.dump(root, ...))
+    skynet.error(util.dump(root, ...))
 end
 
 function util.is_in_list(list, obj)
@@ -169,7 +169,7 @@ function util.num2str(tbl)
 end
 
 local function new_module(modname)
-    Skynet.cache.clear()
+    skynet.cache.clear()
     local module = package.loaded[modname]
     if module then
         package.loaded[modname] = nil

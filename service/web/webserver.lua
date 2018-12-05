@@ -1,24 +1,25 @@
-local Skynet        = require "skynet"
-local Socket        = require "skynet.socket"
-local Httpd         = require "http.httpd"
-local Sockethelper  = require "http.sockethelper"
-local Url           = require "http.url"
-local Util          = require "util"
-local Conf          = require "conf"
-local Whitelist     = require "ip.whitelist"
-local Blacklist     = require "ip.blacklist"
-local Hotfix        = require "hotfix"
+local skynet        = require "skynet"
+local socket        = require "skynet.socket"
+local httpd         = require "http.httpd"
+local sockethelper  = require "http.sockethelper"
+local urllib        = require "http.url"
+local bewater       = require "bewater"
+local conf          = require "conf"
+local whitelist     = require "ip.whitelist"
+local blacklist     = require "ip.blacklist"
+local hotfix        = require "hotfix"
 local errcode       = require "def.errcode"
+--local util          = require "util"
 
 local mode, server_path, handler_path, port, preload, gate = ...
 port = tonumber(port)
 preload = preload and tonumber(preload) or 20
 
 local function response(fd, ...)
-    local ok, err = Httpd.write_response(Sockethelper.writefunc(fd), ...)
+    local ok, err = httpd.write_response(sockethelper.writefunc(fd), ...)
     if not ok then
-        -- if err == Sockethelper.socket_error , that means socket closed.
-        Skynet.error(string.format("fd = %d, %s", fd, err))
+        -- if err == sockethelper.socket_error , that means socket closed.
+        skynet.error(string.format("fd = %d, %s", fd, err))
     end
 end
 
@@ -40,7 +41,7 @@ local function on_message(url, args, body, header, ip)
     local auth = header.authorization
     local api = handler.api[url]
     if api then
-        local ret, data = Util.try(function()
+        local ret, data = bewater.try(function()
             return handler:unpack(body, url)
         end)
         if not ret then
@@ -51,7 +52,7 @@ local function on_message(url, args, body, header, ip)
         if api.auth and not uid then
             return string.format('{"err":%d}', errcode.AUTH_FAIL)
         end
-        if not Util.try(function()
+        if not bewater.try(function()
             ret = api.cb(handler, args, data, uid, ip, header)
         end) then
         ret = '{"err":3, "desc":"server traceback"}'
@@ -62,40 +63,45 @@ local function on_message(url, args, body, header, ip)
     end
 end
 
-Skynet.start(function()
-    Skynet.dispatch("lua", function (_,_,fd, ip)
-        if fd == "hotfix" then
-            handler = Hotfix.module(handler_path)
+skynet.start(function()
+    skynet.dispatch("lua", function (_,_, ...)
+        local args = {...}
+        if args[1] == "hotfix" then
+            handler = hotfix.module(handler_path)
             return
         end
-        Socket.start(fd)
+        if type(args[1]) == "string" then
+            return bewater.ret(handler[args[1]](...))
+        end
+        local fd, ip = ...
+        socket.start(fd)
         -- limit request body size to 8192 (you can pass nil to unlimit)
-        local code, url, method, header, body = Httpd.read_request(Sockethelper.readfunc(fd), nil)
-        --Util.printdump(header)
-        Skynet.error(string.format("recv code:%s, url:%s, method:%s, header:%s", code, url, method, header))
+        local code, url, method, header, body = httpd.read_request(sockethelper.readfunc(fd), nil)
+        --util.printdump(header)
+        skynet.error(string.format("recv code:%s, url:%s, method:%s, header:%s", code, url, method, header))
         if code then
             if code ~= 200 then
                 response(fd, code)
             else
                 local data
-                local _, query = Url.parse(url)
+                local _, query = urllib.parse(url)
                 if query then
-                    data = Url.parse_query(query)
+                    data = urllib.parse_query(query)
                 end
                 ip = header['x-real-ip'] or string.match(ip, "[^:]+")
                 response(fd, code, on_message(url, data, body, header, ip), {["Access-Control-Allow-Origin"] = "*"})
             end
         else
-            if url == Sockethelper.socket_error then
-                Skynet.error("socket closed")
+            if url == sockethelper.socket_error then
+                skynet.error("socket closed")
             else
-                Skynet.error(url)
+                skynet.error(url)
             end
         end
-        Socket.close(fd)
+        socket.close(fd)
     end)
     handler:init(gate)
-    Hotfix.reg()
+    hotfix.reg()
 end)
 
 elseif mode == "gate" then
@@ -105,56 +111,63 @@ if server_path then
     server = require(server_path)
 end
 
+local agents = {}
 local CMD = {}
 function CMD.hotfix()
-    server = Hotfix.module(server_path)
-    return Util.NORET
+    server = hotfix.module(server_path)
+    return bewater.NORET
 end
 
-Skynet.start(function()
+function CMD.call_agent(...)
+    return skynet.call(agents[1], "lua", ...)
+end
+
+skynet.start(function()
     if server then
         server:start()
     end
 
-    local agent = {}
     for i= 1, preload do
-        agent[i] = Skynet.newservice(SERVICE_NAME, "agent", server_path, handler_path, port, preload, Skynet.self())
+        agents[i] = skynet.newservice(SERVICE_NAME, "agent", server_path, handler_path, port, preload, skynet.self())
     end
     local balance = 1
-    local fd = Socket.listen("0.0.0.0", port)
-    Socket.start(fd , function(_fd, ip)
-        if Conf.whitelist and not Whitelist.check(ip) then
-            Socket.start(_fd)
-            Skynet.error(string.format("not in whitelist:%s", ip))
+    local fd = socket.listen("0.0.0.0", port)
+    socket.start(fd , function(_fd, ip)
+        if conf.whitelist and not whitelist.check(ip) then
+            socket.start(_fd)
+            skynet.error(string.format("not in whitelist:%s", ip))
             response(_fd, 403)
-            Socket.close(_fd)
+            socket.close(_fd)
             return
         end
-        if Conf.blacklist and Blacklist.check(ip) then
-            Socket.start(fd)
-            Skynet.error(string.format("in blacklist:%s", ip))
+        if conf.blacklist and blacklist.check(ip) then
+            socket.start(fd)
+            skynet.error(string.format("in blacklist:%s", ip))
             response(fd, 403)
-            Socket.close(fd)
+            socket.close(fd)
             return
         end
-        Skynet.error(string.format("%s connected, pass it to agent :%08x", _fd, agent[balance]))
-        Skynet.send(agent[balance], "lua", _fd, ip)
+        skynet.error(string.format("%s connected, pass it to agent :%08x", _fd, agents[balance]))
+        skynet.send(agents[balance], "lua", _fd, ip)
         balance = balance + 1
-        if balance > #agent then
+        if balance > #agents then
             balance = 1
         end
     end)
 
-    Skynet.dispatch("lua", function(_, _, cmd, subcmd, ...)
-        local f = assert(CMD[cmd] or server[cmd], cmd)
+    skynet.dispatch("lua", function(_, _, cmd, subcmd, ...)
+        if CMD[cmd] then
+            return bewater.ret(CMD[cmd](subcmd, ...))
+        end
+        local f = assert(server[cmd], cmd)
         if type(f) == "function" then
-            Util.ret(f(server, subcmd, ...))
+            bewater.ret(f(server, subcmd, ...))
         else
-            Util.ret(f[subcmd](f, ...))
+            bewater.ret(f[subcmd](f, ...))
         end
     end)
 
-    Hotfix.reg()
+    hotfix.reg()
 end)
 
 else
