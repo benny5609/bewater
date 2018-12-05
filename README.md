@@ -190,5 +190,8 @@ ti.delay(5.5, function()
 end)
 ti.destroy()
 ```
+## 网页后台管理
+之前写过一版简单的[webconsole](https://github.com/zhandouxiaojiji/webconsole)，新版还在开发([SkynetConsole](https://github.com/zhandouxiaojiji/SkynetConsole))
+![preview2](https://github.com/zhandouxiaojiji/webconsole/blob/master/images/preview1.jpg)
 ## 关于bewater
 Be water My friend 是在我心目中浩气长存的伟大武术家李小龙先生已经解释过啦，如果你想更加了解多点的话，不妨一起探讨一下。(QQ:1013299930)
