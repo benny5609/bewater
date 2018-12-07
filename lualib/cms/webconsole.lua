@@ -4,8 +4,10 @@ local web
 
 local M = {}
 function M.init(args)
-    web = skynet.newservice("web/webserver", "gate", "cms.server", "cms.handler",
-        args.port, 10)
+    local port = assert(args.port)
+    local users = assert(args.users)
+    web = skynet.newservice("web/webserver", "gate", "cms.server", "cms.handler", port, 10)
+    skynet.call(web, "lua", "start", users)
 end
 function M.add_api(path)
     assert(web, "webconsole not init")

@@ -64,7 +64,7 @@ local function on_message(url, args, body, header, ip)
         if not bewater.try(function()
             local func = require(handler.root..string.gsub(url, '/', '.'))
             assert(func, url)
-            ret = func(handler, args, data, uid, ip, header) or {}
+            ret = func(args, data, uid, ip, header) or {}
         end) then
             return {
                 err = errcode.TRACEBACK, 
@@ -147,10 +147,6 @@ function CMD.call_all_agent(...)
 end
 
 skynet.start(function()
-    if server then
-        server:start()
-    end
-
     for i= 1, preload do
         agents[i] = skynet.newservice(SERVICE_NAME, "agent", server_path, handler_path, port, preload, skynet.self())
     end
@@ -185,7 +181,7 @@ skynet.start(function()
         end
         local f = assert(server[cmd], cmd)
         if type(f) == "function" then
-            bewater.ret(f(server, subcmd, ...))
+            bewater.ret(f(subcmd, ...))
         else
             bewater.ret(f[subcmd](f, ...))
         end
