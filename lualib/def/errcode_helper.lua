@@ -9,7 +9,7 @@ local name2errcode = {}
 local function REG(err_name, code, describe)
     assert(not code2describe[code], string.format("errcode 0x%x exist", code))
     name2errcode[err_name] = code
-    code2describe[code] = string.format("%s", describe)
+    code2describe[code] = string.format("0x%x:%s【%s】", code, err_name, describe)
 end
 errcode.REG = REG
 
