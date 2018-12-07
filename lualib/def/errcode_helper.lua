@@ -42,5 +42,7 @@ REG("REPEAT",               0x000d, "重复操作")
 REG("SIGN_ERROR",           0x000e, "签名错误")
 REG("SERVER_BUSY",          0x000f, "服务器忙！")
 REG("SERVER_CLOSED",        0x0010, "服役器未启动！")
+REG("BODY_ERROR",           0x001a, "body数据解析错误")
+REG("API_NOT_EXIST",        0x001b, "api不存在")
 
 return errcode

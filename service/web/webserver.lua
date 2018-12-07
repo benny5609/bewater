@@ -9,7 +9,7 @@ local whitelist     = require "ip.whitelist"
 local blacklist     = require "ip.blacklist"
 local hotfix        = require "hotfix"
 local errcode       = require "def.errcode"
---local util          = require "util"
+local util          = require "util"
 
 local mode, server_path, handler_path, port, preload, gate = ...
 port = tonumber(port)
@@ -30,10 +30,10 @@ local handler = require(handler_path)
 -- hander.api = {[[/api/xxx/ooo]] = func}
 -- hander.auth = function(auth) return uid end -- 授权
 -- 如果是非字符串，handler需要提供pack和unpack方法
-handler.pack = handler.pack or function (_, data)
+handler.pack = handler.pack or function (data)
     return data
 end
-handler.unpack = handler.unpack or function (_, data)
+handler.unpack = handler.unpack or function (data)
     return data
 end
 
@@ -42,24 +42,42 @@ local function on_message(url, args, body, header, ip)
     local api = handler.api[url]
     if api then
         local ret, data = bewater.try(function()
-            return handler:unpack(body, url)
+            return handler.unpack(body, url)
         end)
         if not ret then
-            return '{"err":2, "desc":"body error"}'
+            return {
+                err = errcode.BODY_ERROR,
+                desc = "body error"
+            }
         end
-        ret = 0
+        ret = {}
         local uid = handler.auth and handler.auth(handler, auth)
         if api.auth and not uid then
-            return string.format('{"err":%d}', errcode.AUTH_FAIL)
+            return {
+                err = errcode.AUTH_FAIL,
+                desc = "authorization fail",
+            }
+        end
+        if api.args then
+            -- todo check args
         end
         if not bewater.try(function()
-            ret = api.cb(handler, args, data, uid, ip, header)
+            local func = require(handler.root..string.gsub(url, '/', '.'))
+            assert(func, url)
+            ret = func(handler, args, data, uid, ip, header) or {}
         end) then
-        ret = '{"err":3, "desc":"server traceback"}'
+            return {
+                err = errcode.TRACEBACK, 
+                desc = "server traceback"
+            }
         end
-        return handler:pack(ret or 0, url)
+        ret.err = ret.err or 0
+        return ret
     else
-        return '{"err":1, "desc":"api not exist"}'
+        return {
+            err = errcode.API_NOT_EXIST, 
+            desc = "api not exist"
+        }
     end
 end
 
@@ -89,7 +107,8 @@ skynet.start(function()
                     data = urllib.parse_query(query)
                 end
                 ip = header['x-real-ip'] or string.match(ip, "[^:]+")
-                response(fd, code, on_message(url, data, body, header, ip), {["Access-Control-Allow-Origin"] = "*"})
+                response(fd, code, handler.pack(on_message(url, data, body, header, ip)), 
+                    {["Access-Control-Allow-Origin"] = "*"})
             end
         else
             if url == sockethelper.socket_error then
@@ -100,7 +119,6 @@ skynet.start(function()
         end
         socket.close(fd)
     end)
-    handler:init(gate)
     hotfix.reg()
 end)
 
@@ -120,6 +138,12 @@ end
 
 function CMD.call_agent(...)
     return skynet.call(agents[1], "lua", ...)
+end
+
+function CMD.call_all_agent(...)
+    for _, agent in pairs(agents) do
+        skynet.pcall(agent, "lua", ...)
+    end
 end
 
 skynet.start(function()
