@@ -10,10 +10,6 @@ skynet.start(function()
             {account = "root", password = "123"}
         }
     }) 
-
-    local ret, resp = http.post("huangjx.top:9999/api/user/login", json.encode {
-        account = "root",
-        password = "123",
-    })
-    print(ret, resp)
+    
+    print "Be water my friend."
 end)

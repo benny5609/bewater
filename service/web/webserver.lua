@@ -62,9 +62,15 @@ local function on_message(url, args, body, header, ip)
             -- todo check args
         end
         if not bewater.try(function()
-            local func = require(handler.root..string.gsub(url, '/', '.'))
+            local func = require(string.gsub(handler.root..url, '/', '.'))
             assert(func, url)
             ret = func(args, data, uid, ip, header) or {}
+            if type(ret) == "number" then
+                ret = {err = ret}
+                if ret.err ~= 0 then
+                    ret.desc = errcode.describe(ret.err)
+                end
+            end
         end) then
             return {
                 err = errcode.TRACEBACK, 

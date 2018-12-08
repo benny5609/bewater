@@ -2,9 +2,10 @@ local skynet = require "skynet"
 local json = require "cjson.safe"
 
 local M = {
-    root = "cms",
+    root = "cms/api",
     api = {
-        ['/api/user/login'] = {args = {account = "STR", password = "STR"}, auth = false},
+        ['/cms/user/login'] = {args = {account = "STR", password = "STR"}, auth = false},
+        ['/cms/view/menu'] = {auth = true},
     },
 }
 
@@ -16,9 +17,8 @@ function M.unpack(data)
     return json.decode(data)
 end
 
-function M:auth(p)
-    local addr = skynet.uniqueservice("passport")
-    return skynet.call(addr, "lua", "get_uid", p)
+function M:auth(authorization)
+    return skynet.call("cms", "lua", "get_account", authorization)
 end
 
 return M
