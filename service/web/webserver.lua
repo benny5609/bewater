@@ -87,6 +87,15 @@ local function on_message(url, args, body, header, ip)
     end
 end
 
+local function resp_options(fd)
+    response(fd, 200, nil, {
+        ['Access-Control-Allow-Origin'] = '*',
+        ['Access-Control-Allow-Methons'] = 'PUT, POST, GET, OPTIONS, DELETE',
+        ['Access-Control-Allow-Headers'] = 'authorization',
+    })
+    socket.close(fd)
+end
+
 skynet.start(function()
     skynet.dispatch("lua", function (_,_, ...)
         local args = {...}
@@ -102,6 +111,9 @@ skynet.start(function()
         -- limit request body size to 8192 (you can pass nil to unlimit)
         local code, url, method, header, body = httpd.read_request(sockethelper.readfunc(fd), nil)
         --util.printdump(header)
+        if method == "OPTIONS" then
+            return resp_options(fd)
+        end
         skynet.error(string.format("recv code:%s, url:%s, method:%s, header:%s", code, url, method, header))
         if code then
             if code ~= 200 then
