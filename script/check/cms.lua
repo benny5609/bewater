@@ -42,6 +42,7 @@ return function()
     local ret = check_login("root", "123")
     authorization = assert(ret.authorization)
     check_api("/cms/view/menu", {})
+    check_api("/cms/view/node_info", {})
 
     return true
 end

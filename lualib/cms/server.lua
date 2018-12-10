@@ -7,10 +7,7 @@ local util = require "util"
 local trace = log.trace("cms")
 
 local M = {}
-local menu = {
-    left = {},  -- 左侧菜单
-    top = {},   -- 顶部菜单
-}
+local menu = {}
 local acc2info = {}
 local auth2acc = {}
 function M.start(users)
@@ -21,26 +18,8 @@ function M.start(users)
     skynet.register "cms"
 end
 
-function M.add_menu(side, new, ...)
-    local item_list = assert(menu[side], side)
-    local idx_list = {...}
-    if #idx_list == 0 then
-        table.insert(item_list, new)
-    else
-        local cur = item_list
-        for _, idx in ipairs(idx_list) do
-            cur = cur[idx] 
-        end
-        table.insert(cur, new)
-    end
-end
-
-function M.insert_left_menu(menu, ...)
-    M.add_menu("left", menu, ...)
-end
-
-function M.insert_top_menu(menu, ...)
-    M.add_menu("top", menu, ...)
+function M.set_menu(data)
+    menu = data
 end
 
 function M.get_account(auth)
@@ -71,7 +50,6 @@ function M.req_login(account, password)
 end
 
 function M.req_menu()
-    util.printdump(menu)
     return menu
 end
 return M

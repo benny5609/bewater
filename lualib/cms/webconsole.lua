@@ -9,13 +9,21 @@ function M.init(args)
     web = skynet.newservice("web/webserver", "gate", "cms.server", "cms.handler", port, 10)
     skynet.call(web, "lua", "start", users)
 
-    skynet.call(web, "lua", "insert_left_menu", {
-        text = "Skynet", children = {
-            {text = "节点信息", view = "view/node_info"},
-            {text = "所有服务", view = "view/all_service"},
-            {text = "注入调试", view = "view/inject"},
-            {text = "GM", view = "view/gm"},
-        }
+    skynet.call(web, "lua", "set_menu", {
+        {name = "skynet", title = "Skynet", icon = "&#xe665;", children = {
+            {title = "节点信息", href = "/cms/view/node_info"},
+            {title = "所有服务", href = "/cms/view/all_service"},
+            {title = "注入调试", href = "/cms/view/inject"},
+            {title = "GM", href = "/cms/view/gm"},
+        }},
+        {name = "user", title = "用户管理", icon = "&#xe665;", children = {
+            {title = "数据统计", href = "/cms/view/node_info", icon = "&#xe665;"},
+            {title = "GM", href = "/cms/view/gm"},
+        }},
+        {name = "update", title = "更新", icon = "&#xe665;", children = {
+            {title = "客户端更新", href = "/cms/view/node_info"},
+            {title = "服务端热更", href = "/cms/view/gm"},
+        }},
     })
 end
 

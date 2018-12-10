@@ -6,6 +6,10 @@ local M = {
     api = {
         ['/cms/user/login'] = {args = {account = "STR", password = "STR"}, auth = false},
         ['/cms/view/menu'] = {auth = true},
+        ['/cms/view/node_info'] = {auth = true},
+        ['/cms/view/all_service'] = {auth = true},
+        ['/cms/view/inject'] = {auth = true},
+        ['/cms/view/gm'] = {auth = true},
     },
 }
 
