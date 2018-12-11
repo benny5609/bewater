@@ -43,6 +43,8 @@ return function()
     check_api("/cms/view/menu", {})
     local html = check_api("/cms/view/node_info", {})
     print(html.content)
+    html = check_api("/cms/view/all_service", {})
+    print(html.content)
 
     return true
 end

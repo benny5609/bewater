@@ -16,11 +16,11 @@ function layui.table(head, data, ...)
     end
     local str = ""
     if head then
-        str = str .. "<thead>"
+        str = str .. "<thead><tr>"
         for _, v in ipairs(head) do
-            str = str .. v 
+            str = str .. string.format("<th>%s</th>", v)
         end
-        str = str .. "</thead>"
+        str = str .. "</tr></thead>"
     end
 
     for _, tr in ipairs(data) do
