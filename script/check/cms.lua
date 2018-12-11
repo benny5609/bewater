@@ -19,7 +19,6 @@ local function check_login(account, password, expect_err)
 end
 
 local function check_api(api, param, expect_err)
-    print(authorization)
     local ret, resp = http.post(host..api, json.encode(param), {authorization = authorization})
     resp = assert(json.decode(resp), resp)
     assert(ret)
@@ -42,7 +41,8 @@ return function()
     local ret = check_login("root", "123")
     authorization = assert(ret.authorization)
     check_api("/cms/view/menu", {})
-    check_api("/cms/view/node_info", {})
+    local html = check_api("/cms/view/node_info", {})
+    print(html.content)
 
     return true
 end
