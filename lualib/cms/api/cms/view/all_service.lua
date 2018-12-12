@@ -20,7 +20,7 @@ return function()
         local stat = debug_call(addr, "STAT")
         --v.address = skynet.address(addr)
         table.insert(tbl, {
-            string.format(":%x", addr),
+            addr,
             desc,
             mem,
             stat.task,
