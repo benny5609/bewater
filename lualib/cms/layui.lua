@@ -1,10 +1,49 @@
 local layui = {}
-function layui.row(ctx, class)
-    return string.format('<div class="layui-row %s">%s</div>', class or "", ctx)
+
+local function parse(param)
+    local str = ""
+    for k, v in pairs(param or {}) do
+        str = str .. k .. '="' .. v .. '"'
+    end
+    return str
 end
 
-function layui.form(ctx, class)
-    return string.format('<form class="layui-form %s">%s</form>', class or "", ctx)
+function layui.div(ctx, class)
+    return string.format('<div class="%s">%s</div>', class or "", ctx or "")
+end
+
+function layui.row(ctx, class)
+    return string.format('<div class="layui-row %s">%s</div>', class or "", ctx or "")
+end
+
+function layui.form(item_list, class, param)
+    local ctx = ""
+    for _, item in pairs(item_list) do
+        ctx = ctx .. '<div class = "layui-form-item input-item">' .. item .. '</div>'
+    end
+    return string.format('<form class="layui-form %s" %s>%s</form>', class or "", parse(param), ctx or "")
+end
+
+function layui.button(ctx, class)
+    return string.format('<button class="layui-button %s">%s</button>', class or "", ctx or "")
+end
+
+function layui.form_label(ctx, class)
+    return string.format('<label class="layui-form-label %s">%s</label>', class or "", ctx or "")
+end
+
+function layui.input_block(ctx, class)
+    return string.format('<div class="layui-input-block %s">%s</div>', class or "", ctx or "")
+end
+
+function layui.input(ctx, class, param)
+    return string.format('<input class="%s" %s>%s</input>',
+        class or "", parse(param), ctx or "")
+end
+
+function layui.label(ctx, class, param)
+    return string.format('<label class="%s" %s>%s</label>',
+        class or "", parse(param), ctx or "")
 end
 
 function layui.table(head, tbl, class, colgroup)
