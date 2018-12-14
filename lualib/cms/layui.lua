@@ -1,4 +1,12 @@
+local const = require "const"
+
 local layui = {}
+layui.action = const {
+    POST = "POST", -- POST请求:api, ...
+    ALERT = "ALERT", -- 弹窗:str
+    CLICK = "CLICK", -- 点击:...
+    VALUE = "VALUE", -- 值:...
+}
 
 local function parse(param)
     local str = ""
@@ -24,8 +32,9 @@ function layui.form(item_list, class, param)
     return string.format('<form class="layui-form %s" %s>%s</form>', class or "", parse(param), ctx or "")
 end
 
-function layui.button(ctx, class)
-    return string.format('<button class="layui-button %s">%s</button>', class or "", ctx or "")
+function layui.button(ctx, class, param, submit)
+    return string.format('<button class="layui-btn %s" %s %s>%s</button>',
+        class or "", parse(param), submit and "lay-submit" or "", ctx or "")
 end
 
 function layui.form_label(ctx, class)
@@ -43,6 +52,11 @@ end
 
 function layui.label(ctx, class, param)
     return string.format('<label class="%s" %s>%s</label>',
+        class or "", parse(param), ctx or "")
+end
+
+function layui.textarea(ctx, class, param)
+    return string.format('<textarea class="%s" %s>%s</textarea>',
         class or "", parse(param), ctx or "")
 end
 

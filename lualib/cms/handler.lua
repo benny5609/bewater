@@ -5,6 +5,7 @@ local M = {
     root = "cms/api",
     api = {
         ['/cms/user/login'] = {args = {account = "STR", password = "STR"}, auth = false},
+        ['/cms/debug/inject'] = {auth = true},
         ['/cms/view/menu'] = {auth = true},
         ['/cms/view/node_info'] = {auth = true},
         ['/cms/view/all_service'] = {auth = true},
