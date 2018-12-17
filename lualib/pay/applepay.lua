@@ -10,7 +10,7 @@ function M.verify_receipt(receipt, product_id)
         ret, resp = http.post("https://sandbox.itunes.apple.com/verifyReceipt", receipt)
     end
     resp = json.decode(resp)
-    if not ret or resp.status ~= 0 then
+    if not ret or not resp or resp.status ~= 0 then
         return
     end
     if not product_id then

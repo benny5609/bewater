@@ -11,7 +11,7 @@ require "bash"
 
 local mainfile = io.open(string.format("%s/log/%s.log",
     conf.workspace, conf.clustername), "w+")
-local errfile = io.open(string.format("%s/log/traceback.log",
+local errfile = io.open(string.format("%s/log/error.log",
     conf.workspace), "a+")
 
 local function write_log(file, addr, str)
@@ -34,6 +34,11 @@ end
 
 local logs = {} -- key(sys or uid) -> {last_time, file}
 local CMD = {}
+function CMD.error(str)
+    errfile:write(str.."\n")
+    errfile:flush()
+end
+
 function CMD.trace(addr, sys, str)
     str = string.format("[%s] %s", sys, str)
     local log = logs[sys]

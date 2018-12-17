@@ -6,6 +6,7 @@ require "schedule"
 local check_list = {
     "ip_country",
     "schedule",
+    "logger",
 }
 skynet.start(function()
     local count = 0

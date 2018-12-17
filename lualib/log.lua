@@ -21,10 +21,15 @@ function M.print(sys)
     end
 end
 
+
 function M.player(uid)
     return function(fmt, ...)
         skynet.send(".logger", "lua", "player", skynet.self(), uid, string.format(fmt, ...))
     end
+end
+
+function M.error(fmt, ...)
+    skynet.send(".logger", "lua", "error", string.format(fmt, ...))
 end
 
 function M.sighup()
