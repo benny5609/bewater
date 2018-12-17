@@ -24,4 +24,6 @@ skynet.start(function()
     end
     skynet.error(string.format("check %d files, %d ok, %d fail", 
         #check_list, count, #check_list - count))
+
+    skynet.newservice("autoid")
 end)
