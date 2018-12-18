@@ -42,10 +42,11 @@ return function()
     authorization = assert(ret.authorization)
     check_api("/cms/view/menu", {})
     html = check_api("/cms/view/all_service", {})
-    print(html.content)
+    --print(html.content)
     html = check_api("/cms/view/inject", {})
-    print(html.content)
-
+    --print(html.content)
+    
+    check_api("/cms/user/gm", {}, errcode.ARGS_ERROR)
     return true
 end
 

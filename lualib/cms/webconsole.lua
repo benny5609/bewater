@@ -17,12 +17,12 @@ function M.init(args)
             {title = "GM", icon = "&#xe64e;", href = "/cms/view/gm"},
         }},
         {name = "user", title = "用户管理", icon = "&#xe770;", children = {
-            {title = "数据统计", icon = "&#xe62c;", href = "/cms/view/node_info", icon = "&#xe665;"},
+            {title = "数据统计", icon = "&#xe62c;", href = "/cms/view/stat", icon = "&#xe665;"},
             {title = "GM", icon = "&#xe64e;", href = "/cms/view/gm"},
         }},
         {name = "update", title = "更新", icon = "&#xe609;", children = {
-            {title = "客户端更新", icon = "&#xe62f;", href = "/cms/view/node_info"},
-            {title = "服务端热更", icon = "&#xe62f;", href = "/cms/view/gm"},
+            {title = "客户端更新", icon = "&#xe62f;", href = "/cms/view/update_client"},
+            {title = "服务端热更", icon = "&#xe62f;", href = "/cms/view/update_server"},
         }},
     })
 end

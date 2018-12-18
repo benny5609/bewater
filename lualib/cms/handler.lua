@@ -4,8 +4,8 @@ local json = require "cjson.safe"
 local M = {
     root = "cms/api",
     api = {
-        ['/cms/user/login'] = {args = {account = "STR", password = "STR"}, auth = false},
-        ['/cms/user/gm'] = {args = {gm = "STR"}, auth = true},
+        ['/cms/user/login'] = {data = {account = "STR", password = "STR"}, auth = false},
+        ['/cms/user/gm'] = {data = {gm = "STR"}, auth = true},
         ['/cms/debug/inject'] = {auth = true},
         ['/cms/view/menu'] = {auth = true},
         ['/cms/view/main'] = {auth = true},

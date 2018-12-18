@@ -58,8 +58,40 @@ local function on_message(url, args, body, header, ip)
                 desc = "authorization fail",
             }
         end
-        if api.args then
-            -- todo check args
+        if api.data then
+            for k, t in pairs(api.data) do
+                if t == "STR" then
+                    if type(data[k]) ~= "string" then
+                        return {
+                            err = errcode.ARGS_ERROR,
+                            desc = string.format("args error, %s must string", k),
+                        }
+                    end
+                elseif t == "str" then
+                    if data[k] and type(data[k]) ~= "string" then
+                        return {
+                            err = errcode.ARGS_ERROR,
+                            desc = string.format("args error, %s must string", k),
+                        }
+                    end
+                elseif t == "NUM" then
+                    if type(data[k]) ~= "number" then
+                        return {
+                            err = errcode.ARGS_ERROR,
+                            desc = string.format("args error, %s must number", k),
+                        }
+                    end
+                elseif t == "num" then
+                    if data[k] and type(data[k]) ~= "number" then
+                        return {
+                            err = errcode.ARGS_ERROR,
+                            desc = string.format("args error, %s must number", k),
+                        }
+                    end
+                else
+                    error(string.format("api %s def type %s error", api, t))
+                end
+            end
         end
         if not bewater.try(function()
             local func = require(string.gsub(handler.root..url, '/', '.'))
