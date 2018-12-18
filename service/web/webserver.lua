@@ -97,6 +97,7 @@ local function resp_options(fd)
 end
 
 skynet.start(function()
+    bewater.reg_code()
     skynet.dispatch("lua", function (_,_, ...)
         local args = {...}
         if args[1] == "hotfix" then
@@ -165,6 +166,7 @@ function CMD.call_all_agent(...)
 end
 
 skynet.start(function()
+    bewater.reg_code()
     for i= 1, preload do
         agents[i] = skynet.newservice(SERVICE_NAME, "agent", server_path, handler_path, port, preload, skynet.self())
     end

@@ -1,4 +1,5 @@
 local skynet = require "skynet"
+local bewater = require "bewater"
 
 require "ip.ip_country"
 require "schedule"
@@ -7,8 +8,14 @@ local check_list = {
     "ip_country",
     "schedule",
     "cms",
+    "inject",
 }
+
+
 skynet.start(function()
+    skynet.register "check"
+    bewater.reg_code(_G)
+
     local count = 0
     for i, v in ipairs(check_list) do
         local ret = require("check."..v)
