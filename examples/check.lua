@@ -8,7 +8,8 @@ local check_list = {
     "ip_country",
     "schedule",
     "cms",
-    "inject",
+    "date_helper",
+--    "inject",
 }
 
 

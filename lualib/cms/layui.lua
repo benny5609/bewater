@@ -7,6 +7,9 @@ layui.action = const {
     CLICK = "CLICK", -- 点击:...
     GET_VAL = "GET_VAL", -- 获取值:...
     SET_VAL = "SET_VAL", -- 设置值:...
+    APPEND_VAL = "APPEND_VAL", -- 追加值:...
+    GET_TEXT = "GET_TEXT", -- 获取值:...
+    SET_TEXT = "SET_TEXT", -- 获取值:...
 }
 
 local function parse(param)
@@ -87,6 +90,11 @@ function layui.table(head, tbl, class, colgroup)
     end
     str = str .. '</tbody>'
     return string.format('<table class="layui-table %s">%s</table>', class or "mag0", str)
+end
+
+function layui.blockquote(ctx, class, param)
+    return string.format('<blockquote class="layui-elem-quote %s" %s>%s</blockquote>', 
+        class or "title", parse(param), ctx or "")
 end
 
 return layui
