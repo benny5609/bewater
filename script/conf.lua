@@ -1,6 +1,7 @@
 local skynet = require "skynet"
 local conf = {
     workspace = skynet.getenv('workspace'),
+    clustername = skynet.getenv('clustername'),
     debug = true,
 
     proj = "test",

@@ -1,3 +1,4 @@
+local skynet = require "skynet"
 local assert = assert
 local os = os
 
@@ -22,6 +23,21 @@ function M.format(t)
             return "星期六"
         end
     end)
+end
+
+function M.format_now(t)
+    t = t or skynet.now()//100
+    local d = t // (24*3600)
+    local h = (t - d*24*3600)//3600
+    local m = (t // 60) % 60
+    local s = t % 60
+    if d > 0 then
+        return string.format("%s天%s小时", d, h)
+    end
+    if h > 0 then
+        return string.format("%s小时%s分钟", h, m)
+    end
+    return string.format("%s分%s秒", m, s)
 end
 
 function M.hour()

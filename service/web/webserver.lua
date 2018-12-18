@@ -9,7 +9,7 @@ local whitelist     = require "ip.whitelist"
 local blacklist     = require "ip.blacklist"
 local hotfix        = require "hotfix"
 local errcode       = require "def.errcode"
---local util          = require "util"
+local util          = require "util"
 
 local mode, server_path, handler_path, port, preload, gate = ...
 port = tonumber(port)
@@ -30,10 +30,10 @@ local handler = require(handler_path)
 -- hander.api = {[[/api/xxx/ooo]] = func}
 -- hander.auth = function(auth) return uid end -- 授权
 -- 如果是非字符串，handler需要提供pack和unpack方法
-handler.pack = handler.pack or function (_, data)
+handler.pack = handler.pack or function (data)
     return data
 end
-handler.unpack = handler.unpack or function (_, data)
+handler.unpack = handler.unpack or function (data)
     return data
 end
 
@@ -42,28 +42,94 @@ local function on_message(url, args, body, header, ip)
     local api = handler.api[url]
     if api then
         local ret, data = bewater.try(function()
-            return handler:unpack(body, url)
+            return handler.unpack(body, url)
         end)
         if not ret then
-            return '{"err":2, "desc":"body error"}'
+            return {
+                err = errcode.BODY_ERROR,
+                desc = "body error"
+            }
         end
-        ret = 0
+        ret = {}
         local uid = handler.auth and handler.auth(handler, auth)
         if api.auth and not uid then
-            return string.format('{"err":%d}', errcode.AUTH_FAIL)
+            return {
+                err = errcode.AUTH_FAIL,
+                desc = "authorization fail",
+            }
+        end
+        if api.data then
+            for k, t in pairs(api.data) do
+                if t == "STR" then
+                    if type(data[k]) ~= "string" then
+                        return {
+                            err = errcode.ARGS_ERROR,
+                            desc = string.format("args error, %s must string", k),
+                        }
+                    end
+                elseif t == "str" then
+                    if data[k] and type(data[k]) ~= "string" then
+                        return {
+                            err = errcode.ARGS_ERROR,
+                            desc = string.format("args error, %s must string", k),
+                        }
+                    end
+                elseif t == "NUM" then
+                    if type(data[k]) ~= "number" then
+                        return {
+                            err = errcode.ARGS_ERROR,
+                            desc = string.format("args error, %s must number", k),
+                        }
+                    end
+                elseif t == "num" then
+                    if data[k] and type(data[k]) ~= "number" then
+                        return {
+                            err = errcode.ARGS_ERROR,
+                            desc = string.format("args error, %s must number", k),
+                        }
+                    end
+                else
+                    error(string.format("api %s def type %s error", api, t))
+                end
+            end
         end
         if not bewater.try(function()
-            ret = api.cb(handler, args, data, uid, ip, header)
+            local func = require(string.gsub(handler.root..url, '/', '.'))
+            assert(func, url)
+            ret = func(args, data, uid, ip, header) or {}
+            if type(ret) == "number" then
+                ret = {err = ret}
+                if ret.err ~= 0 then
+                    ret.desc = errcode.describe(ret.err)
+                end
+            end
         end) then
-        ret = '{"err":3, "desc":"server traceback"}'
+            return {
+                err = errcode.TRACEBACK, 
+                desc = "server traceback"
+            }
         end
-        return handler:pack(ret or 0, url)
+        ret.err = ret.err or 0
+        return ret
     else
-        return '{"err":1, "desc":"api not exist"}'
+        return {
+            err = errcode.API_NOT_EXIST, 
+            desc = "api not exist"
+        }
     end
 end
 
+local function resp_options(fd)
+    response(fd, 200, nil, {
+        ['Access-Control-Allow-Origin'] = '*',
+        ['Access-Control-Allow-Methons'] = 'PUT, POST, GET, OPTIONS, DELETE',
+        ['Access-Control-Allow-Headers'] = 'authorization',
+    })
+    socket.close(fd)
+end
+
 skynet.start(function()
+    bewater.reg_code()
     skynet.dispatch("lua", function (_,_, ...)
         local args = {...}
         if args[1] == "hotfix" then
@@ -78,6 +144,9 @@ skynet.start(function()
         -- limit request body size to 8192 (you can pass nil to unlimit)
         local code, url, method, header, body = httpd.read_request(sockethelper.readfunc(fd), nil)
         --util.printdump(header)
+        if method == "OPTIONS" then
+            return resp_options(fd)
+        end
         skynet.error(string.format("recv code:%s, url:%s, method:%s, header:%s", code, url, method, header))
         if code then
             if code ~= 200 then
@@ -89,7 +158,8 @@ skynet.start(function()
                     data = urllib.parse_query(query)
                 end
                 ip = header['x-real-ip'] or string.match(ip, "[^:]+")
-                response(fd, code, on_message(url, data, body, header, ip), {["Access-Control-Allow-Origin"] = "*"})
+                response(fd, code, handler.pack(on_message(url, data, body, header, ip)), 
+                    {["Access-Control-Allow-Origin"] = "*"})
             end
         else
             if url == sockethelper.socket_error then
@@ -100,7 +170,6 @@ skynet.start(function()
         end
         socket.close(fd)
     end)
-    handler:init(gate)
     hotfix.reg()
 end)
 
@@ -122,11 +191,14 @@ function CMD.call_agent(...)
     return skynet.call(agents[1], "lua", ...)
 end
 
-skynet.start(function()
-    if server then
-        server:start()
+function CMD.call_all_agent(...)
+    for _, agent in pairs(agents) do
+        skynet.pcall(agent, "lua", ...)
     end
+end
 
+skynet.start(function()
+    bewater.reg_code()
     for i= 1, preload do
         agents[i] = skynet.newservice(SERVICE_NAME, "agent", server_path, handler_path, port, preload, skynet.self())
     end
@@ -161,7 +233,7 @@ skynet.start(function()
         end
         local f = assert(server[cmd], cmd)
         if type(f) == "function" then
-            bewater.ret(f(server, subcmd, ...))
+            bewater.ret(f(subcmd, ...))
         else
             bewater.ret(f[subcmd](f, ...))
         end
