@@ -56,12 +56,7 @@ function CMD.insert(name, tbl)
 end
 
 function CMD.delete(name, query_tbl)
-    local ok, err, r = db[name]:delete(query_tbl)
-    if not ok then
-        skynet.error("mongo update error")
-        util.printdump(r)
-        error(err)
-    end
+    db[name]:delete(query_tbl)
     return true
 end
 

@@ -10,6 +10,7 @@ local check_list = {
     "cms",
     "date_helper",
 --    "inject",
+    "logger",
 }
 
 

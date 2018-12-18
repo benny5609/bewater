@@ -24,13 +24,16 @@ end
 local count = 0 -- 一分钟内累计报错次数
 local last = 0  -- 上次报错时间
 local function send_traceback()
+    if skynet.time() - last < 60 then
+        return
+    end
     local info = require "util.clusterinfo"
-    local path = string.format("%s/log/%s.log", info.workspace, skynet.getenv("clustername") or "error")
-    local str = string.format("服务器TRACEBACK\n项目:%s\n节点:%s\n公网ip:%s\n内网ip:%s\n进程:%s\n路径:%s\n累计报错:%d次",
+    local path = string.format("%s/log/error.log", info.workspace)
+    local str = string.format("服务器出错了\n项目:%s\n节点:%s\n公网ip:%s\n内网ip:%s\n进程:%s\n日志:%s\n累计报错:%d次",
         conf.desc or conf.proj, info.clustername, info.pnet_addr, info.inet_addr, info.pid, path, count)
 
     count = 0
-    last = os.time()
+    last = skynet.time()
 
     local token = get_token()
     local sh = string.format('curl -H "Content-Type:application/json" -X POST -d \'%s\' %s/chat/send?access_token=%s',
@@ -49,9 +52,6 @@ end
 local CMD = {}
 function CMD.traceback(err)
     count = count + 1
-    if os.time() - last < 60 then
-        return
-    end
     send_traceback(err)
 end
 
