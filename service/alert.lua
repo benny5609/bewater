@@ -5,10 +5,12 @@ local bewater= require "bewater"
 local conf   = require "conf"
 local log    = require "log"
 local json   = require "cjson.safe"
+local lock   = require "lock"
 
 local trace  = log.trace("alert")
 require "bash"
 
+local send_lock = lock.new()
 local host = "https://oapi.dingtalk.com"
 local function get_token()
     local ret, resp = http.get(host.."/gettoken", {corpid = conf.alert.corpid, corpsecret = conf.alert.corpsecret})
@@ -24,7 +26,8 @@ end
 local count = 0 -- 一分钟内累计报错次数
 local last = 0  -- 上次报错时间
 local function send_traceback()
-    if skynet.time() - last < 60 then
+    send_lock:lock()
+    if skynet.time() - last < 60 or count == 0 then
         return
     end
     local info = require "util.clusterinfo"
@@ -46,7 +49,7 @@ local function send_traceback()
         }
     }, host, token)
     bash(sh)
-
+    send_lock:unlock()
 end
 
 local CMD = {}

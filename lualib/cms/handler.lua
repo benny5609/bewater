@@ -24,7 +24,7 @@ function M.unpack(data)
     return json.decode(data)
 end
 
-function M:auth(authorization)
+function M.auth(authorization)
     return skynet.call("cms", "lua", "get_account", authorization)
 end
 

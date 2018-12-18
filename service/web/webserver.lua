@@ -51,7 +51,7 @@ local function on_message(url, args, body, header, ip)
             }
         end
         ret = {}
-        local uid = handler.auth and handler.auth(handler, auth)
+        local uid = handler.auth and handler.auth(auth)
         if api.auth and not uid then
             return {
                 err = errcode.AUTH_FAIL,
