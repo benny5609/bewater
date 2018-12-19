@@ -1,6 +1,6 @@
 local skynet    = require "skynet.manager"
-local mongo     = require "db.mongo_helper"
-local bewater   = require "bewater"
+local mongo     = require "bw.db.mongo_helper"
+local bewater   = require "bw.bewater"
 local def       = require "def"
 
 local RESERVE_COUNT = 100

@@ -2,13 +2,13 @@
 --
 local skynet    = require "skynet"
 local cluster   = require "skynet.cluster"
-local info      = require "util.clusterinfo"
+local info      = require "bw.util.clusterinfo"
 local conf      = require "conf"
-local bewater   = require "bewater"
-local log       = require "log"
+local bewater   = require "bw.bewater"
+local log       = require "bw.log"
 local print     = log.print("report")
 
-require "bash"
+require "bw.bash"
 
 local function send(...)
     print("send", conf.clustername.monitor, ...)

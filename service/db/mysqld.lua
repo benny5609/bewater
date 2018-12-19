@@ -1,7 +1,7 @@
 local skynet    = require "skynet.manager"
 local mysql     = require "skynet.db.mysql"
-local bewater   = require "bewater"
-local util      = require "util"
+local bewater   = require "bw.bewater"
+local util      = require "bw.util"
 local Conf      = require "conf"
 
 local mod = ...

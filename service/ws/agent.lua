@@ -1,8 +1,8 @@
 local skynet        = require "skynet"
 local socket        = require "skynet.socket"
-local bewater       = require "bewater"
+local bewater       = require "bw.bewater"
 local errcode       = require "def.errcode"
-local protobuf      = require "protobuf"
+local protobuf      = require "bw.protobuf"
 
 local player_path   = ...
 local Player        = require(player_path)

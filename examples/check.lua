@@ -1,8 +1,8 @@
 local skynet = require "skynet"
-local bewater = require "bewater"
+local bewater = require "bw.bewater"
 
-require "ip.ip_country"
-require "schedule"
+require "bw.ip.ip_country"
+require "bw.schedule"
 
 local check_list = {
     "ip_country",

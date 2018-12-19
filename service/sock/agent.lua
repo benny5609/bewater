@@ -1,8 +1,8 @@
 local skynet    = require "skynet"
-local packet    = require "sock.packet"
-local bewater   = require "bewater"
-local protobuf  = require "protobuf"
-local log       = require "log"
+local packet    = require "bw.sock.packet"
+local bewater   = require "bw.bewater"
+local protobuf  = require "bw.protobuf"
+local log       = require "bw.log"
 
 local trace = log.trace("agent")
 

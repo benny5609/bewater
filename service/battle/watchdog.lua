@@ -1,6 +1,6 @@
 local skynet    = require "skynet"
-local autoid    = require "share.autoid"
-local bewater   = require "bewater"
+local autoid    = require "bw.share.autoid"
+local bewater   = require "bw.bewater"
 
 local agents = {}
 local id2agent = {} -- battle_id -> agent

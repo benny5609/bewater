@@ -1,6 +1,6 @@
 local skynet    = require "skynet"
-local http      = require "web.http_helper"
-local wc        = require "cms.webconsole"
+local http      = require "bw.web.http_helper"
+local wc        = require "bw.cms.webconsole"
 local json      = require "cjson.safe"
 
 skynet.start(function()

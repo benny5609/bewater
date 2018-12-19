@@ -1,6 +1,6 @@
 local Skynet    = require "skynet.manager"
 local Redis     = require "skynet.db.redis"
-local bewater   = require "bewater"
+local bewater   = require "bw.bewater"
 local conf      = require "conf"
 
 local mod = ...

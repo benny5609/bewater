@@ -1,6 +1,6 @@
 local skynet = require "skynet.manager"
 local mongo  = require "skynet.db.mongo"
-local util   = require "util"
+local util   = require "bw.util"
 local conf   = require "conf"
 
 local mod = ...

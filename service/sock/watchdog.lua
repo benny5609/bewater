@@ -1,6 +1,6 @@
 local skynet    = require "skynet"
-local bewater   = require "bewater"
-local log       = require "log"
+local bewater   = require "bw.bewater"
+local log       = require "bw.log"
 
 local trace = log.trace("watchdog")
 

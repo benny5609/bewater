@@ -1,5 +1,5 @@
-local skynet = require "skynet"
-local bewater = require "bewater"
+local skynet    = require "skynet"
+local bewater   = require "bw.bewater"
 
 local addrs = {} -- mode -> service
 

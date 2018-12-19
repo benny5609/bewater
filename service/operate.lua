@@ -1,8 +1,8 @@
 local skynet    = require "skynet"
 local cluster   = require "skynet.cluster"
-local mongo     = require "db.mongo_helper"
-local bewater   = require "bewater"
-local log       = require "log"
+local mongo     = require "bw.db.mongo_helper"
+local bewater   = require "bw.bewater"
+local log       = require "bw.log"
 
 local trace = log.trace("operate")
 

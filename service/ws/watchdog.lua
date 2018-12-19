@@ -1,6 +1,6 @@
 local skynet        = require "skynet"
 local socket        = require "skynet.socket"
-local bewater       = require "bewater"
+local bewater       = require "bw.bewater"
 
 local server_path, player_path = ...
 assert(server_path) -- 服务器逻辑(xxx.xxxserver)

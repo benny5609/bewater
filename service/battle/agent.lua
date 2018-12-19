@@ -1,5 +1,5 @@
 local skynet    = require "skynet"
-local bewater   = require "bewater"
+local bewater   = require "bw.bewater"
 local errcode   = require "def.errcode"
 
 local battle_path = ...

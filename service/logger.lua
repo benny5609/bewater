@@ -4,10 +4,10 @@
 --
 
 local skynet        = require "skynet.manager"
-local date_helper   = require "util.date_helper"
+local date_helper   = require "bw.util.date_helper"
 local conf          = require "conf"
-local sname         = require "sname"
-require "bash"
+local sname         = require "bw.sname"
+require "bw.bash"
 
 local mainfile = io.open(string.format("%s/log/%s.log",
     conf.workspace, conf.clustername), "w+")

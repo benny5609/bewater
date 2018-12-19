@@ -57,12 +57,12 @@ bash 		执行系统命令
 xml.lua2xml 	lua转xml
 xml.xml2lua 	xml转lua
 web.http_helper 带header的get&post请求
-pay.alipay 	支付宝支付
-pay.wxpay 	微信支付
-pay.applepay 	苹果支付
-ip.blacklist 	黑名单
-ip.whitelist 	白名单
-ip.ip_country 	查询ip地区
+bw.payment.alipay 	支付宝支付
+bw.payment.wxpay 	微信支付
+bw.payment.applepay 	苹果支付
+bw.ip.blacklist 	黑名单
+bw.ip.whitelist 	白名单
+bw.ip.ip_country 	查询ip地区
 auth.wx 	微信api
 ```
 
@@ -105,7 +105,7 @@ sock/agent    socket消息代理，多个玩家共享，可配置
     当处理消息的方法返回的是util.NORET，表示发送方以send的方式发送，本服务不作回应  
     
     local skynet = require "skynet"
-    local bewater = require "bewater"
+    local bewater = require "bw.bewater"
     local CMD = {}
     function CMD.on_send()
         return bewater.NORET
@@ -136,7 +136,7 @@ sock/agent    socket消息代理，多个玩家共享，可配置
 目前skynet只有在logger服务捕捉SIGHUP信号，其它信号需要写C服务，后续再加上  
 如需要安全停机:  
 ```
-local log = require "log"
+local log = require "bw.log"
 log.sighup() -- 向logger注册信号处理服务
 skynet.dispatch("lua", function(_, _, cmd)
     if cmd == "SIGHUP" then
@@ -148,7 +148,7 @@ end)
 ## GM系统
 按模块添加方法集，然后在后台输入命令
 ```
-local gm = require "gm"
+local gm = require "bw.gm"
 gm.add_gmcmd("test_module", "test_cmd")
 ```
 ## 创建一个websocket监听服务
@@ -180,7 +180,7 @@ schedule.changetime({mon = 9, day = 30, hour = 23, min = 59, sec = 59})
 ## 定时器
 skynet的timeout本身不支持取消，而且每个timeout都会新建一条协程，但是游戏通常需要用大量的定时器。所以我对根据云风大神建议对skynet的timeout进行了封装，以单向链表的数据结构记录时间和回调。timer库可以创建大量的定时器，销毁也比较方便，最好是在同个虚拟机或者单个玩家的对象只挂一个timer，这样比较省资源，也比较方便管理。后续会参照日程表schedule加入修改系统时间的方法，让调试更加方便。
 ```
-local timer = require "timer"
+local timer = require "bw.timer"
 local ti = timer.create()
 ti.delay(1, function()
     -- todo timeout

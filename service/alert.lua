@@ -1,14 +1,14 @@
 -- 钉钉警报系统
 local skynet = require "skynet"
-local http   = require "web.http_helper"
-local bewater= require "bewater"
+local http   = require "bw.web.http_helper"
+local bewater= require "bw.bewater"
 local conf   = require "conf"
-local log    = require "log"
+local log    = require "bw.log"
 local json   = require "cjson.safe"
-local lock   = require "lock"
+local lock   = require "bw.lock"
 
 local trace  = log.trace("alert")
-require "bash"
+require "bw.bash"
 
 local send_lock = lock.new()
 local host = "https://oapi.dingtalk.com"
@@ -30,7 +30,7 @@ local function send_traceback()
     if skynet.time() - last < 60 or count == 0 then
         return
     end
-    local info = require "util.clusterinfo"
+    local info = require "bw.util.clusterinfo"
     local path = string.format("%s/log/error.log", info.workspace)
     local str = string.format("服务器出错了\n项目:%s\n节点:%s\n公网ip:%s\n内网ip:%s\n进程:%s\n日志:%s\n累计报错:%d次",
         conf.desc or conf.proj, info.clustername, info.pnet_addr, info.inet_addr, info.pid, path, count)

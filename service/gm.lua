@@ -1,8 +1,8 @@
 local skynet        = require "skynet"
-local log           = require "log"
-local schedule      = require "schedule"
-local bewater       = require "bewater"
-local date_helper   = require "util.date_helper"
+local log           = require "bw.log"
+local schedule      = require "bw.schedule"
+local bewater       = require "bw.bewater"
+local date_helper   = require "bw.util.date_helper"
 
 require "skynet.cluster"
 

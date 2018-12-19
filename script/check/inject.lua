@@ -6,7 +6,7 @@ return function ()
     inject([[print "hello"]])
     inject([[print(skynet)]])
     inject([[
-    local bewater = require "bewater"
+    local bewater = require "bw.bewater"
     print(bewater.traceback())
     ]])
     inject([[print(check_list)]])

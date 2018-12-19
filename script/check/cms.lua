@@ -1,7 +1,7 @@
 local skynet    = require "skynet"
-local http      = require "web.http_helper"
-local wc        = require "cms.webconsole"
 local json      = require "cjson.safe"
+local http      = require "bw.web.http_helper"
+local wc        = require "bw.cms.webconsole"
 local errcode   = require "def.errcode"
 
 local authorization
