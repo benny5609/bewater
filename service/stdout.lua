@@ -3,8 +3,7 @@ local conf   = require "conf"
 
 local mode = ...
 if mode == 'agent' then
-    local lock   = require "bw.lock"
-
+    local lock = require "bw.lock"
     local run_lock = lock.new()
     local runing = false
     local path

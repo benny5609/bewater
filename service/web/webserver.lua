@@ -96,7 +96,7 @@ local function on_message(url, args, body, header, ip)
             end
         end
         if not bewater.try(function()
-            local func = require(string.gsub(handler.root..url, '/', '.'))
+            local func = require(string.sub(url, 2, -1))
             assert(func, url)
             ret = func(args, data, uid, ip, header) or {}
             if type(ret) == "number" then

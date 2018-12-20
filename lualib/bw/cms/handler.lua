@@ -1,8 +1,8 @@
 local skynet    = require "skynet"
 local json      = require "cjson.safe"
+package.path = "../bewater/lualib/bw/cms/api/?.lua;" .. package.path
 
 local M = {
-    root = "bw/cms/api",
     api = {
         ['/cms/user/login'] = {data = {account = "STR", password = "STR"}, auth = false},
         ['/cms/user/gm'] = {data = {gm = "STR"}, auth = true},

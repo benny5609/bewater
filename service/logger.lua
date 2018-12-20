@@ -24,7 +24,7 @@ local function write_log(file, addr, str)
         errfile:flush()
     end
 
-    if file == mainfile then
+    if file == mainfile or file == errfile then
         print(str)
     end
 
@@ -35,7 +35,6 @@ end
 local logs = {} -- key(sys or uid) -> {last_time, file}
 local CMD = {}
 function CMD.error(addr, str)
-    print(str)
     write_log(errfile, addr, str)
 end
 
