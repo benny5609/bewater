@@ -29,7 +29,7 @@ function M.player(uid)
 end
 
 function M.error(fmt, ...)
-    skynet.send(".logger", "lua", "error", string.format(fmt, ...))
+    skynet.send(".logger", "lua", "error", skynet.self(), string.format(fmt, ...))
 end
 
 function M.sighup()

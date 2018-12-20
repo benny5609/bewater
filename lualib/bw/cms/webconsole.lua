@@ -9,7 +9,7 @@ function M.init(args)
     web = skynet.newservice("web/webserver", "gate", "bw.cms.server", "bw.cms.handler", port, 10)
     skynet.call(web, "lua", "start", users)
 
-    skynet.call(web, "lua", "set_menu", {
+    skynet.call(web, "lua", "set_menu", args.menu or {
         {name = "skynet", title = "Skynet", icon = "&#xe665;", children = {
             {title = "节点信息", icon = "&#xe857", href = "/cms/view/node_info"},
             {title = "所有服务", icon = "&#xe62d;", href = "/cms/view/all_service"},

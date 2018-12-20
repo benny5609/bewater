@@ -34,9 +34,9 @@ end
 
 local logs = {} -- key(sys or uid) -> {last_time, file}
 local CMD = {}
-function CMD.error(str)
-    errfile:write(str.."\n")
-    errfile:flush()
+function CMD.error(addr, str)
+    print(str)
+    write_log(errfile, addr, str)
 end
 
 function CMD.trace(addr, sys, str)

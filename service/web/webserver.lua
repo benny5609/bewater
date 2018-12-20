@@ -11,6 +11,8 @@ local hotfix        = require "bw.hotfix"
 local errcode       = require "def.errcode"
 local util          = require "bw.util"
 
+require "bw.ip.ip_country"
+
 local mode, server_path, handler_path, port, preload, gate = ...
 port = tonumber(port)
 preload = preload and tonumber(preload) or 20
@@ -137,7 +139,8 @@ skynet.start(function()
             return
         end
         if type(args[1]) == "string" then
-            return bewater.ret(handler[args[1]](...))
+            local func = assert(handler[args[1]], args[1])
+            return bewater.ret(func(...))
         end
         local fd, ip = ...
         socket.start(fd)

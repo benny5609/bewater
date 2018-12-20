@@ -21,7 +21,7 @@ function M.create_order(param)
         subject = item_desc,
         body = item_desc,
         total_fee = pay_price,
-        notify_url = string.format("%s:%s/api/payment/alipay_notify", conf.pay.host, conf.pay.port),
+        notify_url = string.format("%s/api/payment/alipay_notify", conf.pay.host),
         service = "mobile.securitypay.pay",
         payment_type = '1',
         anti_phishing_key = '',
