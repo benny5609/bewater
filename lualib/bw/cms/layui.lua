@@ -15,6 +15,9 @@ layui.action = const {
 local function parse(param)
     local str = ""
     for k, v in pairs(param or {}) do
+        if k == "filter" then
+            k = "lay-filter"
+        end
         str = str .. k .. '="' .. v .. '"'
     end
     return str
@@ -90,6 +93,10 @@ function layui.table(head, tbl, class, colgroup)
     end
     str = str .. '</tbody>'
     return string.format('<table class="layui-table %s">%s</table>', class or "mag0", str)
+end
+
+function layui.table_method(id, filter)
+    return string.format('<table id="%s" lay-filter="%s"></table>', id, filter)
 end
 
 function layui.blockquote(ctx, class, param)
