@@ -10,6 +10,7 @@ layui.action = const {
     APPEND_VAL = "APPEND_VAL", -- 追加值:...
     GET_TEXT = "GET_TEXT", -- 获取值:...
     SET_TEXT = "SET_TEXT", -- 获取值:...
+    OPEN = "OPEN",
 }
 
 local function parse(param)
@@ -17,6 +18,8 @@ local function parse(param)
     for k, v in pairs(param or {}) do
         if k == "filter" then
             k = "lay-filter"
+        elseif k == "event" then
+            k = "lay-event"
         end
         str = str .. k .. '="' .. v .. '"'
     end
@@ -102,6 +105,16 @@ end
 function layui.blockquote(ctx, class, param)
     return string.format('<blockquote class="layui-elem-quote %s" %s>%s</blockquote>', 
         class or "title", parse(param), ctx or "")
+end
+
+function layui.a(ctx, class, param)
+    return string.format('<a class="%s" %s>%s</a>', 
+        class or "", parse(param), ctx or "")
+end
+
+function layui.fieldset(ctx, class, param)
+    return string.format('<fieldset class="%s" %s>%s</fieldset>', 
+        class or "", parse(param), ctx or "")
 end
 
 return layui

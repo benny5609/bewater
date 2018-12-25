@@ -14,8 +14,8 @@ return function()
     return {
         content = html,
         actions = {
-            {"online", action.SET_TEXT, online},
-            {"run_time", action.SET_TEXT, run_time},
+            {action.SET_TEXT, "online", online},
+            {action.SET_TEXT, "online", run_time},
         }
     }
 end

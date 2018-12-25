@@ -4,7 +4,7 @@ local layui  = require "bw.cms.layui"
 local action = layui.action
 local function ret(output)
     return {
-        cb = {"output", layui.action.APPEND_VAL, output}
+        cb = {action.APPEND_VAL, "output", output}
     }
 end
 return function(_, data)

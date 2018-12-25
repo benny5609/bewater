@@ -6,6 +6,6 @@ return function(_, data)
     local ok, output = bewater.inject(data.addr, data.code)
     print("ret", ok, output)
     return {
-        cb = {"output", layui.action.SET_VAL, output}
+        cb = {layui.action.SET_VAL, "output", output}
     }
 end
