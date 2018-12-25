@@ -7,12 +7,10 @@ local M = {
         ['/cms/user/login'] = {data = {account = "STR", password = "STR"}, auth = false},
         ['/cms/user/gm'] = {data = {gm = "STR"}, auth = true},
         ['/cms/debug/inject'] = {auth = true},
+        ['/cms/skynet/node_info'] = {auth = true},
+        ['/cms/skynet/all_service'] = {auth = true},
+        ['/cms/sys/main'] = {auth = true},
         ['/cms/view/menu'] = {auth = true},
-        ['/cms/view/main'] = {auth = true},
-        ['/cms/view/node_info'] = {auth = true},
-        ['/cms/view/all_service'] = {auth = true},
-        ['/cms/view/inject'] = {auth = true},
-        ['/cms/view/gm'] = {auth = true},
     },
 }
 

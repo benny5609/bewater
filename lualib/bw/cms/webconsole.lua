@@ -12,18 +12,18 @@ function M.init(args)
 
     skynet.call(web, "lua", "set_menu", args.menu or {
         {name = "skynet", title = "Skynet", icon = "&#xe665;", children = {
-            {title = "节点信息", icon = "&#xe857", href = "/cms/view/node_info"},
-            {title = "所有服务", icon = "&#xe62d;", href = "/cms/view/all_service"},
-            {title = "注入调试", icon = "&#xe631;", href = "/cms/view/inject"},
-            {title = "GM", icon = "&#xe64e;", href = "/cms/view/gm"},
+            {title = "节点信息", icon = "&#xe857", href = "page/skynet/node_info.html"},
+            {title = "所有服务", icon = "&#xe62d;", href = "page/skynet/all_service.html"},
+            {title = "注入调试", icon = "&#xe631;", href = "page/skynet/inject.html"},
+            {title = "GM", icon = "&#xe64e;", href = "page/skynet/gm.html"},
         }},
         {name = "user", title = "用户管理", icon = "&#xe770;", children = {
-            {title = "数据统计", icon = "&#xe62c;", href = "/cms/view/stat", icon = "&#xe665;"},
-            {title = "GM", icon = "&#xe64e;", href = "/cms/view/gm"},
+            {title = "数据统计", icon = "&#xe62c;", href = "page/stat.html", icon = "&#xe665;"},
+            {title = "GM", icon = "&#xe64e;", href = "page/skynet/gm.html"},
         }},
         {name = "update", title = "更新", icon = "&#xe609;", children = {
-            {title = "客户端更新", icon = "&#xe62f;", href = "/cms/view/client_update"},
-            {title = "服务端热更", icon = "&#xe62f;", href = "/cms/view/server_update"},
+            {title = "客户端更新", icon = "&#xe62f;", href = "page/client_update"},
+            {title = "服务端热更", icon = "&#xe62f;", href = "page/server_update"},
         }},
     })
 end

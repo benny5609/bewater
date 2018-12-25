@@ -4,8 +4,5 @@ local util 		= require "bw.util"
 return function(_, data)
     print("debug inject!", data.addr, data.code)
     local ok, output = bewater.inject(data.addr, data.code)
-    print("ret", ok, output)
-    return {
-        cb = {layui.action.SET_VAL, "output", output}
-    }
+    return {output = output}
 end
