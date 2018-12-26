@@ -33,14 +33,12 @@ return function()
             {account = "root", password = "123"}
         }
     }) 
-    check_api("/cms/view/menu", {}, errcode.AUTH_FAIL)
 
     check_login("aaa", "2222", errcode.ACC_NOT_EXIST)   
     check_login("root", "xxx", errcode.PASSWD_ERROR)
 
     local ret = check_login("root", "123")
     authorization = assert(ret.authorization)
-    check_api("/cms/view/menu", {})
     
     check_api("/cms/user/gm", {}, errcode.ARGS_ERROR)
     return true

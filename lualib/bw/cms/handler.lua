@@ -4,8 +4,8 @@ package.path = "../bewater/lualib/bw/cms/api/?.lua;" .. package.path
 
 local M = {
     api = {
-        ['/cms/user/login'] = {data = {account = "STR", password = "STR"}, auth = false},
-        ['/cms/user/gm'] = {data = {gm = "STR"}, auth = true},
+        ['/cms/user/login'] = {data = {account = "str", password = "str"}, auth = false},
+        ['/cms/user/gm'] = {data = {gm = "str"}, auth = true},
         ['/cms/debug/inject'] = {auth = true},
         ['/cms/skynet/node_info'] = {auth = true},
         ['/cms/skynet/all_service'] = {auth = true},

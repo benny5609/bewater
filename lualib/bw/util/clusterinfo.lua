@@ -5,7 +5,7 @@ local skynet = require "skynet"
 local http   = require "bw.web.http_helper"
 local util   = require "bw.util"
 local conf   = require "conf"
-require "bw.bash"
+local bash   = require "bw.bash"
 
 local M = {}
 local _cache = {}
@@ -50,7 +50,7 @@ end
 
 -- 内网ip
 function M.get_inet_addr()
-    local ret = bash "ifconfig eth0"
+    local ret = bash.bash "ifconfig eth0"
     return string.match(ret, "inet addr:([^%s]+)") or string.match(ret, "inet ([^%s]+)")
 end
 
@@ -64,14 +64,14 @@ function M._pid()
     if not filename then
         return
     end
-    local pid = bash("cat %s", filename)
+    local pid = bash.bash("cat %s", filename)
     return string.gsub(pid, "\n", "")
 end
 
 function M.get_profile()
     local pid = M.pid
     if not pid then return end
-    local ret = bash(string.format('ps -p %d u', pid))
+    local ret = bash.bash(string.format('ps -p %d u', pid))
     local list = util.split(string.match(ret, '\n(.+)'), ' ')
     return {
         cpu = tonumber(list[3]),

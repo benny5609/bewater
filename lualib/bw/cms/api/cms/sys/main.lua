@@ -1,10 +1,13 @@
-local skynet    = require "skynet"
-local conf      = require "conf"
+local skynet        = require "skynet"
+local date_helper   = require "bw.util.date_helper"
+local conf          = require "conf"
 
 return function()
     local info = require "bw.util.clusterinfo"
     local profile = info.profile
     return {
+        online = 0,
+        run_time = date_helper.format_now(),
         list = {
             {k="项目", v=conf.desc or "未知"},
             {k="节点", v=conf.clustername or "未知"},
@@ -18,6 +21,6 @@ return function()
             {k="redis", v= conf.redis and string.format("%s:%s", conf.redis.host, conf.redis.port) or "未知"},
             {k="mysql", v=conf.mysql and string.format("%s:%s[%s]", conf.mysql.host, conf.mysql.port, conf.mysql.name) or "未知"},
             {k="警报", v=(conf.alert and conf.alert.enable) and "已开启" or "未开启"},
-        }
+        },
     }
 end

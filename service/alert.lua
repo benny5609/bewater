@@ -8,7 +8,7 @@ local json   = require "cjson.safe"
 local lock   = require "bw.lock"
 
 local trace  = log.trace("alert")
-require "bw.bash"
+local bash   = require "bw.bash"
 
 local send_lock = lock.new()
 local host = "https://oapi.dingtalk.com"
@@ -48,7 +48,7 @@ local function send_traceback()
             content = str,
         }
     }, host, token)
-    bash(sh)
+    bash.bash(sh)
     send_lock:unlock()
 end
 
@@ -77,7 +77,7 @@ function CMD.test(str)
             content = str,
         }
     }, host, token)
-    bash(sh)
+    bash.bash(sh)
 
 end
 

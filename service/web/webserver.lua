@@ -62,28 +62,28 @@ local function on_message(url, args, body, header, ip)
         end
         if api.data then
             for k, t in pairs(api.data) do
-                if t == "STR" then
+                if t == "str" then
                     if type(data[k]) ~= "string" then
                         return {
                             err = errcode.ARGS_ERROR,
                             desc = string.format("args error, %s must string", k),
                         }
                     end
-                elseif t == "str" then
+                elseif t == "str?" then
                     if data[k] and type(data[k]) ~= "string" then
                         return {
                             err = errcode.ARGS_ERROR,
                             desc = string.format("args error, %s must string", k),
                         }
                     end
-                elseif t == "NUM" then
+                elseif t == "num" then
                     if type(data[k]) ~= "number" then
                         return {
                             err = errcode.ARGS_ERROR,
                             desc = string.format("args error, %s must number", k),
                         }
                     end
-                elseif t == "num" then
+                elseif t == "num?" then
                     if data[k] and type(data[k]) ~= "number" then
                         return {
                             err = errcode.ARGS_ERROR,
@@ -111,7 +111,9 @@ local function on_message(url, args, body, header, ip)
                 desc = "server traceback"
             }
         end
-        ret.err = ret.err or 0
+        if type(ret) == "table" then
+            ret.err = ret.err or 0
+        end
         return ret
     else
         return {

@@ -4,7 +4,6 @@ local skynet    = require "skynet"
 local json      = require "cjson.safe"
 local sname     = require "bw.sname"
 --local Util      = require "bw.util"
-require "bw.bash"
 
 local M = {}
 function M.get(url, get, header, no_reply)

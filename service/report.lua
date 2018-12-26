@@ -8,8 +8,6 @@ local bewater   = require "bw.bewater"
 local log       = require "bw.log"
 local print     = log.print("report")
 
-require "bw.bash"
-
 local function send(...)
     print("send", conf.clustername.monitor, ...)
     cluster.send("monitor", "svr", ...)

@@ -7,7 +7,7 @@ local skynet        = require "skynet.manager"
 local date_helper   = require "bw.util.date_helper"
 local conf          = require "conf"
 local sname         = require "bw.sname"
-require "bw.bash"
+local bash          = require "bw.bash"
 
 local mainfile = io.open(string.format("%s/log/%s.log",
     conf.workspace, conf.clustername), "w+")
@@ -45,7 +45,7 @@ function CMD.trace(addr, sys, str)
         if log then
             log.file:close()
         end
-        bash("mkdir -p %s/log/%s", conf.workspace, sys)
+        bash.bash("mkdir -p %s/log/%s", conf.workspace, sys)
         local filename = string.format("%s/log/%s/%s.log",
             conf.workspace, sys, os.date("%Y%m%d", os.time()))
         local file = io.open(filename, "a+")
@@ -66,7 +66,7 @@ function CMD.player(addr, uid, str)
             log.file:close()
         end
         local dir = string.format("%d/%d/%d", uid//1000000, uid%1000000//1000, uid%1000)
-        bash("mkdir -p %s/log/player/%s", conf.workspace, dir)
+        bash.bash("mkdir -p %s/log/player/%s", conf.workspace, dir)
         local filename = string.format("%s/log/player/%s/%s.log",
             conf.workspace, dir, os.date("%Y%m%d", os.time()))
         local file = io.open(filename, "a+")

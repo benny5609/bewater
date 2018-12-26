@@ -1,6 +1,8 @@
 local skynet = require "skynet"
 package.path = "?.lua;" .. package.path
 
+local _ENV = setmetatable({}, {__index = _ENV})
+
 local function io_popen(cmd, mode)
     local file = io.popen(cmd)
     local ret = file:read(mode or "*a")
@@ -126,3 +128,4 @@ function stdout(cmd, filename)
     runing = false
 end
 
+return _ENV

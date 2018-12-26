@@ -1,7 +1,8 @@
 local skynet = require "skynet"
 local conf = require "conf"
 local util = require "bw.util"
-require "bw.bash"
+local bash = require "bw.bash"
+bash = bash.bash
 
 local nodename = require "publish.nodename"
 
