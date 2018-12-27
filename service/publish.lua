@@ -23,8 +23,8 @@ local function publish(pconf, confname)
     bash("cd %s && mkdir -p skynet bewater proj/%s", tmp, projname)
     bash("cp -r skynet luaclib lualib service cservice %s/skynet", tmp)
     bash("cp -r %s/lualib %s/luaclib %s/service %s/bewater", bewater, bewater, bewater, tmp)
-    bash("cp -r %s/etc %s/script %s/service %s/shell %s",
-        conf.workspace, conf.workspace, conf.workspace, conf.workspace, proj)
+    bash("cp -r %s/etc %s/script %s/service %s/shell %s/data %s",
+        conf.workspace, conf.workspace, conf.workspace, conf.workspace, conf.workspace, proj)
 
     -- 配置文件
     pconf.workspace = string.format("%s/proj/%s/", pconf.remote_path, projname)

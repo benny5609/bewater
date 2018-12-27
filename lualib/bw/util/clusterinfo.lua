@@ -89,7 +89,7 @@ end
 
 -- 绝对路径
 function M._workspace()
-    local path = bash("cd %s && pwd", conf.workspace)
+    local path = bash.bash("cd %s && pwd", conf.workspace)
     return string.gsub(path, "\n", "")
 end
 
