@@ -35,7 +35,7 @@ else
         if not file then
             return "", 0, false
         end
-        file:seek("set", offset)
+        file:seek("set", offset or 0)
         local str = file:read("a")
         offset = file:seek()
         file:close()

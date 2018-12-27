@@ -84,7 +84,7 @@ function bash(expr, ...)
         end)
     end
     local cmd = eval(expr)
-    --skynet.error(cmd)
+    skynet.error(cmd)
     local ret = io_popen(cmd)
     if ret ~= "" then
         --skynet.error(ret)
@@ -98,34 +98,6 @@ function remote_bash(user, host, expr, ...)
         return bash(cmd)
     end
     return bash('ssh %s@%s "%s"', user, host, cmd)
-end
-
-function stdout(cmd, filename)
-    if not filename then
-        local conf   = require "conf"
-        filename = conf.workspace.."/log/stdout.log"
-    end
-    bash('echo "%s" > %s', cmd, filename)
-    cmd = string.format('%s >%s 2>&1', cmd, filename)
-    local runing = true
-    skynet.timeout(0, function()
-        local file = io.open(filename, "r")
-        local offset = 0
-        while true do
-            file:seek("set", offset)
-            print("&&&&&")
-            --print(file:read("a")) 
-            offset = file:seek()
-            skynet.sleep(10)
-            if not runing then
-                break
-            end
-        end
-        bash("rm "..filename)
-        skynet.error("done")
-    end)
-    os.execute(cmd)
-    runing = false
 end
 
 return _ENV

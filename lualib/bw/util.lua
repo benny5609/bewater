@@ -40,18 +40,6 @@ function util.try(func, ...)
     return xpcall(func, __TRACEBACK__, ...)
 end
 
-function util.to_version_num(version)
-    local v1, v2, v3 = string.match(version, "(%d+)%.(%d+)%.(%d+)")
-	if not v1 then
-        return
-    end
-	return v1*1000000 + v2*1000 + v3
-end
-
-function util.to_version_str(num)
-    return string.format("%d.%d.%d", num//1000000, num%1000000//1000, num%1000)
-end
-
 function util.shell(cmd, ...)
     cmd = string.format(cmd, ...)
     skynet.error(cmd)
