@@ -80,6 +80,15 @@ function M.get_version_list(name)
     return list
 end
 
+function M.get_current(name)
+    local list = M.get_version_list(name)
+    for _, v in pairs(list) do
+        if v.LAY_CHECKED then
+            return v.version
+        end
+    end
+end
+
 function M.to_version_num(version)
     assert(type(version) == "string")
     local v1, v2, v3 = string.match(version, "(%d+)%.(%d+)%.(%d+)")
