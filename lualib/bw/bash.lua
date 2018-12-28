@@ -87,6 +87,7 @@ function bash(expr, ...)
     skynet.error(cmd)
     local ret = io_popen(cmd)
     if ret ~= "" then
+        ret = string.match(ret, "(.+)\n$") -- 去掉最后一个换行符
         --skynet.error(ret)
     end
     return ret
