@@ -103,17 +103,17 @@ function layui.table_method(id, filter)
 end
 
 function layui.blockquote(ctx, class, param)
-    return string.format('<blockquote class="layui-elem-quote %s" %s>%s</blockquote>', 
+    return string.format('<blockquote class="layui-elem-quote %s" %s>%s</blockquote>',
         class or "title", parse(param), ctx or "")
 end
 
 function layui.a(ctx, class, param)
-    return string.format('<a class="%s" %s>%s</a>', 
+    return string.format('<a class="%s" %s>%s</a>',
         class or "", parse(param), ctx or "")
 end
 
 function layui.fieldset(ctx, class, param)
-    return string.format('<fieldset class="%s" %s>%s</fieldset>', 
+    return string.format('<fieldset class="%s" %s>%s</fieldset>',
         class or "", parse(param), ctx or "")
 end
 

@@ -2,7 +2,6 @@ local skynet    = require "skynet"
 local errcode   = require "def.errcode"
 local uuid      = require "bw.uuid"
 local log       = require "bw.log"
-local util      = require "bw.util"
 
 local trace = log.trace("cms")
 

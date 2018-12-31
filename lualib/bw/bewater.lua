@@ -28,7 +28,7 @@ end
 
 -- 给一个服务注入一段代码
 -- return ok, output
-function M.inject(addr, source, filename)
+function M.inject(addr, source)
     return skynet.call(addr, "debug", "RUN", source)
     --return skynet.call(addr, "code", source)
     --return skynet.call(addr, "debug", "INJECTCODE", source, filename)
@@ -85,9 +85,9 @@ function M.traceback(start_level, max_level)
 
     for level = start_level, max_level do
 
-        local info = debug.getinfo( level, "nSl") 
+        local info = debug.getinfo( level, "nSl")
         if info == nil then break end
-        print( string.format("[ line : %-4d]  %-20s :: %s", 
+        print( string.format("[ line : %-4d]  %-20s :: %s",
             info.currentline, info.name or "", info.source or "" ) )
 
         local index = 1

@@ -19,7 +19,7 @@ function M.verify_receipt(receipt, product_id)
         resp = json.decode(resp_str)
     end
     if not ret or not resp or resp.status ~= 0 then
-        log.error("verify_receipt error, ret:%s, resp:%s", ret, resp_str) 
+        log.error("verify_receipt error, ret:%s, resp:%s", ret, resp_str)
         return
     end
     if not product_id then
@@ -31,7 +31,7 @@ function M.verify_receipt(receipt, product_id)
         end
     end
     log.error("verify_receipt error, product_id is wrong, product_id:%s, ret:%s, resp_str:%s",
-        product_id, ret, resp_str) 
+        product_id, ret, resp_str)
 end
 return M
 

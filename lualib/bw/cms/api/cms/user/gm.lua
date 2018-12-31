@@ -1,4 +1,3 @@
-local skynet = require "skynet"
 local gm     = require "bw.gm"
 local function ret(output)
     local time_str = string.format("[%s] ", os.date("%Y-%m-%d %H:%M:%S"))

@@ -9,11 +9,11 @@ local whitelist     = require "bw.ip.whitelist"
 local blacklist     = require "bw.ip.blacklist"
 local hotfix        = require "bw.hotfix"
 local errcode       = require "def.errcode"
-local util          = require "bw.util"
+--local util          = require "bw.util"
 
 require "bw.ip.ip_country"
 
-local mode, server_path, handler_path, port, preload, gate = ...
+local mode, server_path, handler_path, port, preload  = ...
 port = tonumber(port)
 preload = preload and tonumber(preload) or 20
 
@@ -107,7 +107,7 @@ local function on_message(url, args, body, header, ip)
             end
         end) then
             return {
-                err = errcode.TRACEBACK, 
+                err = errcode.TRACEBACK,
                 desc = "server traceback"
             }
         end
@@ -117,7 +117,7 @@ local function on_message(url, args, body, header, ip)
         return ret
     else
         return {
-            err = errcode.API_NOT_EXIST, 
+            err = errcode.API_NOT_EXIST,
             desc = "api not exist"
         }
     end
@@ -163,7 +163,7 @@ skynet.start(function()
                     data = urllib.parse_query(query)
                 end
                 ip = header['x-real-ip'] or string.match(ip, "[^:]+")
-                response(fd, code, handler.pack(on_message(url, data, body, header, ip)), 
+                response(fd, code, handler.pack(on_message(url, data, body, header, ip)),
                     {["Access-Control-Allow-Origin"] = "*"})
             end
         else
