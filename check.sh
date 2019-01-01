@@ -1,1 +1,0 @@
-luacheck --config .luacheckrc ./

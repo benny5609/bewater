@@ -5,12 +5,12 @@ require "bw.ip.ip_country"
 require "bw.schedule"
 
 local check_list = {
-    "ip_country",
-    "schedule",
-    "cms",
-    "date_helper",
---    "inject",
-    "logger",
+    "check_ip_country",
+    "check_schedule",
+    "check_cms",
+    "check_date_helper",
+    "check_logger",
+    "check_context",
 }
 
 
@@ -24,6 +24,7 @@ skynet.start(function()
         if type(ret) == "function" then
             ret = ret()
         end
+        assert(ret, v.." error")
         skynet.error(string.format("check %s %s", v, ret and "ok" or "fail"))
         if ret then
             count = count + 1
