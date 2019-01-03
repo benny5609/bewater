@@ -1,4 +1,5 @@
 return {
-    GATE = nil
-
+    GATE    = nil,
+    SERVER  = "",
+    ROLE    = "",
 }

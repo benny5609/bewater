@@ -1,27 +1,29 @@
 local skynet = require "skynet"
-local ctx = require "bw.context"
+local env = require "env"
+
 
 local mt = {}
 mt.__index = mt
 
-function mt:open(gate, fd, ip, port, uid)
-    self.gate   = assert(gate)
+function mt:open(fd, ip)
     self.fd     = assert(fd)
     self.ip     = assert(ip)
-    self.port   = assert(port)
-    self.uid    = assert(uid)
-    
-    skynet.call(self.gate, "lua", "forward", fd)
+
+    skynet.call(env.GATE, "lua", "forward", fd)
 end
 
 -- 被动关闭
-function M:close()
+function mt:close()
 
 end
 
 -- 主动关闭
-function M:kick()
-    skynet.call(self.gate, "lua", "kick", self.fd)
+function mt:kick()
+    skynet.call(env.GATE, "lua", "kick", self.fd)
+end
+
+function mt:recv(fd, msg)
+
 end
 
 local M = {}
