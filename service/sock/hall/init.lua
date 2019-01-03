@@ -1,5 +1,6 @@
 local skynet    = require "skynet"
 local bewater   = require "bw.bewater"
+local protobuf  = require "bw.protobuf"
 local log       = require "bw.log"
 local env       = require "env"
 local sessions  = require "sessions"
@@ -21,6 +22,8 @@ function CMD.start(param)
     env.NODELAY     = assert(param.nodelay)
     env.MAXCLIENT   = assert(param.maxclient)
     env.PRELOAD     = param.preload or 10
+
+    protobuf.register_file(env.PROTO)
     
     skynet.call(gate, "lua", "open", param)
     if server.start then

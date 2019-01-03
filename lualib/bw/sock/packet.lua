@@ -24,8 +24,8 @@ function M.pack(opcode, csn, ssn, crypt_type, crypt_key, buff, sz)
     return data:pack() -- sock_buff, sock_sz
 end
 function M.unpack(sock_buff, sock_sz)
-    assert(type(sock_buff) == "userdata")
-    assert(type(sock_sz) == "number")
+    assert(type(sock_buff) == "userdata", type(sock_buff))
+    assert(type(sock_sz) == "number", type(sock_sz))
     local data      = core.new(sock_buff, sock_sz)
     --local total     = data:read_ushort() -- skynet抠掉了这2个字节
     local opcode    = data:read_ushort()
