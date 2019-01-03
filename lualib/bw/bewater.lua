@@ -1,4 +1,5 @@
 local skynet = require "skynet.manager"
+local log = require "bw.log"
 
 local M = {}
 M.NORET = "NORET"
@@ -99,5 +100,28 @@ function M.traceback(start_level, max_level)
         end
     end
 end
+
+function M.protect(tbl, depth)
+    setmetatable(tbl, {
+        __index = function(t, k)
+            local v = rawget(t, k)
+            assert(v, string.format("read error key:%s", k))
+            return v
+        end,
+        __newindex = function(t, k, v)
+            assert(rawget(t, k), string.format("write error key:%s", k))  
+            rawset(t, k, v)
+        end
+    })
+    if depth and depth > 0 then
+        for k, v in pairs(tbl) do
+            if type(v) == "table" then
+                M.protect(v, depth - 1)
+            end
+        end
+    end
+    return tbl
+end
+
 return M
 

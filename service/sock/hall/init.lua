@@ -7,14 +7,25 @@ local agents    = require "agents"
 
 local trace = log.trace("hall")
 
+local server_path, role_path = ...
+env.SERVER  = assert(server_path) -- 服务逻辑(xxx.xxxserver)
+env.ROLE    = assert(role_path)   -- 玩家逻辑(xxx.xxxrole)
+
 local gate
-local server
+local server = require(server_path)
 
 local CMD = {}
 function CMD.start(param)
-    env.SERVER = assert(param.server)
-    env.ROLE = assert(param.role)
-    server = require(param.server)
+    env.PROTO       = assert(param.proto)
+    env.PORT        = assert(param.port)
+    env.NODELAY     = assert(param.nodelay)
+    env.MAXCLIENT   = assert(param.maxclient)
+    env.PRELOAD     = param.preload or 10
+    
+    skynet.call(gate, "lua", "open", param)
+    if server.start then
+        server.start()
+    end
 end
 
 function CMD.stop()
@@ -36,5 +47,5 @@ skynet.start(function()
     end)
 
     gate = skynet.newservice("gate")
-    env.gate = gate
+    env.GATE = gate
 end)
