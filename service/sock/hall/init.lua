@@ -8,9 +8,10 @@ local agents    = require "agents"
 
 local trace = log.trace("hall")
 
-local server_path, role_path = ...
-env.SERVER  = assert(server_path) -- 服务逻辑(xxx.xxxserver)
-env.ROLE    = assert(role_path)   -- 玩家逻辑(xxx.xxxrole)
+local server_path, role_path, visitor_path = ...
+env.SERVER  = assert(server_path)
+env.ROLE    = assert(role_path)
+env.VISITOR = assert(visitor_path)
 
 local gate
 local server = require(server_path)
@@ -24,7 +25,7 @@ function CMD.start(param)
     env.PRELOAD     = param.preload or 10
 
     protobuf.register_file(env.PROTO)
-    
+
     skynet.call(gate, "lua", "open", param)
     if server.start then
         server.start()

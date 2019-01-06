@@ -4,6 +4,8 @@ return bewater.protect {
 
     SERVER  = "",
     ROLE    = "",
+    VISITOR = "",
+
     PROTO   = "",
     PORT    = 0,
     NODELAY = false,

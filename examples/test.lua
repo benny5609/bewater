@@ -15,9 +15,6 @@ skynet.start(function()
             {account = "root", password = "123"}
         }
     }) ]]
-    
     skynet.error("Be water my friend.")
-   
     --test "test_hall"
-    test "test_bewater"
 end)

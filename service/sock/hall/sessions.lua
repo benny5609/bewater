@@ -1,6 +1,8 @@
 local skynet    = require "skynet"
-local session   = require "session"
 local log       = require "bw.log"
+local agents    = require "agents"
+local session   = require "session"
+local env       = require "env"
 
 local trace = log.trace("sessions")
 
@@ -14,6 +16,7 @@ end
 function M.close(fd)
     trace("close, fd:%s", fd)
     sessions[fd] = nil
+    skynet.call(env.GATE, "lua", "kick", fd)
 end
 
 function M.error(fd, msg)
@@ -25,6 +28,11 @@ function M.warning(fd, size)
     log.error("socket warning, %sK bytes havn't send out in fd", fd, size)
 end
 
+-- 转发到agent
+function M.forward_agent(fd, uid)
+    agents.forward(fd, uid)
+end
+
 skynet.register_protocol {
 	name = "client",
 	id = skynet.PTYPE_CLIENT,
@@ -33,7 +41,7 @@ skynet.register_protocol {
     end,
 	dispatch = function (fd, _, msg, len)
 		skynet.ignoreret()	-- session is fd, don't call skynet.ret
-        local s = assert(sessions[fd], fd)  
+        local s = assert(sessions[fd], fd)
         s:recv(msg, len)
 	end
 }

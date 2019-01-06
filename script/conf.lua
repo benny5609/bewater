@@ -12,7 +12,13 @@ local conf = {
         name = "test",
         port = 27017,
     },
-   
+
+    alert = {
+        enable      = true,
+        corpid      = '',
+        corpsecret  = '',
+        agentid     = '',
+    },
 }
 
 return conf

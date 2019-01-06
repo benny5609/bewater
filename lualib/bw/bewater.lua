@@ -109,7 +109,7 @@ function M.protect(tbl, depth)
             return v
         end,
         __newindex = function(t, k, v)
-            assert(rawget(t, k), string.format("write error key:%s", k))  
+            assert(rawget(t, k), string.format("write error key:%s", k))
             rawset(t, k, v)
         end
     })
