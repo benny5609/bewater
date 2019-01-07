@@ -22,9 +22,11 @@ function M.print(sys)
 end
 
 
-function M.player(uid)
+function M.role(uid, sys)
+    assert(uid)
+    assert(sys)
     return function(fmt, ...)
-        skynet.send(".logger", "lua", "player", skynet.self(), uid, string.format(fmt, ...))
+        skynet.send(".logger", "lua", "role", skynet.self(), uid, sys, string.format(fmt, ...))
     end
 end
 

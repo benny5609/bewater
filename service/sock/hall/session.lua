@@ -15,8 +15,8 @@ local mt = {}
 mt.__index = mt
 
 function mt:open(fd, ip)
-    self.fd     = assert(fd)
-    self.ip     = assert(ip)
+    self.fd = assert(fd)
+    self.ip = assert(ip)
 
     local visitor = require(env.VISITOR)
     self.visitor = visitor.new(self)

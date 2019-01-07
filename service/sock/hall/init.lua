@@ -4,7 +4,6 @@ local protobuf  = require "bw.protobuf"
 local log       = require "bw.log"
 local env       = require "env"
 local sessions  = require "sessions"
-local agents    = require "agents"
 
 local trace = log.trace("hall")
 
@@ -30,6 +29,7 @@ function CMD.start(param)
     if server.start then
         server.start()
     end
+    trace("hall start")
 end
 
 function CMD.stop()

@@ -13,13 +13,9 @@ function CMD.start(param)
     protobuf.register_file(env.PROTO)
 end
 
-function CMD.open(fd, uid)
-    skynet.call(env.GATE, "lua", "forward", fd)
-end
-
 skynet.start(function()
     skynet.dispatch("lua", function(_, _, cmd, ...)
-        local f = assert(CMD[cmd], cmd)
+        local f = assert(CMD[cmd] or users[cmd], cmd)
         bewater.ret(f(...))
     end)
 end)

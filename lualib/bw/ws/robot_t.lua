@@ -9,7 +9,7 @@ local class     = require "bw.class"
 local opcode    = require "def.opcode"
 local errcode   = require "def.errcode"
 
-local M = class("robot_t")
+local M = {}
 function M:ctor(url, send_type)
     self._url       = url
     self._send_type = send_type or "text"
@@ -39,14 +39,14 @@ function M:start()
                 return
             end
             if type == "text" then
-                self:_recv_text(data) 
+                self:_recv_text(data)
             elseif type == "binary" then
                 self:_recv_binary(data)
             end
             --skynet.sleep(10)
         end
     end)
-    
+
     -- ping
     if self.ping then
         skynet.fork(function()
@@ -76,7 +76,7 @@ end
 
 function M:test(func)
     local co = coroutine.create(function()
-        util.try(func)  
+        util.try(func)
     end)
     self:_suspended(co)
 end
@@ -87,7 +87,7 @@ function M:call(op, data)
     local code = ret and ret.err
     --[[assert(code, string.format("opcode %s no errcode", opcode.toname(op)))
     if code ~= 0 then
-        skynet.error(string.format("call %s error:0x%x, desc:%s", 
+        skynet.error(string.format("call %s error:0x%x, desc:%s",
             opcode.toname(op), code, errcode.describe(code)))
     end]]
     return ret
@@ -108,7 +108,7 @@ end
 function M:_suspended(co, op, ...)
     assert(op == nil or type(op) == "string" or op >= 0) -- 暂时兼容text
     local status, op, wait = coroutine.resume(co, ...)
-    if coroutine.status(co) == "suspended" then                                                                                                                                                                                  
+    if coroutine.status(co) == "suspended" then
         if op then
             self._call_requests[op] = co
         end
@@ -125,9 +125,9 @@ function M:_recv_text(text)
     --print("recv", recv_id)
     local req_id = "C2s"..string.match(recv_id, "S2c(.+)")
     if self[recv_id] then
-        self[recv_id](self, data.msg)     
+        self[recv_id](self, data.msg)
     end
-    
+
     local co = self._call_requests[req_id]
     self._call_requests[req_id] = nil
     if co and coroutine.status(co) == "suspended" then
@@ -148,9 +148,9 @@ function M:_dispatch(op, data)
     local simplename = opcode.tosimplename(op)
     local funcname = modulename .. "_" .. simplename
     if self[funcname] then
-        self[funcname](self, data) 
+        self[funcname](self, data)
     end
-    
+
     local co = self._call_requests[op - 1]
     self._call_requests[op - 1] = nil
     if co and coroutine.status(co) == "suspended" then
@@ -165,10 +165,10 @@ function M:_recv_binary(sock_buff)
     print("recv_binary", opname, #sock_buff)
 
     self._ssn = ssn
-    
+
     local data = protobuf.decode(opname, buff, sz)
     if data.err ~= 0 then
-        skynet.error(string.format("recv %s error:0x%x, desc:%s", 
+        skynet.error(string.format("recv %s error:0x%x, desc:%s",
             opcode.toname(op), data.err, errcode.describe(data.err)))
     end
     --util.printdump(data)
@@ -185,4 +185,4 @@ function M:_send_binary(op, tbl)
     self._ws:send_binary(string.pack(">HHHs2", op, self._csn, self._ssn, data))
 end
 
-return M
+return class(M)

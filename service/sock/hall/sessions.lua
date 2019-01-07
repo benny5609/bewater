@@ -29,8 +29,8 @@ function M.warning(fd, size)
 end
 
 -- 转发到agent
-function M.forward_agent(fd, uid)
-    agents.forward(fd, uid)
+function M.forward_agent(fd, uid, ip)
+    agents.forward(fd, uid, ip)
 end
 
 skynet.register_protocol {

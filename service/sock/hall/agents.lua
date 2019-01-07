@@ -35,14 +35,14 @@ local function get_free_agent()
 end
 
 local M = {}
-function M.forward(fd, uid)
+function M.forward(fd, uid, ip)
     local agent = uid2agent[uid]
     if not agent then
         agent = get_free_agent()
         agent.uids:add(uid)
         uid2agent[uid] = agent
     end
-    skynet.call(agent.addr, "lua", "open", fd, uid)
+    skynet.call(agent.addr, "lua", "open", fd, uid, ip)
 end
 
 return M

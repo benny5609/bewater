@@ -10,7 +10,7 @@ local packetc   = require "packet.core"
 
 local coroutine = require "skynet.coroutine"
 
-local M = class("robot_t")
+local M = {}
 function M:ctor(proj)
     self._proj = proj
     self._host = nil
@@ -172,4 +172,4 @@ function M:_suspended(co, _op, ...)
     end
 end
 
-return M
+return class(M)

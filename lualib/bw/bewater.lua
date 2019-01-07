@@ -105,11 +105,11 @@ function M.protect(tbl, depth)
     setmetatable(tbl, {
         __index = function(t, k)
             local v = rawget(t, k)
-            assert(v, string.format("read error key:%s", k))
+            assert(v ~= nil, string.format("read error key:%s", k))
             return v
         end,
         __newindex = function(t, k, v)
-            assert(rawget(t, k), string.format("write error key:%s", k))
+            assert(rawget(t, k) ~= nil, string.format("write error key:%s", k))
             rawset(t, k, v)
         end
     })
