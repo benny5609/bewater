@@ -15,7 +15,9 @@ end
 
 function M.close(fd)
     trace("close, fd:%s", fd)
+    sessions[fd]:close()
     sessions[fd] = nil
+    agents.close(fd)
     skynet.call(env.GATE, "lua", "kick", fd)
 end
 

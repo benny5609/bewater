@@ -4,6 +4,8 @@ local protobuf  = require "bw.protobuf"
 local users     = require "users"
 local env       = require "env"
 
+require "skynet.cluster"
+
 local CMD = {}
 function CMD.start(param)
     env.ROLE    = assert(param.role_path)

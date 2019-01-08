@@ -30,7 +30,7 @@ end
 
 -- 被动关闭
 function mt:close()
-
+    print("onclose")
 end
 
 -- 主动关闭

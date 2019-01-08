@@ -13,12 +13,13 @@ function M.open(fd, uid, ip)
     local user = user.new(fd, uid, ip)
     users[uid] = user
     fd2user[fd] = user
-    skynet.call(env.GATE, "lua", "forward", fd)
+    skynet.call(env.GATE, "lua", "forward", fd, nil, skynet.self())
     trace("forward fd:%s", fd)
 end
 
 function M.close(fd)
     trace("close, fd:%s", fd)
+    users[fd]:close()
     users[fd] = nil
     skynet.call(env.GATE, "lua", "kick", fd)
 end

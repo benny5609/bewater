@@ -26,11 +26,12 @@ end
 
 -- 被动关闭
 function mt:close()
-
+    trace("close", self.fd)
 end
 
 -- 主动关闭
 function mt:kick()
+    self:close()
     skynet.call(env.GATE, "lua", "kick", self.fd)
 end
 

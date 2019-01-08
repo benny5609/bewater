@@ -7,7 +7,8 @@ local env        = require "env"
 local trace = log.trace("agents")
 local MAX_COUNT = 100 -- 每个agent最多负载人数
 local agents = {}
-local uid2agent = setmetatable({}, {__mode = "v"})
+local uid2agent = setmetatable({}, {__mode = "kv"})
+local fd2uid = {}
 
 local function new_agent()
     trace("new_agent")
@@ -42,7 +43,22 @@ function M.forward(fd, uid, ip)
         agent.uids:add(uid)
         uid2agent[uid] = agent
     end
+    fd2uid[fd] = uid
     skynet.call(agent.addr, "lua", "open", fd, uid, ip)
+end
+
+function M.close(fd)
+    local uid = fd2uid[fd]
+    if not uid then
+        log.error("agents close, fd error", fd)
+        return
+    end
+    local agent = uid2agent[uid]
+    if not agent then
+        log.error("agents close, uid error", uid)
+        return
+    end
+    skynet.call(agent.addr, "lua", "close", uid)
 end
 
 return M
