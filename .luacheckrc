@@ -3,8 +3,9 @@ color = true
 
 std = "max"
 
-include_files = { 
+include_files = {
     "lualib/*",
+    "script/*",
     "service/*",
 }
 

@@ -49,6 +49,14 @@ function echo(path, content)
     file:close()
 end
 
+function file_exists(path)
+    local file = io.open(path, "rb")
+    if file then
+        file:close()
+    end
+    return file ~= nil
+end
+
 local function lookup_local(level, key)
     assert(key and #key > 0, key)
     for i = 1, 256 do

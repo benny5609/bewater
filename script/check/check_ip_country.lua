@@ -14,7 +14,7 @@ return function()
     c = ip_country.get_country('127.0.0.1')
     assert(c == "local", c)
     assert(ip_country.is_china('127.0.0.1'))
-    
+
     c = ip_country.get_country('localhost')
     assert(c == "local", c)
     assert(ip_country.is_china('localhost'))
