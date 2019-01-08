@@ -1,14 +1,16 @@
 local skynet    = require "skynet"
 local socket    = require "skynet.socket"
+local coroutine = require "skynet.coroutine"
 local packet    = require "bw.sock.packet"
 local protobuf  = require "bw.protobuf"
 local class     = require "bw.class"
 local bewater   = require "bw.bewater"
+local log       = require "bw.log"
 local opcode    = require "def.opcode"
 local errcode   = require "def.errcode"
 local packetc   = require "packet.core"
 
-local coroutine = require "skynet.coroutine"
+local trace = log.trace("client")
 
 local M = {}
 function M:ctor(proj)
@@ -89,12 +91,12 @@ function M:test(func)
     self:_suspended(co)
 end
 
-function M:call(op, data)
+function M:call(op, data, expect_err)
     self:send(op, data)
     local ret = coroutine.yield(op)
     local code = ret and ret.err
-    if code ~= 0 then
-        skynet.error(string.format("call %s error:0x%x, desc:%s",
+    if code ~= (expect_err or 0) then
+        error(string.format("call %s error:0x%x, desc:%s",
             opcode.toname(op), code, errcode.describe(code)))
     end
     return ret
@@ -113,7 +115,7 @@ function M:send(op, tbl)
             self._crypt_type, self._crypt_key, buffer, bufferlen)
     end)
 
-    print(string.format("send %s, csn:%d, sz:%s", opcode.toname(op), self._csn, len))
+    trace("send %s, csn:%d, sz:%s", opcode.toname(op), self._csn, len)
     socket.write(self._fd, data, len)
 end
 
@@ -151,7 +153,7 @@ function M:_recv(sock_buff)
 
     local co = self._call_requests[op - 1]
 
-    print(string.format("recv %s, csn:%d ssn:%d co:%s", opname, csn, ssn, co))
+    trace("recv %s, csn:%d ssn:%d co:%s", opname, csn, ssn, co)
 
     self._call_requests[op - 1] = nil
     if co and coroutine.status(co) == "suspended" then
