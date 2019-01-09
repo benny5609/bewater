@@ -1,7 +1,7 @@
 # skynet通用模块
   skynet官方并没有提供多少游戏的解决方案，我造了些轮子，勉强能用吧~
 ## 项目结构
-项目结构可以参照[bewater_sample](https://github.com/zhandouxiaojiji/bewater_sample)，或者以第三方库的形式引入你的项目。我们有时候需要同时维护多个新老项目，我把通用部分抽离出来，一方面是为了让旧项目与新代码保持同步，另一方面为了降低新建项目的成本，做到开箱即用。
+项目结构可以参照[bewater-sample](https://github.com/zhandouxiaojiji/bewater-sample)，或者以第三方库的形式引入你的项目。我们有时候需要同时维护多个新老项目，我把通用部分抽离出来，一方面是为了让旧项目与新代码保持同步，另一方面为了降低新建项目的成本，做到开箱即用。
 ```
 bewater(通用模块,本仓库) https://github.com/zhandouxiaojiji/bewater.git
     luaclib(编译好的c库)
@@ -18,10 +18,10 @@ proj
         lualib(项目lua库)
         service(项目用到的服务)
         script(项目的逻辑脚本)
-    monitor(监视节点) https://github.com/zhandouxiaojiji/monitor.git
-    share(数据共享节点) https://github.com/zhandouxiaojiji/share.git
-    backup(备份节点) https://github.com/zhandouxiaojiji/backup.git
-    test(测试节点) https://github.com/zhandouxiaojiji/test.git
+    bewater-monitor(监视节点) https://github.com/zhandouxiaojiji/bewater-monitor.git
+    bewater-share(数据共享节点) https://github.com/zhandouxiaojiji/bewater-share.git
+    bewater-backup(备份节点) https://github.com/zhandouxiaojiji/bewater-backup.git
+    bewater-test(测试节点) https://github.com/zhandouxiaojiji/bewater-test.git
 ```
 ## 配置
 ```
@@ -39,31 +39,30 @@ cd test/shell
 ./run.sh test #启动进程, run.sh [配置名]
 ```
 ## 脚本与服务检索优先级
-```
-项目>bewater>skynet
-这三个目录下都有luaclib,lualib-src,lualib,service这几个目录，skynet的所有代码不作改动，通用的写到bewater
-脚本放到项目下script
-```
+项目>bewater>skynet  
+这三个目录下都有luaclib,lualib-src,lualib,service这几个目录，skynet的所有代码不作改动，通用的写到bewater  
+服务的检索分两种，service/?.lua和service/?/init.lua，可以服务写成一个脚本，放在service下，或者写成一个目录，入口文件是init.lua，服务内require优先查找当前目录，参考service/sock/hall
+
 ## lua库
 ```
-timer 		定时器
-uuid 		生成唯一uuid
-lock 		协程锁
-hotfix 		热更
-hash_array 	同时具有哈希和数组特性的结构体
-const 		给table添加只读限制
-class 		类
-bash 		执行系统命令
-xml.lua2xml 	lua转xml
-xml.xml2lua 	xml转lua
-web.http_helper 带header的get&post请求
+bw.timer 		定时器
+bw.uuid 		生成唯一uuid
+bw.lock 		协程锁
+bw.hotfix 		热更
+bw.hash_array 		同时具有哈希和数组特性的结构体
+bw.const 		给table添加只读限制
+bw.class 		类
+bw.bash 		执行系统命令
+bw.xml.lua2xml 		lua转xml
+bw.xml.xml2lua 		xml转lua
+bw.web.http_helper 	带header的get&post请求
 bw.payment.alipay 	支付宝支付
 bw.payment.wxpay 	微信支付
 bw.payment.applepay 	苹果支付
 bw.ip.blacklist 	黑名单
 bw.ip.whitelist 	白名单
 bw.ip.ip_country 	查询ip地区
-auth.wx 	微信api
+auth.wx 		微信api
 ```
 
 ## c库
@@ -82,7 +81,7 @@ webclient 	http库
 
 ## 通用的服务
 ```
-alert         警报系统（已接钉钉api)
+alert         警报系统（已接企业微信api)
 gm            通用的gm服务
 logger        日志服务
 proto_env     节点内共享protobuf数据
@@ -96,7 +95,7 @@ web/webclient http客户端，支持http/https, GET/POST
 web/webserver http服务端，支持http(不支持https，需要nginx转发), GET/POST
 ws/watchdog   websocket侦听服务(不支持wss，需要nginx转发)
 ws/agent      websocket消息代理，多个玩家共享，可配置
-sock/watchdog socket侦听服务
+sock/hall     socket侦听服务
 sock/agent    socket消息代理，多个玩家共享，可配置
 ```
 
@@ -128,9 +127,6 @@ sock/agent    socket消息代理，多个玩家共享，可配置
     
 ## sname服务
     定义一些常用的服务，第一次引用的时候创建一个unique服务，同一节点通用，通常还会再封装一层api。参照MONGO的用法。   
-    
-## watchdog/agent
-代码里有很多对watchdog/agent，它们是专门用来监听和代发消息的服务，上层逻辑可以根据需求选择，不需要重复写这部分代码。每个agent是都会启动一个虚拟机，但是可以多个玩家共用一个agent，每个agent可配置最大玩家数，预加载一些，不够会自动创建，峰值过后agent不释放。如此设计主要是考虑到利用多核又不消耗过多的内存（一人一agent的土豪可以直接忽略）
 
 ## 停机方法
 目前skynet只有在logger服务捕捉SIGHUP信号，其它信号需要写C服务，后续再加上  
@@ -151,15 +147,6 @@ end)
 local gm = require "bw.gm"
 gm.add_gmcmd("test_module", "test_cmd")
 ```
-## 创建一个websocket监听服务
-	-- gamesvr.gamesvr 和 gamesvr.player分别为游戏服逻辑和玩家逻辑
-	local game = skynet.newservice("ws/watchdog", "gamesvr.gamesvr", "gamesvr.player")
-    skynet.call(game, "lua", "start", {
-        port = 8002, -- 监听端口
-        preload = 10, -- agent预加载数 
-        proto = conf.workspace.."script/def/proto/package.pb", -- pb文件路径
-        send_type = "text", -- websock类型 text/binary
-    })
 
 ## 发布到远程服务器
 在项目的script/publish/conf目录下创建需要发布的配置，克隆一份conf，修改部分参数，运行shell/publish.sh进行发布，具体参照share节点
@@ -191,7 +178,7 @@ end)
 ti.destroy()
 ```
 ## 网页后台管理
-之前写过一版简单的[webconsole](https://github.com/zhandouxiaojiji/webconsole)，新版还在开发([SkynetConsole](https://github.com/zhandouxiaojiji/SkynetConsole))
+之前写过一版简单的[skynet-webconsole](https://github.com/zhandouxiaojiji/webconsole)，新版还在开发([skynet-cms-layui](https://github.com/zhandouxiaojiji/skynet-cms-layui))
 ![preview2](https://github.com/zhandouxiaojiji/webconsole/blob/master/images/preview1.jpg)
 ## 关于bewater
 Be water My friend 是在我心目中浩气长存的伟大武术家李小龙先生已经解释过啦，如果你想更加了解多点的话，不妨一起探讨一下。(QQ:1013299930)
