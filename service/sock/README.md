@@ -5,7 +5,7 @@ visitor对象处理玩家的登陆的逻辑(这个时候没有load角色数据)�
 ## agent服务
 一个agent服务会承载多个用户的，类似hall，agent也有users和user，对应关系为uid->user，每个user对应一个role，role对象处理玩家的上线后逻辑。session断开
 或者重连的时候对user都没影响，只是更换fd
-
+![Hall](http://i1.bvimg.com/674207/0f7f4ea5ddfe343a.jpg)
 ## Usage
 ```
 local hall = skynet.newservice("sock/hall", "gamesvr", "role.role", "visitor") -- role和visitor需要使用者提供
