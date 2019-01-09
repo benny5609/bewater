@@ -5,12 +5,11 @@ local mode = ...
 if mode == 'agent' then
     local lock = require "bw.lock"
     local run_lock = lock.new()
-    local runing = false
     local path
     skynet.start(function()
         skynet.dispatch("lua", function(_, _, expr, filename)
             run_lock:lock()
-            path = filename or conf.workspace.."/log/stdout.log" 
+            path = filename or conf.workspace.."/log/stdout.log"
             os.execute('echo "%s" > %s', expr, path)
             skynet.retpack()
             expr = string.format('%s >%s 2>&1', expr, path)

@@ -58,16 +58,16 @@ function CMD.trace(addr, sys, str)
     write_log(mainfile, addr, str)
 end
 
-function CMD.player(addr, uid, str)
-    str = string.format("[%d] %s", uid, str)
+function CMD.role(addr, uid, sys, str)
+    str = string.format("[%d][%s] %s", uid, sys, str)
     local log = logs[uid]
     if not log or date_helper.is_sameday(os.time(), log.last_time) then
         if log then
             log.file:close()
         end
         local dir = string.format("%d/%d/%d", uid//1000000, uid%1000000//1000, uid%1000)
-        bash.bash("mkdir -p %s/log/player/%s", conf.workspace, dir)
-        local filename = string.format("%s/log/player/%s/%s.log",
+        bash.bash("mkdir -p %s/log/role/%s", conf.workspace, dir)
+        local filename = string.format("%s/log/role/%s/%s.log",
             conf.workspace, dir, os.date("%Y%m%d", os.time()))
         local file = io.open(filename, "a+")
         log = {file = file}

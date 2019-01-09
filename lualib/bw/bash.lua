@@ -49,6 +49,14 @@ function echo(path, content)
     file:close()
 end
 
+function file_exists(path)
+    local file = io.open(path, "rb")
+    if file then
+        file:close()
+    end
+    return file ~= nil
+end
+
 local function lookup_local(level, key)
     assert(key and #key > 0, key)
     for i = 1, 256 do
@@ -84,7 +92,7 @@ function bash(expr, ...)
         end)
     end
     local cmd = eval(expr)
-    skynet.error(cmd)
+    --skynet.error(cmd)
     local ret = io_popen(cmd)
     if ret ~= "" then
         ret = string.match(ret, "(.+)\n$") -- 去掉最后一个换行符

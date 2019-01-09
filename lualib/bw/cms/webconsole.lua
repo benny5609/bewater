@@ -18,7 +18,7 @@ function M.init(args)
             {title = "GM", icon = "&#xe64e;", href = "page/skynet/gm.html"},
         }},
         {name = "user", title = "用户管理", icon = "&#xe770;", children = {
-            {title = "数据统计", icon = "&#xe62c;", href = "page/stat.html", icon = "&#xe665;"},
+            {title = "数据统计", icon = "&#xe62c;", href = "page/stat.html"},
             {title = "GM", icon = "&#xe64e;", href = "page/skynet/gm.html"},
         }},
         {name = "update", title = "更新", icon = "&#xe609;", children = {

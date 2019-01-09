@@ -1,11 +1,9 @@
 local skynet    = require "skynet"
-local util      = require "bw.util"
 
 local function debug_call(addr, cmd, ...)
     return skynet.call(addr, "debug", cmd, ...)
 end
 return function()
-    local head = {"地址", "描述", "内存", "任务", "消息队列"}
     local list = {}
     local all = skynet.call(".launcher", "lua", "LIST")
     for addr, desc in pairs(all) do

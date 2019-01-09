@@ -23,7 +23,7 @@ local function check_api(api, param, expect_err)
     resp = assert(json.decode(resp), resp)
     assert(ret)
     assert(resp.err == (expect_err or 0), errcode.describe(resp.err))
-    return resp  
+    return resp
 end
 
 return function()

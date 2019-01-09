@@ -43,7 +43,7 @@ end
 
 
 function _M.connect(self, uri, opts)
-    local parsed = url.parse(uri)    
+    local parsed = url.parse(uri)
     local host = parsed.host
     local port = parsed.port
     local path = parsed.path
@@ -63,7 +63,7 @@ function _M.connect(self, uri, opts)
 	   if type(protos) == "table" then
 	      proto_header = "Sec-WebSocket-Protocol: "
 		 .. concat(protos, ",") .. "\r\n"
-	      
+
             else
 	       proto_header = "Sec-WebSocket-Protocol: " .. protos .. "\r\n"
 	   end
@@ -89,7 +89,7 @@ function _M.connect(self, uri, opts)
     if not id then
         return nil, "failed to connect: " .. err
     end
-    
+
     self.socket = socket_base.new_sock(id)
     -- do the websocket handshake:
 
@@ -114,7 +114,7 @@ function _M.connect(self, uri, opts)
 
     local header_reader = self.socket:readline("\r\n\r\n")
     -- FIXME: check for too big response headers
-    
+
     --    print (header_reader)
    -- local header, err, partial = header_reader()
    -- if not header then

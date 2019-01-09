@@ -9,14 +9,12 @@ local function test(filename)
 end
 
 skynet.start(function()
-    wc.init({
+    --[[wc.init({
         port = "9999",
         users = {
             {account = "root", password = "123"}
         }
-    }) 
-    
+    }) ]]
     skynet.error("Be water my friend.")
-   
-    --test "stdout"
+    --test "test_hall"
 end)

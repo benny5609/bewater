@@ -1,15 +1,10 @@
-#生成一份配置
-
+#生成一份配置(需要在shell目录下运行)
+workspace=../bewater #相对skyne程序位置
 if [ $# -lt 2 ]
 then
     echo 至少需要两个参数, etc.sh 配置名 启动脚本 是否后台执行
     exit
 fi
-
-cd ../
-workspace=$(cd $(dirname $0); pwd)
-root_name=$(basename $workspace)
-cd -
 
 etc_name=$1 #master
 start_script=$2
@@ -18,35 +13,14 @@ is_deamon=$4 #true
 
 config=${etc_name}.cfg
 
-echo $workspace
-mkdir -p ${workspace}/log
-mkdir -p ${workspace}/etc
-cd ${workspace}/etc
+mkdir -p ../log
+mkdir -p ../etc
 
-echo workspace = \"../${root_name}/\" > ${config}
-echo thread = 8 >> ${config}
-echo logpath = \".\" >> ${config}
-echo harbor = 0 >> ${config}
-echo start = \"${start_script}\" >> ${config}
-echo 'bootstrap = "snlua bootstrap"' >> ${config}
-echo 'lualoader = "lualib/loader.lua"' >> ${config}
-echo 'snax = workspace.."service/?.lua"' >> ${config}
-echo 'luaservice = workspace.."examples/?.lua;"..workspace.."service/?.lua;"..workspace.."service/?.lua;".."./service/?.lua;".."./liblua/?.lua;"' >> ${config}
-echo 'cpath = workspace.."luaclib/?.so;"..workspace.."luaclib/?.so;".."./cservice/?.so;./luaclib/?.so"' >> ${config}
-echo 'lua_path = workspace.."script/?.lua;"..workspace.."lualib/?.lua;"..workspace.."lualib/?.lua;".."./lualib/?.lua;"' >> ${config}
-echo 'lua_cpath = workspace.."luaclib/?.so;"..workspace.."luaclib/?.so;".."./luaclib/?.so;"'  >> ${config}
-echo logger = \"logger\" >> ${config}
-echo logservice = \"snlua\" >> ${config}
-
-if [ "${clustername}" != "" ]
+if [ "${workspace}" == "../bewater" ]
 then
-    echo clustername = \"${clustername}\" >> ${config}
+    echo_etc=echo_etc.sh
 else
-    echo clustername = \"${etc_name}\" >> ${config}
+    echo_etc=../../../bewater/shell/echo_etc.sh
 fi
 
-if [ "${is_deamon}" == "true" ]
-then
-    echo daemon = workspace..\"/log/pid/${etc_name}.pid\" >> ${config}
-fi
-
+sh ${echo_etc} ${workspace} ${etc_name} ${start_script} ${clustername} ${is_deamon} > ../etc/${etc_name}.cfg

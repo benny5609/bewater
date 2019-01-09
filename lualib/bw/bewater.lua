@@ -1,4 +1,5 @@
 local skynet = require "skynet.manager"
+local log = require "bw.log"
 
 local M = {}
 M.NORET = "NORET"
@@ -28,7 +29,7 @@ end
 
 -- 给一个服务注入一段代码
 -- return ok, output
-function M.inject(addr, source, filename)
+function M.inject(addr, source)
     return skynet.call(addr, "debug", "RUN", source)
     --return skynet.call(addr, "code", source)
     --return skynet.call(addr, "debug", "INJECTCODE", source, filename)
@@ -85,9 +86,9 @@ function M.traceback(start_level, max_level)
 
     for level = start_level, max_level do
 
-        local info = debug.getinfo( level, "nSl") 
+        local info = debug.getinfo( level, "nSl")
         if info == nil then break end
-        print( string.format("[ line : %-4d]  %-20s :: %s", 
+        print( string.format("[ line : %-4d]  %-20s :: %s",
             info.currentline, info.name or "", info.source or "" ) )
 
         local index = 1
@@ -99,5 +100,28 @@ function M.traceback(start_level, max_level)
         end
     end
 end
+
+function M.protect(tbl, depth)
+    setmetatable(tbl, {
+        __index = function(t, k)
+            local v = rawget(t, k)
+            assert(v ~= nil, string.format("read error key:%s", k))
+            return v
+        end,
+        __newindex = function(t, k, v)
+            assert(rawget(t, k) ~= nil, string.format("write error key:%s", k))
+            rawset(t, k, v)
+        end
+    })
+    if depth and depth > 0 then
+        for k, v in pairs(tbl) do
+            if type(v) == "table" then
+                M.protect(v, depth - 1)
+            end
+        end
+    end
+    return tbl
+end
+
 return M
 

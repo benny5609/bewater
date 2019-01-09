@@ -48,7 +48,7 @@ function M.set(k, v)
     assert(v.name)
     local settings = M.get_settings()
     settings[k] = v
-    save_settings(settings) 
+    save_settings(settings)
 end
 
 function M.remove_settings(names)
@@ -80,7 +80,7 @@ function M.get_version_list(name)
                     time = time,
                     desc = v.desc,
                     git = v.git
-                }) 
+                })
             end
         end
     end
@@ -92,7 +92,7 @@ function M.get_version_list(name)
         end
     end
     table.sort(list, function(a, b)
-        return M.to_version_num(a.version) > M.to_version_num(b.version) 
+        return M.to_version_num(a.version) > M.to_version_num(b.version)
     end)
     return list
 end
@@ -116,7 +116,7 @@ function M.to_version_num(version)
 end
 
 function M.to_version_str(num)
-    assert(type(version) == "number")
+    assert(type(num) == "number")
     return string.format("%d.%d.%d", num//1000000, num%1000000//1000, num%1000)
 end
 
