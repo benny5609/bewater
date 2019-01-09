@@ -84,7 +84,7 @@ function M:start(host, port)
     end)
 end
 
-function M:test(func)
+function M:create(func)
     local co = coroutine.create(function()
         bewater.try(func)
     end)

@@ -26,7 +26,7 @@ end
 
 -- 被动关闭
 function mt:close()
-    trace("close", self.fd)
+    trace("close %s", self.fd)
 end
 
 -- 主动关闭

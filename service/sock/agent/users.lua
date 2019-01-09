@@ -5,22 +5,33 @@ local env       = require "env"
 
 local trace = log.trace("users")
 
-local users = {} -- fd:user
+local users = {} -- uid:user
 local fd2user = setmetatable({}, {__mode = "kv"})
 
 local M = {}
 function M.open(fd, uid, ip)
-    local user = user.new(fd, uid, ip)
-    users[uid] = user
-    fd2user[fd] = user
+    local u = users[uid]
+    if u then
+        skynet.call(env.GATE, "lua", "kick", u.fd)
+    else
+        u = user.new(fd, uid, ip)
+    end
+    u.fd = fd
+    u:online()
+    users[uid] = u
+    fd2user[fd] = u
     skynet.call(env.GATE, "lua", "forward", fd, nil, skynet.self())
     trace("forward fd:%s", fd)
 end
 
 function M.close(fd)
-    trace("close, fd:%s", fd)
-    users[fd]:close()
-    users[fd] = nil
+    local u = fd2user[fd]
+    if not u or u.fd ~= fd then
+        trace("close, fd:%s, u.fd:%s", fd, u and u.fd)
+        return
+    end
+    u:close()
+    trace("close, uid:%s", u.uid)
     skynet.call(env.GATE, "lua", "kick", fd)
 end
 
@@ -35,6 +46,15 @@ end
 
 function M.get_user(uid)
     return users[uid]
+end
+
+function M.check_timeout()
+    for uid, u in pairs(users) do
+        if u:check_timeout() then
+            users[uid] = nil
+            trace("destroy user:%s", uid)
+        end
+    end
 end
 
 skynet.register_protocol {

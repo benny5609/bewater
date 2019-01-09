@@ -3,6 +3,7 @@ local socket    = require "skynet.socket"
 local bewater   = require "bw.bewater"
 local packet    = require "bw.sock.packet"
 local protobuf  = require "bw.protobuf"
+local class     = require "bw.class"
 local util      = require "bw.util"
 local log       = require "bw.log"
 local opcode    = require "def.opcode"
@@ -14,9 +15,10 @@ local trace = log.trace("user")
 local mt = {}
 mt.__index = mt
 
-function mt:open(fd, uid, ip)
-    self.fd = assert(fd)
-    self.ip = assert(ip)
+function mt:ctor(fd, uid, ip)
+    self.fd     = assert(fd)
+    self.uid    = assert(uid)
+    self.ip     = assert(ip)
     self.csn = 0
     self.ssn = 0
     self.crypt_key = 0
@@ -30,12 +32,22 @@ end
 
 -- 被动关闭
 function mt:close()
-    print("onclose")
+    trace("onclose")
+    if self.role.offline then
+        self.role:offline()
+    end
 end
 
 -- 主动关闭
 function mt:kick()
     skynet.call(env.GATE, "lua", "kick", self.fd)
+end
+
+function mt:online()
+    trace("online")
+    if self.role.online then
+        self.role:online()
+    end
 end
 
 function mt:send(op, data)
@@ -84,11 +96,15 @@ function mt:recv(msg, len)
     self:send(op+1, ret)
 end
 
-local M = {}
-function M.new(...)
-    local obj = setmetatable({}, mt)
-    obj:open(...)
-    return obj
+function mt:check_timeout()
+    local flag = false
+    if self.role.is_timeout then
+        flag = self.role:is_timeout()
+    end
+    if flag then
+        self.role:destroy()
+    end
+    return flag
 end
 
-return M
+return class(mt)

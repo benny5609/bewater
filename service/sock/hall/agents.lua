@@ -58,7 +58,7 @@ function M.close(fd)
         log.error("agents close, uid error", uid)
         return
     end
-    skynet.call(agent.addr, "lua", "close", uid)
+    skynet.call(agent.addr, "lua", "close", fd)
 end
 
 return M

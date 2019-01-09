@@ -13,6 +13,13 @@ function CMD.start(param)
     env.GATE    = assert(param.gate)
 
     protobuf.register_file(env.PROTO)
+
+    skynet.fork(function()
+        while true do
+            users.check_timeout()
+            skynet.sleep(100)
+        end
+    end)
 end
 
 skynet.start(function()
