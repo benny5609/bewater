@@ -33,7 +33,7 @@ function CMD.start(param)
 end
 
 function CMD.stop()
-
+    sessions.close_all()
 end
 
 skynet.start(function()
