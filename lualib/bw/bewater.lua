@@ -1,5 +1,4 @@
 local skynet = require "skynet.manager"
-local log = require "bw.log"
 
 local M = {}
 M.NORET = "NORET"

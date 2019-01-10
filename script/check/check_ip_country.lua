@@ -1,4 +1,3 @@
-local skynet        = require "skynet"
 local ip_country    = require "bw.ip.ip_country"
 return function()
     local cn = '113.111.109.39'

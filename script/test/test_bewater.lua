@@ -10,7 +10,7 @@ return function()
             }
         }
     }, 1)
-    
+
     tbl.a = 100
     --tbl.c = 111
     --print(tbl.c)
