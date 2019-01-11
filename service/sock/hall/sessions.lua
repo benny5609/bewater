@@ -10,11 +10,17 @@ local sessions = {} -- fd:session
 
 local M = {}
 function M.open(fd, addr)
+    if not env.IS_OPEN then
+        return
+    end
     sessions[fd] = session.new(fd, addr)
 end
 
 function M.close(fd)
     trace("close, fd:%s", fd)
+    if not sessions[fd] then
+        return
+    end
     sessions[fd]:close()
     sessions[fd] = nil
     agents.close(fd)

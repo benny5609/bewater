@@ -16,9 +16,9 @@ local mt = {}
 mt.__index = mt
 
 function mt:ctor(fd, uid, ip)
-    self.fd     = assert(fd)
-    self.uid    = assert(uid)
-    self.ip     = assert(ip)
+    self.fd  = assert(fd)
+    self.uid = assert(uid)
+    self.ip  = assert(ip)
     self.csn = 0
     self.ssn = 0
     self.crypt_key = 0
@@ -27,6 +27,7 @@ function mt:ctor(fd, uid, ip)
     local role = require(env.ROLE)
     self.role = role.new(uid)
 
+    trace("&&&&&&& forward %s", fd)
     skynet.call(env.GATE, "lua", "forward", fd)
 end
 

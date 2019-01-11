@@ -29,10 +29,13 @@ function CMD.start(param)
     if server.start then
         server.start()
     end
+    env.IS_OPEN = true
     trace("hall start")
 end
 
 function CMD.stop()
+    env.IS_OPEN = false
+    skynet.sleep(10) -- todo 等正在上线的玩家完成登陆后再断开
     sessions.close_all()
 end
 
