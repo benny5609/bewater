@@ -17,9 +17,9 @@ function M.open(fd, uid, ip)
         u = user.new(fd, uid, ip)
     end
     u.fd = fd
-    u:online()
     users[uid] = u
     fd2user[fd] = u
+    u:online()
     skynet.call(env.GATE, "lua", "forward", fd, nil, skynet.self())
     trace("forward fd:%s", fd)
 end

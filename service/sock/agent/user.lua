@@ -27,7 +27,6 @@ function mt:ctor(fd, uid, ip)
     local role = require(env.ROLE)
     self.role = role.new(uid)
 
-    trace("&&&&&&& forward %s", fd)
     skynet.call(env.GATE, "lua", "forward", fd)
 end
 
