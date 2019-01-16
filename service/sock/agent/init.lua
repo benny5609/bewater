@@ -23,9 +23,22 @@ function CMD.start(param)
 end
 
 skynet.start(function()
-    skynet.dispatch("lua", function(_, _, cmd, ...)
-        local f = assert(CMD[cmd] or users[cmd], cmd)
-        bewater.ret(f(...))
+    skynet.dispatch("lua", function(_, _, arg1, arg2, arg3, ...)
+        local f = CMD[arg1] or users[arg1]
+        if f then
+            bewater.ret(f(arg2, arg3, ...))
+        elseif type(arg1) == "number" then
+            local uid = arg1
+            local user = users.get_user(uid)
+            assert(user, uid)
+            local role = assert(user.role, uid)
+            local module = assert(role[arg2], arg2)
+            if type(module) == "function" then
+                bewater.ret(module(role, arg3, ...))
+            else
+                bewater.ret(module[arg3](module, ...))
+            end
+        end
     end)
 end)
 
