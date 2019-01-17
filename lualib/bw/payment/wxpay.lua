@@ -48,7 +48,7 @@ function M.create_order(param)
             appid = appid,
             partnerid = mch_id,
             noncestr = data.nonce_str,
-            package = 'sign=WXPay',
+            package = 'Sign=WXPay',
             prepayid = data.prepay_id,
             timestamp = os.time(),
         }

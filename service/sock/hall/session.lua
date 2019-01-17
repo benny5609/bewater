@@ -17,6 +17,10 @@ mt.__index = mt
 function mt:open(fd, ip)
     self.fd = assert(fd)
     self.ip = assert(ip)
+    self.csn = 0
+    self.ssn = 0
+    self.crypt_key = 0
+    self.crypt_type = 0
 
     local visitor = require(env.VISITOR)
     self.visitor = visitor.new(self)
@@ -35,10 +39,11 @@ function mt:kick()
     skynet.call(env.GATE, "lua", "kick", self.fd)
 end
 
-function mt:send(op, data)
+function mt:send(op, data, csn)
+    trace("send:%s, csn:%s", opcode.toname(op), csn)
     local msg, len
     protobuf.encode(opcode.toname(op), data or {}, function(buffer, bufferlen)
-        msg, len = packet.pack(op, self.csn or 0, self.ssn or 0,
+        msg, len = packet.pack(op, csn or 0, self.ssn or 0,
             self.crypt_type or 0, self.crypt_key or 0, buffer, bufferlen)
     end)
 	socket.write(self.fd, msg, len)
@@ -46,6 +51,7 @@ end
 
 function mt:recv(msg, len)
     local op, csn, ssn, crypt_type, crypt_key, buff, sz = packet.unpack(msg, len)
+    self.csn = csn
 
     local opname = opcode.toname(op)
     local modulename = opcode.tomodule(op)
@@ -57,7 +63,7 @@ function mt:recv(msg, len)
 
     local data = protobuf.decode(opname, buff, sz)
     assert(type(data) == "table", data)
-    trace("recv, op:%s, data:%s", opcode.toname(op), util.dump(data))
+    trace("recv, op:%s, csn:%s data:%s", opcode.toname(op), csn, util.dump(data))
     --util.printdump(data)
 
     local ret = 0 -- 返回整数为错误码，table为返回客户端数据
@@ -73,7 +79,7 @@ function mt:recv(msg, len)
     else
         ret = {err = ret}
     end
-    self:send(op+1, ret)
+    self:send(op+1, ret, csn)
 end
 
 local M = {}

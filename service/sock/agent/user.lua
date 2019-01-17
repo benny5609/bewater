@@ -28,6 +28,7 @@ function mt:ctor(fd, uid, ip)
     self.role = role.new(uid)
 
     skynet.call(env.GATE, "lua", "forward", fd)
+    trace("new user, fd:%s, uid:%s", fd, uid)
 end
 
 -- 被动关闭
@@ -50,10 +51,11 @@ function mt:online()
     end
 end
 
-function mt:send(op, data)
+function mt:send(op, data, csn)
+    trace("send:%s, csn:%s", opcode.toname(op), csn)
     local msg, len
     protobuf.encode(opcode.toname(op), data or {}, function(buffer, bufferlen)
-        msg, len = packet.pack(op, self.csn, self.ssn,
+        msg, len = packet.pack(op, csn or 0, self.ssn,
             self.crypt_type, self.crypt_key, buffer, bufferlen)
     end)
 	socket.write(self.fd, msg, len)
@@ -77,7 +79,7 @@ function mt:recv(msg, len)
 
     local data = protobuf.decode(opname, buff, sz)
     assert(type(data) == "table", data)
-    trace("recv, op:%s, data:%s", opcode.toname(op), util.dump(data))
+    trace("recv, op:%s, csn:%s, data:%s", opcode.toname(op), csn, util.dump(data))
     --util.printdump(data)
 
     local ret = 0 -- 返回整数为错误码，table为返回客户端数据
@@ -93,7 +95,7 @@ function mt:recv(msg, len)
     else
         ret = {err = ret}
     end
-    self:send(op+1, ret)
+    self:send(op+1, ret, csn)
 end
 
 function mt:check_timeout()
