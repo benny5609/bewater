@@ -7,12 +7,20 @@ local trace = log.trace("users")
 
 local users = {} -- uid:user
 local fd2user = setmetatable({}, {__mode = "kv"})
+local half_closed = {} -- fd:bool
 
 local M = {}
 function M.open(fd, uid, ip)
     local u = users[uid]
     if u then
-        skynet.call(env.GATE, "lua", "kick", u.fd)
+        local old_fd = u.fd
+        u:kick()
+        half_closed[old_fd] = true
+        skynet.timeout(300, function()
+            trace("close old_fd:%s", old_fd)
+            skynet.call(env.GATE, "lua", "kick", old_fd)
+            half_closed[old_fd] = nil
+        end)
     else
         u = user.new(fd, uid, ip)
     end
@@ -65,6 +73,9 @@ skynet.register_protocol {
     end,
 	dispatch = function (fd, _, msg, len)
 		skynet.ignoreret()
+        if half_closed[fd] then
+            return
+        end
         local u = assert(fd2user[fd], fd)
         u:recv(msg, len)
 	end

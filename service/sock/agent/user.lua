@@ -41,7 +41,9 @@ end
 
 -- 主动关闭
 function mt:kick()
-    skynet.call(env.GATE, "lua", "kick", self.fd)
+    if self.role.kickout then
+        self.role:kickout()
+    end
 end
 
 function mt:online()
@@ -52,7 +54,7 @@ function mt:online()
 end
 
 function mt:send(op, data, csn)
-    trace("send:%s, csn:%s", opcode.toname(op), csn)
+    trace("send:%s, fd:%s, csn:%s", opcode.toname(op), self.fd, csn)
     local msg, len
     protobuf.encode(opcode.toname(op), data or {}, function(buffer, bufferlen)
         msg, len = packet.pack(op, csn or 0, self.ssn,

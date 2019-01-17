@@ -13,7 +13,7 @@ function M.verify_receipt(receipt, product_id)
             product_id, receipt)
         return
     end
-    if resp.status ~= 0 then
+    if not resp or resp.status ~= 0 then
         trace("try sandbox")
         ret, resp_str = http.post("https://sandbox.itunes.apple.com/verifyReceipt", receipt)
         resp = json.decode(resp_str)
