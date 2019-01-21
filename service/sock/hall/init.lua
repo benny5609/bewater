@@ -4,6 +4,7 @@ local protobuf  = require "bw.protobuf"
 local log       = require "bw.log"
 local env       = require "env"
 local sessions  = require "sessions"
+local agents    = require "agents"
 
 local trace = log.trace("hall")
 
@@ -37,6 +38,10 @@ function CMD.stop()
     env.IS_OPEN = false
     skynet.sleep(10) -- todo 等正在上线的玩家完成登陆后再断开
     sessions.close_all()
+end
+
+function CMD.online_count()
+    return agents.online_count()
 end
 
 skynet.start(function()

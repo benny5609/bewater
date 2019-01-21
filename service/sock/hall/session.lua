@@ -40,7 +40,7 @@ function mt:kick()
 end
 
 function mt:send(op, data, csn)
-    trace("send:%s, csn:%s", opcode.toname(op), csn)
+    trace("send:%s, csn:%s, fd:%s", opcode.toname(op), csn, self.fd)
     local msg, len
     protobuf.encode(opcode.toname(op), data or {}, function(buffer, bufferlen)
         msg, len = packet.pack(op, csn or 0, self.ssn or 0,

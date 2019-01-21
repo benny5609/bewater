@@ -16,20 +16,22 @@ local errfile = io.open(string.format("%s/log/error.log",
 
 local function write_log(file, addr, str)
     str = string.format("[%08x][%s] %s", addr, os.date("%Y-%m-%d %H:%M:%S", os.time()), str)
-    if string.match(str, "\n(%w+ %w+)") == "stack traceback" then
-        if conf.alert and conf.alert.enable then
-            skynet.send(sname.ALERT, "lua", "traceback", str)
-        end
-        errfile:write(str.."\n")
-        errfile:flush()
-    end
-
     if file == mainfile or file == errfile then
         print(str)
     end
 
     file:write(str.."\n")
     file:flush()
+
+    if string.match(str, "\n(%w+ %w+)") == "stack traceback" then
+        if conf.alert and conf.alert.enable then
+            skynet.fork(function()
+                skynet.send(sname.ALERT, "lua", "traceback", str)
+            end)
+        end
+        errfile:write(str.."\n")
+        errfile:flush()
+    end
 end
 
 local logs = {} -- key(sys or uid) -> {last_time, file}

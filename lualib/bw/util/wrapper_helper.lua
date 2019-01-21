@@ -68,7 +68,7 @@ function M.get_version_list(name)
     local list = {}
     local ret = bash("ls --full-time %s/assets", setting.path)
     for str in string.gmatch(ret, "[^\n]+") do
-        if string.len(str) > 10 then
+        if string.len(str) > 20 then
             local version = string.match(str, "[^ ]+$")
             local time = string.match(str, "(%d+-%d+-%d+ %d+:%d+:%d+)")
             if string.match(str, "current") then

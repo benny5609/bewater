@@ -61,4 +61,12 @@ function M.close(fd)
     skynet.call(agent.addr, "lua", "close", fd)
 end
 
+function M.online_count()
+    local count = 0
+    for _, _ in pairs(uid2agent) do
+        count = count + 1
+    end
+    return count
+end
+
 return M
