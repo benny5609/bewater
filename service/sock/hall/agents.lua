@@ -38,6 +38,11 @@ end
 
 local M = {}
 function M.forward(fd, uid, ip)
+    local sessions = require "sessions"
+    if not sessions.get_session(fd) then
+        trace("forward fail, session is disconnect, fd:%s", fd)
+        return
+    end
     local agent = uid2agent[uid]
     if not agent then
         agent = get_free_agent()

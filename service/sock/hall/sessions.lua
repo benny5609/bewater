@@ -27,6 +27,10 @@ function M.close(fd)
     skynet.call(env.GATE, "lua", "kick", fd)
 end
 
+function M.get_session(fd)
+    return sessions[fd]
+end
+
 function M.close_all()
     for fd, _ in pairs(sessions) do
         M.close(fd)

@@ -106,6 +106,10 @@ function M:wait(time)
     return coroutine.yield(nil, time)
 end
 
+function M:close()
+    socket.close(self._fd)
+end
+
 function M:send(op, tbl)
     self._csn = self._csn + 1
 
