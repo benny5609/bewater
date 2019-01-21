@@ -20,6 +20,7 @@ local function new_agent()
         role_path = env.ROLE,
         proto     = env.PROTO,
         gate      = env.GATE,
+        hall      = skynet.self(),
     })
     return agent
 end
@@ -44,7 +45,23 @@ function M.forward(fd, uid, ip)
         uid2agent[uid] = agent
     end
     fd2uid[fd] = uid
+    trace("forward fd:%s", fd)
+    skynet.call(env.GATE, "lua", "forward", fd, 0, agent.addr)
     skynet.call(agent.addr, "lua", "open", fd, uid, ip)
+end
+
+function M.half_close(fd)
+    local uid = fd2uid[fd]
+    if not uid then
+        log.error("agents half_close, fd error", fd)
+        return
+    end
+    local agent = uid2agent[uid]
+    if not agent then
+        log.error("agents half_close, uid error", uid)
+        return
+    end
+    fd2uid[fd] = nil
 end
 
 function M.close(fd)
@@ -58,7 +75,17 @@ function M.close(fd)
         log.error("agents close, uid error", uid)
         return
     end
+    fd2uid[fd] = nil
     skynet.call(agent.addr, "lua", "close", fd)
+end
+
+function M.remove_uid(uid)
+    local agent = uid2agent[uid]
+    if not agent then
+        log.error("agents remove uid error", uid)
+        return
+    end
+    agent.uids:remove(uid)
 end
 
 function M.online_count()

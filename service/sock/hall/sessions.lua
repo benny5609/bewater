@@ -21,9 +21,9 @@ function M.close(fd)
     if not sessions[fd] then
         return
     end
+    agents.close(fd)
     sessions[fd]:close()
     sessions[fd] = nil
-    agents.close(fd)
     skynet.call(env.GATE, "lua", "kick", fd)
 end
 

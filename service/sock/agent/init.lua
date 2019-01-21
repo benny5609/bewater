@@ -11,6 +11,7 @@ function CMD.start(param)
     env.ROLE    = assert(param.role_path)
     env.PROTO   = assert(param.proto)
     env.GATE    = assert(param.gate)
+    env.HALL    = assert(param.hall)
 
     protobuf.register_file(env.PROTO)
 

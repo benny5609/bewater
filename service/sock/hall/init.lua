@@ -44,6 +44,14 @@ function CMD.online_count()
     return agents.online_count()
 end
 
+function CMD.half_close(fd)
+    agents.half_close(fd)
+end
+
+function CMD.agents_remove_uid(uid)
+    agents.remove_uid(uid)
+end
+
 skynet.start(function()
     skynet.dispatch("lua", function(_, _, arg1, arg2, ...)
         if arg1 == "socket" then

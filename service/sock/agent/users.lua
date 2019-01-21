@@ -16,9 +16,9 @@ function M.open(fd, uid, ip)
         local old_fd = u.fd
         u:kick()
         half_closed[old_fd] = true
-        skynet.timeout(300, function()
-            trace("close old_fd:%s", old_fd)
-            skynet.call(env.GATE, "lua", "kick", old_fd)
+        skynet.timeout(100, function()
+            trace("half_close old_fd:%s", old_fd)
+            skynet.call(env.HALL, "lua", "half_close", old_fd)
             half_closed[old_fd] = nil
         end)
     else
@@ -28,8 +28,6 @@ function M.open(fd, uid, ip)
     users[uid] = u
     fd2user[fd] = u
     u:online()
-    skynet.call(env.GATE, "lua", "forward", fd, nil, skynet.self())
-    trace("forward fd:%s", fd)
 end
 
 function M.close(fd)
@@ -59,6 +57,7 @@ end
 function M.check_timeout()
     for uid, u in pairs(users) do
         if u:check_timeout() then
+            skynet.call(env.HALL, "lua", "agents_remove_uid", uid)
             users[uid] = nil
             trace("destroy user:%s", uid)
         end

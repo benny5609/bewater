@@ -27,7 +27,6 @@ function mt:ctor(fd, uid, ip)
     local role = require(env.ROLE)
     self.role = role.new(uid)
 
-    skynet.call(env.GATE, "lua", "forward", fd)
     trace("new user, fd:%s, uid:%s", fd, uid)
 end
 
@@ -81,7 +80,7 @@ function mt:recv(msg, len)
 
     local data = protobuf.decode(opname, buff, sz)
     assert(type(data) == "table", data)
-    trace("recv, op:%s, csn:%s, data:%s", opcode.toname(op), csn, util.dump(data))
+    trace("recv, op:%s, csn:%s, fd:%s, data:%s", opcode.toname(op), csn, self.fd, util.dump(data))
     --util.printdump(data)
 
     local ret = 0 -- 返回整数为错误码，table为返回客户端数据

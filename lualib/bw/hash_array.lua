@@ -15,6 +15,9 @@ function mt:remove(obj)
         return idx
     end
     local tail_obj = self._array[#self._array]
+    if not tail_obj then
+        return
+    end
     self._array[idx] = tail_obj
     self._array[#self._array] = nil
     self._hash[obj] = nil
