@@ -91,6 +91,7 @@ function M.remove_uid(uid)
         return
     end
     agent.uids:remove(uid)
+    uid2agent[uid] = nil
 end
 
 function M.online_count()

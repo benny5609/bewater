@@ -2,7 +2,7 @@ local skynet    = require "skynet.manager"
 local mysql     = require "skynet.db.mysql"
 local bewater   = require "bw.bewater"
 local util      = require "bw.util"
-local Conf      = require "conf"
+local conf      = require "conf"
 
 local mod = ...
 
@@ -14,11 +14,11 @@ skynet.start(function()
         _db:query("set charset utf8")
     end
     db=mysql.connect({
-        host=Conf.mysql.host,
-        port=Conf.mysql.port,
-        database=Conf.mysql.name,
-        user=Conf.mysql.user,
-        password=Conf.mysql.password,
+        host=conf.mysql.host,
+        port=conf.mysql.port,
+        database=conf.mysql.name,
+        user=conf.mysql.user,
+        password=conf.mysql.password,
         max_packet_size = 1024 * 1024,
         on_connect = on_connect
     })
@@ -33,7 +33,7 @@ end)
 else
 
 skynet.start(function()
-    local preload = Conf.preload or 10
+    local preload = conf.preload or 10
     local agent = {}
     for i = 1, preload do
         agent[i] = skynet.newservice(SERVICE_NAME, "agent")
