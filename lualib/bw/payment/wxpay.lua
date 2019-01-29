@@ -35,10 +35,11 @@ function M.create_order(param)
     }
     args.sign = sign.md5_args(args, key)
     local xml = lua2xml.encode("xml", args, true)
-    local _, resp = http.post("https://api.mch.weixin.qq.com/pay/unifiedorder", xml)
-    local data = xml2lua.decode(resp).xml
+    local _, resp_str = http.post("https://api.mch.weixin.qq.com/pay/unifiedorder", xml)
+    local data = xml2lua.decode(resp_str).xml
 
     if data.return_code ~= "SUCCESS" and data.return_msg ~= "OK" then
+        log.error(string.format("wxpay create_order error, param:%s, resp:%s", util.dump(param), resp_str))
         return errcode.WXORDER_FAIL
     end
 
