@@ -64,14 +64,18 @@ function M.get_version_list(name)
     local settings = M.get_settings()
     local doc = M.get_doc(name)
     local setting = settings[name]
-    local cur
+    local cur, cur_android, cur_ios
     local list = {}
     local ret = bash("ls --full-time %s/assets", setting.path)
     for str in string.gmatch(ret, "[^\n]+") do
         if string.len(str) > 20 then
             local version = string.match(str, "[^ ]+$")
             local time = string.match(str, "(%d+-%d+-%d+ %d+:%d+:%d+)")
-            if string.match(str, "current") then
+            if string.match(str, "current.ios") then
+                cur_ios = version
+            elseif string.match(str, "current.android") then
+                cur_android = version
+            elseif string.match(str, "current") then
                 cur = version
             else
                 local v = doc[version] or {}
@@ -86,9 +90,12 @@ function M.get_version_list(name)
     end
     if cur then
         for _, v in pairs(list) do
-            if cur == v.version then
+            --[[if cur == v.version then
                 v.LAY_CHECKED = true
-            end
+            end]]
+            v.cur = v.version == cur
+            v.cur_ios = v.version == cur_ios
+            v.cur_android = v.version == cur_android
         end
     end
     table.sort(list, function(a, b)

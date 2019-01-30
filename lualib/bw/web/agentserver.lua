@@ -113,6 +113,8 @@ local function resp_options(fd)
     })
     socket.close(fd)
 end
+
+local agentserver = {}
 function agentserver.start(handler)
     -- handler 需要提供
     -- hander.api = {[[/api/xxx/ooo]] = func}
