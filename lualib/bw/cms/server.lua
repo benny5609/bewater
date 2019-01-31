@@ -48,7 +48,27 @@ function M.req_login(account, password)
     }
 end
 
-function M.req_menu()
-    return menu
+function M.req_menu(account)
+    local info = acc2info[account]
+    if not info then
+        return errcode.ACC_NOT_EXIST
+    end
+    local top = {}
+    local navs = {}
+    for _, v in ipairs(menu) do
+        if not v.lv or info.lv >= v.lv then
+            table.insert(top, v)
+            navs[v.name] = {}
+            for _, vv in ipairs(v.children) do
+                if not vv.lv or info.lv >= vv.lv then
+                    table.insert(navs[v.name], vv)
+                end
+            end
+        end
+    end
+    return {
+        top = top,
+        navs = navs,
+    }
 end
 return M
