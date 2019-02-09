@@ -9,6 +9,7 @@ local reg = {
     ALERT = "alert",    -- 警报服务
     REPORT = "report",  -- 自动向monitor发送报告
     STDOUT = "stdout",
+    PASSPORT = "passport",
     GM = "gm",
 }
 

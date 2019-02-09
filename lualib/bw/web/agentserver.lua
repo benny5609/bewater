@@ -13,7 +13,8 @@ local errcode       = require "def.errcode"
 require "bw.ip.ip_country"
 
 local function response(fd, ...)
-    local ok, err = httpd.write_response(sockethelper.writefunc(fd), ...)
+    local writefunc = sockethelper.writefunc(fd)
+    local ok, err = httpd.write_response(writefunc, ...)
     if not ok then
         -- if err == sockethelper.socket_error , that means socket closed.
         skynet.error(string.format("fd = %d, %s", fd, err))
@@ -105,11 +106,12 @@ local function on_message(handler, url, args, body, header, ip)
     end
 end
 
-local function resp_options(fd)
+local function resp_options(fd, header)
     response(fd, 200, nil, {
-        ['Access-Control-Allow-Origin'] = '*',
+        ['Access-Control-Allow-Origin'] = header['origin'],
         ['Access-Control-Allow-Methons'] = 'PUT, POST, GET, OPTIONS, DELETE',
-        ['Access-Control-Allow-Headers'] = 'authorization',
+        ['Access-Control-Allow-Headers'] = header['access-control-request-headers'],
+        --['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, content-Type, Accept, Authorization',
     })
     socket.close(fd)
 end
@@ -140,10 +142,10 @@ function agentserver.start(handler)
             -- limit request body size to 8192 (you can pass nil to unlimit)
             local code, url, method, header, body = httpd.read_request(sockethelper.readfunc(fd), nil)
             --util.printdump(header)
-            if method == "OPTIONS" then
-                return resp_options(fd)
-            end
             skynet.error(string.format("recv code:%s, url:%s, method:%s, header:%s", code, url, method, header))
+            if method == "OPTIONS" then
+                return resp_options(fd, header)
+            end
             if code then
                 if code ~= 200 then
                     response(fd, code)
@@ -154,8 +156,13 @@ function agentserver.start(handler)
                         data = urllib.parse_query(query)
                     end
                     ip = header['x-real-ip'] or string.match(ip, "[^:]+")
-                    response(fd, code, handler.pack(on_message(url, data, body, header, ip)),
-                    {["Access-Control-Allow-Origin"] = "*"})
+                    response(fd, code, handler.pack(on_message(handler, url, data, body, header, ip)),
+                    {
+                        ['Access-Control-Allow-Origin'] = header['origin'],
+                        ['Access-Control-Allow-Methons'] = 'PUT, POST, GET, OPTIONS, DELETE',
+                        ['Access-Control-Allow-Headers'] = header['access-control-request-headers']
+                    })
+
                 end
             else
                 if url == sockethelper.socket_error then

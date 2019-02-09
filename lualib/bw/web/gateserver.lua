@@ -4,10 +4,13 @@ local httpd         = require "http.httpd"
 local sockethelper  = require "http.sockethelper"
 local urllib        = require "http.url"
 local bewater       = require "bw.bewater"
-local conf          = require "conf"
+local log           = require "bw.log"
 local whitelist     = require "bw.ip.whitelist"
 local blacklist     = require "bw.ip.blacklist"
 local errcode       = require "def.errcode"
+local conf          = require "conf"
+
+local trace = log.trace("gateserver")
 
 require "bw.ip.ip_country"
 
