@@ -28,7 +28,7 @@ function CMD.get_uid(passport)
 end
 
 function CMD.get_passport(uid)
-    return uid2passport[uid]
+    return uid2passport[uid] or CMD.create(uid)
 end
 
 skynet.start(function()

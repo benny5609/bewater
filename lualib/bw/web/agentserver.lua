@@ -8,7 +8,7 @@ local conf          = require "conf"
 local whitelist     = require "bw.ip.whitelist"
 local blacklist     = require "bw.ip.blacklist"
 local errcode       = require "def.errcode"
---local util          = require "bw.util"
+local util          = require "bw.util"
 
 require "bw.ip.ip_country"
 
