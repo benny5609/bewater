@@ -15,6 +15,7 @@ local gmcmd = {
 local CMD = {}
 function CMD.add_gmcmd(modname, gmcmd_path)
     gmcmd[modname] = require(gmcmd_path)
+    assert(type(gmcmd[modname]) == "table", modname)
 end
 
 function CMD.run(modname, cmd, ...)

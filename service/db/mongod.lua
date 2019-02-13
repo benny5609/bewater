@@ -75,6 +75,7 @@ function CMD.get(key, default)
 end
 
 function CMD.set(key, value)
+    value = util.num2str(value)
     db.global:findAndModify({
         query = {key = key},
         update = {key = key, value = value},
