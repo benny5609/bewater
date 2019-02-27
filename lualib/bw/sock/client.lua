@@ -157,8 +157,8 @@ function M:_recv(sock_buff)
 
     local co = self._call_requests[op - 1]
 
+    trace("recv %s, csn:%d ssn:%d co:%s sz:%d", opname, csn, ssn, co, sz)
     assert(data, opname)
-    trace("recv %s, csn:%d ssn:%d co:%s", opname, csn, ssn, co)
     assert(self._csn == csn or csn == 0, string.format("self._csn:%d, csn:%d", self._csn, csn))
 
     self._call_requests[op - 1] = nil
