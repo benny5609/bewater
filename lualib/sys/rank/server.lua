@@ -8,14 +8,14 @@ local trace = log.trace("rank.server")
 local ranks = {}
 
 local CMD = {}
-function CMD.update(rank_name, k, v, data)
+function CMD.update(rank_name, k, v)
     local rank = ranks[rank_name]
-    rank:update(k, v, data)
+    rank:update(k, v)
     return bewater.NORET
 end
 
 local server = {}
-function server.start(handler)
+function server.start(handler, start_func)
     handler = handler or {}
     skynet.start(function()
         trace("start")
@@ -23,6 +23,10 @@ function server.start(handler)
             local func = assert(handler[cmd] or CMD[cmd], cmd)
             bewater.ret(func(...))
         end)
+
+        if start_func then
+            return start_func()
+        end
     end)
 end
 
