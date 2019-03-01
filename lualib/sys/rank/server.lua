@@ -8,7 +8,9 @@ local trace = log.trace("rank.server")
 local ranks = {}
 
 local CMD = {}
-function CMD.update(rank_name, k, v)
+function CMD.update(rank_name, k, v, data)
+    local rank = ranks[rank_name]
+    rank:update(k, v, data)
     return bewater.NORET
 end
 
@@ -28,6 +30,14 @@ function server.load_rank(rank_name, rank_type, max_count, asc)
     assert(not ranks[rank_name], rank_name)
     local rank = rank_cls.new(rank_name, rank_type, max_count, asc)
     ranks[rank_name] = rank
+end
+
+function server.get_rank(rank_name)
+    return ranks[rank_name]
+end
+
+function server.update(...)
+    CMD.update(...)
 end
 
 return server
