@@ -53,7 +53,7 @@ end
 
 function mt:update(k, v)
     local last = self.list[#self.list]
-    if last then
+    if last and #self.list >= self.max_count then
         if not self.cmp(v, last.v) then
             return
         end
