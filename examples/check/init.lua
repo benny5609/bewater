@@ -20,7 +20,7 @@ skynet.start(function()
 
     local count = 0
     for i, v in ipairs(check_list) do
-        local ret = require("check."..v)
+        local ret = require(v)
         if type(ret) == "function" then
             ret = ret()
         end

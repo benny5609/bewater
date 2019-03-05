@@ -4,8 +4,8 @@ local wc        = require "bw.cms.webconsole"
 local sname     = require "bw.sname"
 local json      = require "cjson.safe"
 
-local function test(filename)
-    require("test."..filename)()
+local function test(name)
+    require("test_"..name)()
 end
 
 skynet.start(function()
@@ -16,5 +16,6 @@ skynet.start(function()
         }
     }) ]]
     skynet.error("Be water my friend.")
-    --test "test_hall"
+    test "lpeg"
+    --test "hall"
 end)

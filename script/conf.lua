@@ -14,7 +14,7 @@ local conf = {
     },
 
     alert = {
-        enable      = true,
+        enable      = false,
         corpid      = '',
         corpsecret  = '',
         agentid     = '',

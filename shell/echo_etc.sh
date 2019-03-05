@@ -14,7 +14,7 @@ echo 'lualoader = "lualib/loader.lua"'
 echo 'snax = workspace.."service/?.lua"'
 if [ "${workspace}" == "../bewater" ]
 then
-    echo 'luaservice = workspace.."/examples/?.lua;"..workspace.."service/?/init.lua;"..workspace.."service/?.lua;"..workspace.."service/?.lua;".."./service/?.lua;".."./liblua/?.lua;"'
+    echo 'luaservice = workspace.."/examples/?/init.lua;"..workspace.."/examples/?.lua;"..workspace.."service/?/init.lua;"..workspace.."service/?.lua;"..workspace.."service/?.lua;".."./service/?.lua;".."./liblua/?.lua;"'
     echo 'cpath = workspace.."luaclib/?.so;"..workspace.."luaclib/?.so;".."./cservice/?.so;./luaclib/?.so"'
     echo 'lua_path = workspace.."script/?.lua;"..workspace.."lualib/?.lua;"..workspace.."lualib/?.lua;".."./lualib/?.lua;"'
     echo 'lua_cpath = workspace.."luaclib/?.so;"..workspace.."luaclib/?.so;".."./luaclib/?.so;"'
