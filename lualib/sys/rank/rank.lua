@@ -1,5 +1,4 @@
 local bewater   = require "bw.bewater"
-local util      = require "bw.util"
 local class     = require "bw.class"
 local mongo     = require "bw.db.mongo_helper"
 

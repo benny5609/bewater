@@ -2,12 +2,10 @@ local skynet        = require "skynet"
 local socket        = require "skynet.socket"
 local httpd         = require "http.httpd"
 local sockethelper  = require "http.sockethelper"
-local urllib        = require "http.url"
 local bewater       = require "bw.bewater"
 local log           = require "bw.log"
 local whitelist     = require "bw.ip.whitelist"
 local blacklist     = require "bw.ip.blacklist"
-local errcode       = require "def.errcode"
 local conf          = require "conf"
 
 local trace = log.trace("gateserver")
@@ -59,7 +57,7 @@ function gateserver.start(server, agentname, port, preload)
                 socket.close(fd)
                 return
             end
-            skynet.error(string.format("%s connected, pass it to agent :%08x", _fd, agents[balance]))
+            trace("%s connected, pass it to agent :%08x", _fd, agents[balance])
             skynet.send(agents[balance], "lua", _fd, ip)
             balance = balance + 1
             if balance > #agents then

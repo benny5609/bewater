@@ -4,9 +4,6 @@ local httpd         = require "http.httpd"
 local sockethelper  = require "http.sockethelper"
 local urllib        = require "http.url"
 local bewater       = require "bw.bewater"
-local conf          = require "conf"
-local whitelist     = require "bw.ip.whitelist"
-local blacklist     = require "bw.ip.blacklist"
 local errcode       = require "def.errcode"
 local util          = require "bw.util"
 
@@ -74,6 +71,7 @@ local function on_message(handler, url, args, body, header, ip)
                         }
                     end
                 else
+                    util.printdump(data)
                     error(string.format("api %s def type %s error", api, t))
                 end
             end

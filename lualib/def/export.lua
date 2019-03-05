@@ -1,5 +1,4 @@
 local skynet    = require "skynet"
-local util      = require "bw.util"
 local conf      = require "conf"
 local opcode    = require "def.opcode"
 local errcode   = require "def.errcode"
