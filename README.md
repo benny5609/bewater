@@ -46,19 +46,19 @@ cd bewater/shell
 ## lua库
 ```
 bw.bewater    框架相关api
-bw.timer 		  定时器
-bw.uuid 		  生成唯一uuid
-bw.lock 		  协程锁
-bw.hotfix 		热更
+bw.timer      定时器
+bw.uuid       生成唯一uuid
+bw.lock       协程锁
+bw.hotfix     热更
 bw.hash_array 同时具有哈希和数组特性的结构体
-bw.const 		  给table添加只读限制
-bw.class 		  类
-bw.bash 		  执行系统命令
-bw.xml 		    xml库
+bw.const      给table添加只读限制
+bw.class      类
+bw.bash       执行系统命令
+bw.xml        xml库
 bw.web        http相关库
-bw.payment 	  支付宝支付&微信支付&苹果支付
-bw.ip  	      ip相关api
-bw.auth.wx 		微信api
+bw.payment    支付宝支付&微信支付&苹果支付
+bw.ip         ip相关api
+bw.auth.wx    微信api 
 ```
 
 ## c库
