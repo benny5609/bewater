@@ -1,12 +1,16 @@
 # skynet通用模块
-  skynet官方并没有提供多少游戏的解决方案，我造了些轮子，勉强能用吧~
+  skynet官方并没有提供多少游戏相关的解决方案，我造了些轮子，勉强能用吧~
 ## 项目结构
 项目结构可以参照[bewater-sample](https://github.com/zhandouxiaojiji/bewater-sample)，或者以第三方库的形式引入你的项目。我们有时候需要同时维护多个新老项目，我把通用部分抽离出来，一方面是为了让旧项目与新代码保持同步，另一方面为了降低新建项目的成本，做到开箱即用。
 ```
 bewater(通用模块,本仓库) https://github.com/zhandouxiaojiji/bewater.git
+    examples(测试服务)
     luaclib(编译好的c库)
     lualib-src(c库源码)
     lualib(lua库)
+      bw(一些常用的lua库)
+      sys(一些业务相关的系统，可以忽略)
+      def(一些定义，在你的项目里把它覆盖）
     service(通用服务)
     etc(测试启动配置)
     shell(测试启动脚本)
@@ -30,11 +34,7 @@ cd workspace
 git clone https://github.com/zhandouxiaojiji/bewater.git
 git clone https://github.com/zhandouxiaojiji/skynet.git
 mkdir proj #项目目录，参考monitor和share
-cd skynet && make linux
-cd ../proj
-git clone https://github.com/zhandouxiaojiji/share.git
-git clone https://github.com/zhandouxiaojiji/test.git
-cd test/shell
+cd bewater/shell
 ./etc.sh test test #生成启动配置, etc.sh [配置名] [启动脚本] [集群名] [是否以进程的方式启动]
 ./run.sh test #启动进程, run.sh [配置名]
 ```
@@ -45,39 +45,30 @@ cd test/shell
 
 ## lua库
 ```
-bw.timer 		定时器
-bw.uuid 		生成唯一uuid
-bw.lock 		协程锁
+bw.bewater    框架相关api
+bw.timer 		  定时器
+bw.uuid 		  生成唯一uuid
+bw.lock 		  协程锁
 bw.hotfix 		热更
-bw.hash_array 		同时具有哈希和数组特性的结构体
-bw.const 		给table添加只读限制
-bw.class 		类
-bw.bash 		执行系统命令
-bw.xml.lua2xml 		lua转xml
-bw.xml.xml2lua 		xml转lua
-bw.web.http_helper 	带header的get&post请求
-bw.payment.alipay 	支付宝支付
-bw.payment.wxpay 	微信支付
-bw.payment.applepay 	苹果支付
-bw.ip.blacklist 	黑名单
-bw.ip.whitelist 	白名单
-bw.ip.ip_country 	查询ip地区
-auth.wx 		微信api
+bw.hash_array 同时具有哈希和数组特性的结构体
+bw.const 		  给table添加只读限制
+bw.class 		  类
+bw.bash 		  执行系统命令
+bw.xml 		    xml库
+bw.web        http相关库
+bw.payment 	  支付宝支付&微信支付&苹果支付
+bw.ip  	      ip相关api
+bw.auth.wx 		微信api
 ```
 
 ## c库
 ```
-cjson 		json库
-codec 		集成md5,rsa,base64,aes等编码加解密算法
-protobuf 	pb库
-random 		随机库
+cjson 		  json库
+codec 		  集成md5,rsa,base64,aes等编码加解密算法
+protobuf 	  pb库
+random 		  随机库
 webclient 	http库
 ```
-## 通用的节点
-    monitor监视节点，所有需要监视的节点在启动后要向monitor上报节点配置，运行性能  
-    https://github.com/zhandouxiaojiji/monitor.git
-    share公共数据节点，节点间数据共享  
-    https://github.com/zhandouxiaojiji/share.git
 
 ## 通用的服务
 ```
@@ -180,5 +171,10 @@ ti.destroy()
 ## 网页后台管理
 之前写过一版简单的[skynet-webconsole](https://github.com/zhandouxiaojiji/webconsole)，新版还在开发([skynet-cms-layui](https://github.com/zhandouxiaojiji/skynet-cms-layui))
 ![preview2](https://github.com/zhandouxiaojiji/webconsole/blob/master/images/preview1.jpg)
+## 优化与改进计划
++ 最初的思路是设计各种通用的服务，然后暴露一些接口给使用者，这种设计思路其实是错误的。应该把通用的逻辑抽成lua库，让使用者自己制定服务，参照云风写的agent和gateserver二者的关系。后续将逐步消灭service目录下的服务，改成lualib。
++ 带业务逻辑的服务应该写成目录的形式(即service/?/init.lua)，这样可以保证服务内部api的私有性，不用写在lualib跟其它服务的逻辑混淆。
++ mongo的数据读写使用orm模块进行严格检查
++ 日志系统改用rsyslog
 ## 关于bewater
 Be water My friend 是在我心目中浩气长存的伟大武术家李小龙先生已经解释过啦，如果你想更加了解多点的话，不妨一起探讨一下。(QQ:1013299930)
