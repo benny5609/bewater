@@ -1,6 +1,7 @@
 local skynet = require "skynet"
+local workspace = skynet.getenv('workspace')
 local conf = {
-    workspace = skynet.getenv('workspace'),
+    workspace = workspace,
     clustername = skynet.getenv('clustername'),
     debug = true,
 
@@ -12,6 +13,8 @@ local conf = {
         name = "test",
         port = 27017,
     },
+
+    typedef = workspace.."lualib/def/typedef",
 
     alert = {
         enable      = false,

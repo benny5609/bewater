@@ -16,6 +16,5 @@ skynet.start(function()
         }
     }) ]]
     skynet.error("Be water my friend.")
-    test "lpeg"
-    --test "hall"
+    test "factory"
 end)

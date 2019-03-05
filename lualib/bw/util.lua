@@ -236,6 +236,28 @@ function util.clone(_obj, _deep)
     return _clone(_obj, _deep)
 end
 
+-- t2是不是t1的内容一样
+function util.cmp_table(t1, t2)
+    for k,v1 in pairs(t1) do
+        local v2 = t2[k]
+        if type(v1)=="table" and type(v2)=="table" then
+            if not util.cmp_table(v1, v2) then
+                return false
+            end
+        elseif v1~=v2 then
+            return false
+        end
+    end
+
+    for k,v2 in pairs(t2) do
+        if t1[k]==nil then
+            return false
+        end
+    end
+    return true
+end
+
+
 function util.short_name(name)
     return string.match(name, "_(%S+)") or name
 end
