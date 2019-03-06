@@ -1,49 +1,38 @@
-local bewater   = require "bw.bewater"
 local class     = require "bw.class"
 local mongo     = require "bw.db.mongo_helper"
+local factory   = require "bw.orm.factory"
+local util      = require "bw.util"
+local log       = require "bw.log"
 
-local DEFAULT_MAX = 50
+local trace = log.trace("rank")
 
 local mt = {}
-function mt:ctor(rank_name, rank_type, max_count, cmp)
-    self.name = assert(rank_name)
-    self.type = assert(rank_type)
-    self.max_count = max_count or DEFAULT_MAX
-    self.cmp = cmp or function(a, b) return a > b end
-    self.list = {}
-
-    self:load()
+function mt:ctor(cmp)
+    assert(type(cmp) == "function")
+    self.cmp = cmp
+    self.obj = nil
 end
 
-function mt:init_by_data(data)
-    data = data or {}
-    self.list = data.list or {}
-end
-
-function mt:base_data()
-    return {
-        name = self.name,
-        type = self.type,
-        max_count = self.max_count,
-        list = self.list
-    }
-end
-
-function mt:load()
-    local data = mongo.find_one("rank", {name = self.name}, {_id = false})
+function mt:load(query)
+    local data = mongo.find_one("rank", {name = query.name}, {_id = false})
     if not data then
-        data = self:base_data()
+        data = factory.create_obj("Rank", query)
         mongo.insert("rank", data)
     end
-    self:init_by_data(data)
+    self.obj = factory.create_obj("Rank", data)
 end
 
 function mt:save()
-    mongo.update("rank", {name = self.name}, self:base_data())
+    local new_obj = factory.extract_data(self.obj)
+    if util.cmp_table(new_obj, self.obj) then
+        trace("no change, rank:%s", self.obj.name)
+    end
+    mongo.update("rank", {name = self.name}, self.obj)
+    self.obj = new_obj
 end
 
 function mt:find(k)
-    for i, item in pairs(self.list) do
+    for i, item in pairs(self.obj.items) do
         if k == item.k then
             return item, i
         end
@@ -51,10 +40,11 @@ function mt:find(k)
 end
 
 function mt:update(k, v)
-    local last = self.list[#self.list]
-    if last and #self.list >= self.max_count then
+    local list = self.obj.items
+    local last = list[#list]
+    if last and #list >= self.obj.max_count then
         if not self.cmp(v, last.v) then
-            return
+            return false
         end
     end
 
@@ -62,25 +52,24 @@ function mt:update(k, v)
     if old then
         old.v = v
     else
-        self.list[#self.list + 1] = bewater.protect {
+        list[#list + 1] = {
             k = k,
             v = v
         }
     end
 
-    for i = #self.list, 2, -1 do
-        if self.cmp(self.list[i].v, self.list[i-1].v) then
-            local item = self.list[i]
-            self.list[i] = self.list[i-1]
-            self.list[i-1] = item
+    for i = #list, 2, -1 do
+        if self.cmp(list[i].v, list[i-1].v) then
+            local item = list[i]
+            list[i] = list[i-1]
+            list[i-1] = item
         end
     end
 
-    while #self.list > self.max_count do
-        self.list[#self.list] = nil
+    while #list > self.obj.max_count do
+        list[#list] = nil
     end
-
-    self:save()
+    return true
 end
 
 return class(mt)

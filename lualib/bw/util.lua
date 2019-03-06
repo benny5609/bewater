@@ -249,7 +249,7 @@ function util.cmp_table(t1, t2)
         end
     end
 
-    for k,v2 in pairs(t2) do
+    for k, _ in pairs(t2) do
         if t1[k]==nil then
             return false
         end

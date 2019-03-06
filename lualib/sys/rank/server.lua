@@ -10,7 +10,9 @@ local ranks = {}
 local CMD = {}
 function CMD.update(rank_name, k, v)
     local rank = ranks[rank_name]
-    rank:update(k, v)
+    if rank:update(k, v) then
+        rank:save()
+    end
     return bewater.NORET
 end
 
@@ -30,9 +32,14 @@ function server.start(handler, start_func)
     end)
 end
 
-function server.load_rank(rank_name, rank_type, max_count, asc)
+function server.load_rank(rank_name, rank_type, max_count, cmp)
     assert(not ranks[rank_name], rank_name)
-    local rank = rank_cls.new(rank_name, rank_type, max_count, asc)
+    local rank = rank_cls.new(cmp)
+    rank:load({
+        name = rank_name,
+        type = rank_type,
+        max_count = max_count,
+    })
     ranks[rank_name] = rank
 end
 
