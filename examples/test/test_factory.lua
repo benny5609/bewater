@@ -12,6 +12,7 @@ return function()
     util.printdump(obj)
     obj = factory.create_obj("user", {
         uid = 10001,
+        aaa = 11,
     })
     util.printdump(obj)
     local new_obj = factory.extract_data(obj)
