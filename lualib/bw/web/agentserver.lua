@@ -77,7 +77,7 @@ local function on_message(handler, url, args, body, header, ip)
             end
         end
         if not bewater.try(function()
-            local func = require(string.sub(url, 2, -1))
+            local func = require(handler.topath(url))
             assert(func, url)
             ret = func(args, data, uid, ip, header) or {}
             if type(ret) == "number" then
@@ -125,6 +125,9 @@ function agentserver.start(handler)
     end
     handler.unpack = handler.unpack or function (data)
         return data
+    end
+    handler.topath = handler.topath or function(url)
+        return string.sub(url, 2, -1)
     end
 
     skynet.start(function()
