@@ -1,6 +1,6 @@
+local skynet    = require "skynet.manager"
 local json      = require "cjson.safe"
 local http      = require "bw.web.http_helper"
-local wc        = require "bw.cms.webconsole"
 local errcode   = require "def.errcode"
 
 local authorization
@@ -26,12 +26,8 @@ local function check_api(api, param, expect_err)
 end
 
 return function()
-    wc.init({
-        port = "9999",
-        users = {
-            {account = "root", password = "123"}
-        }
-    })
+    local cms = skynet.newservice("cms")
+    skynet.name(".cms", cms)
 
     check_login("aaa", "2222", errcode.ACC_NOT_EXIST)
     check_login("root", "xxx", errcode.PASSWD_ERROR)
