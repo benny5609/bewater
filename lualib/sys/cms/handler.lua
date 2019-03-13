@@ -6,7 +6,8 @@ require "user.login"
 
 local M = {
     api = {
-        ['/cms/user/login'] = {data = {account = "str", password = "str"}, auth = false},
+        ['/cms/user/login'] = {data = {userName = "str", password = "str", type = "str"}, auth = false},
+        ['/cms/user/current'] = {auth = true},
         ['/cms/user/gm'] = {data = {gm = "str"}, auth = true},
         ['/cms/user/menu'] = {auth = true},
         ['/cms/debug/inject'] = {auth = true},

@@ -34,18 +34,33 @@ function M.create_auth(account)
     return auth
 end
 
-function M.req_login(account, password)
+function M.req_login(data)
+    local account = data.userName
+    local password = data.password
     trace("req_login, account:%s, password:%s", account, password)
+    local info = acc2info[account]
+    if not info or password ~= info.password then
+        return {
+            err = errcode.PASSWD_ERROR,
+            status = "error",
+            type = data.type,
+            currentAuthority = "guest",
+        }
+    end
+    return {
+        authorization = M.create_auth(account),
+        type = data.type,
+        status = "ok",
+        currentAuthority = info.auth,
+    }
+end
+
+function M.req_current(account)
     local info = acc2info[account]
     if not info then
         return errcode.ACC_NOT_EXIST
     end
-    if password ~= info.password then
-        return errcode.PASSWD_ERROR
-    end
-    return {
-        authorization = M.create_auth(account)
-    }
+    return info
 end
 
 function M.req_menu(account)
