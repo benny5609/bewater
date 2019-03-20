@@ -1,4 +1,4 @@
--- 一些通用服务名, 第一次引用的自动创建
+-- 一些通用服务名, 第一次引用的自动创建(不推荐使用，最好在进程启动的时候把所有要用的服务启动)
 local skynet = require "skynet.manager"
 local reg = {
     WEB = "web/webclient",
