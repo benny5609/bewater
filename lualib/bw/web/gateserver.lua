@@ -34,7 +34,7 @@ function CMD.call_all_agent(...)
     end
 end
 
-function gateserver.start(server, agentname, port, preload)
+function gateserver.start(handler, agentname, port, preload)
     skynet.start(function()
         bewater.reg_code()
         for i= 1, preload or 10 do
@@ -69,7 +69,7 @@ function gateserver.start(server, agentname, port, preload)
             if CMD[cmd] then
                 return bewater.ret(CMD[cmd](subcmd, ...))
             end
-            local f = assert(server[cmd], cmd)
+            local f = assert(handler[cmd], cmd)
             if type(f) == "function" then
                 bewater.ret(f(subcmd, ...))
             else

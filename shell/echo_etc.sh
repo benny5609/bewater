@@ -21,7 +21,7 @@ then
 else
     echo 'luaservice = workspace.."service/?/init.lua;"..workspace.."service/?.lua;"..workspace.."../../bewater/service/?/init.lua;"..workspace.."../../bewater/service/?.lua;".."./service/?.lua;".."./liblua/?.lua;"'
     echo 'cpath = workspace.."luaclib/?.so;"..workspace.."../../luaclib/?.so;".."./cservice/?.so;./luaclib/?.so"'
-    echo 'lua_path = workspace.."script/?.lua;"..workspace.."lualib/?.lua;"..workspace.."../../bewater/lualib/?.lua;".."./lualib/?.lua;"'
+    echo 'lua_path = workspace.."lualib/?.lua;"..workspace.."../../bewater/lualib/?.lua;".."./lualib/?.lua;"'
     echo 'lua_cpath = workspace.."luaclib/?.so;"..workspace.."../../bewater/luaclib/?.so;".."./luaclib/?.so;"'
 fi
 echo logger = \"logger\"

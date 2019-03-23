@@ -1,14 +1,33 @@
-local cluster = require "skynet.cluster"
+local bewater   = require "bw.util"
+local uuid      = require "bw.uuid"
+
+local string_gsub = string.gsub
+local uid2passport = {}
+local passport2uid = {}
 
 local M = {}
-setmetatable(M, {__index = function(t, k)
-    local v = rawget(t, k)
-    if v then
-        return v
-    else
-        return function(...)
-            return cluster.call("share", "passport", k, ...)
+function M.create(uid)
+    local passport = uid2passport[uid]
+    if passport then
+        passport2uid[passport] = nil
+    end
+    while true do
+        passport = string_gsub(uuid(), '-', '')
+        if not passport2uid[passport] then
+            break
         end
     end
-end})
+    uid2passport[uid] = passport
+    passport2uid[passport] = uid
+    return passport
+end
+
+function M.get_uid(passport)
+    return passport2uid[passport]
+end
+
+function M.get_passport(uid)
+    return uid2passport[uid] or M.create(uid)
+end
+
 return M

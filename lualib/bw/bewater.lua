@@ -122,15 +122,15 @@ function M.protect(tbl, depth)
     return tbl
 end
 
-function M.proxy(addr, is_call)
+function M.proxy(addr, is_send)
     assert(addr)
     return setmetatable({}, {
         __index = function(_, k)
             return function(...)
-                if is_call then
-                    return skynet.call(addr, "lua", ...)
+                if is_send then
+                    return skynet.send(addr, "lua", ...)
                 else
-                    skynet.send(addr, "lua", ...)
+                    skynet.call(addr, "lua", ...)
                 end
             end
         end,
