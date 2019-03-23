@@ -125,7 +125,7 @@ end
 function M.proxy(addr, is_call)
     assert(addr)
     return setmetatable({}, {
-        __index = function(t, k)
+        __index = function(_, k)
             return function(...)
                 if is_call then
                     return skynet.call(addr, "lua", ...)

@@ -124,28 +124,6 @@ function util.printdump(root, ...)
     skynet.error(util.dump(root, ...))
 end
 
-function util.serialize_table(root)
-    local cache = {  [root] = "." }
-    local function _dump(t,space,name)
-        local temp = {}
-        for k,v in pairs(t) do
-            local key = tostring(k)
-            if cache[v] then
-                table.insert(temp,"+" .. key .. " {" .. cache[v].."}")
-            elseif type(v) == "table" then
-                local new_key = name .. "." .. key
-                cache[v] = new_key
-                table.insert(temp,"+" .. key .. _dump(v,space .. "|" .. srep(" ",#key),new_key))
-            else
-                table.insert(temp,"+" .. key .. " [" .. tostring(v).."]")
-            end
-        end
-        return tconcat(temp,"\n"..space)
-    end
-    return (_dump(root, "",""))
-end
-
-
 function util.is_in_list(list, obj)
     for _, o in pairs(list) do
         if o == obj then

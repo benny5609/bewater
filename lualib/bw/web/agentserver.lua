@@ -5,10 +5,9 @@ local sockethelper  = require "http.sockethelper"
 local urllib        = require "http.url"
 local bewater       = require "bw.bewater"
 local util          = require "bw.util"
-local log           = require "bw.log"
 local errcode       = require "def.errcode"
-
-local print = log.print("agentserver")
+--local log           = require "bw.log"
+--local print = log.print("agentserver")
 
 local function response(fd, ...)
     local writefunc = sockethelper.writefunc(fd)
@@ -144,7 +143,8 @@ function agentserver.start(handler)
             -- limit request body size to 8192 (you can pass nil to unlimit)
             local code, url, method, header, body = httpd.read_request(sockethelper.readfunc(fd), nil)
             --util.printdump(header)
-            skynet.error(string.format("recv code:%s, url:%s, method:%s, header:%s, body:%s", code, url, method, util.tbl2str(header), body))
+            skynet.error(string.format("recv code:%s, url:%s, method:%s, header:%s, body:%s",
+                code, url, method, util.tbl2str(header), body))
             if method == "OPTIONS" then
                 return resp_options(fd, header)
             end

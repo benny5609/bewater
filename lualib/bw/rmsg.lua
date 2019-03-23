@@ -2,7 +2,6 @@
 --  可靠消息
 local skynet    = require "skynet"
 local json      = require "cjson.safe"
-local bewater   = require "bw.bewater"
 local factory   = require "bw.orm.factory"
 local log       = require "bw.log"
 
@@ -67,7 +66,7 @@ end
 function M.process(uid, mid, err)
     local msg = M.get_msg(uid, mid)
     if not msg then
-        log.error("[rmsg] msg not exist, uid:%s, mid:%s, state:%s", uid, mid, state)
+        log.error("[rmsg] msg not exist, uid:%s, mid:%s, err:%s", uid, mid, err)
         return
     end
     msg.err = err
