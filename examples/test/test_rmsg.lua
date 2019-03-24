@@ -1,5 +1,5 @@
 local skynet    = require "skynet"
-local rmsg      = require "bw.rmsg"
+local rmsg      = require "bw.share.rmsg"
 local util      = require "bw.util"
 local log       = require "bw.log"
 
@@ -7,7 +7,7 @@ return function()
     local mid = 10000
     local uid = 101
     rmsg.start({
-        autoid = function()
+        id_producer = function()
             mid = mid + 1
             return mid
         end
