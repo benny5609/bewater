@@ -108,7 +108,7 @@ sock/agent    socket消息代理，多个玩家共享，可配置
             bewater.ret(f(...))
         end)
     end)
-``
+```
 ## logger服务
     文件fd，保存一段时间，自动关闭
     系统log分系统存, 一天一份日志
