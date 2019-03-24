@@ -117,8 +117,8 @@ end
 local agentserver = {}
 function agentserver.start(handler)
     -- handler 需要提供
-    -- hander.api = {[[/api/xxx/ooo]] = func}
-    -- hander.auth = function(auth) return uid end -- 授权
+    -- handler.api = {[[/api/xxx/ooo]] = func}
+    -- handler.auth = function(auth) return uid end -- 授权
     -- 如果是非字符串，handler需要提供pack和unpack方法
     handler.pack = handler.pack or function (data)
         return data

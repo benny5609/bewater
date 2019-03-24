@@ -5,14 +5,14 @@ local json      = require "cjson.safe"
 local factory   = require "bw.orm.factory"
 local log       = require "bw.log"
 
-local autoid -- function create mid
+local id_producer -- function create mid
 
 local broadcasts = {}   -- mid: msg
 local queues = {}       -- uid: {mid: msg}
 
 local M = {}
 function M.start(handler)
-    autoid = assert(handler.autoid)
+    id_producer = assert(handler.id_producer)
 end
 
 function M.get_broadcasts()
@@ -76,7 +76,7 @@ function M.push(uid, op, args)
     assert(uid)
     assert(op)
     local queue = M.get_queue(uid)
-    local mid = autoid()
+    local mid = id_producer()
     local msg = factory.create_obj("rmsg", {
         mid = mid,
         op = op,
@@ -90,7 +90,7 @@ end
 
 function M.broadcast(op, args)
     assert(op)
-    local mid = autoid()
+    local mid = id_producer()
     local msg = factory.create_obj("rmsg", {
         mid = mid,
         op = op,

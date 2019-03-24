@@ -1,4 +1,3 @@
-local bewater   = require "bw.util"
 local uuid      = require "bw.uuid"
 
 local string_gsub = string.gsub
