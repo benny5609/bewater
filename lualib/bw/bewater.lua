@@ -128,9 +128,9 @@ function M.proxy(addr, is_send)
         __index = function(_, k)
             return function(...)
                 if is_send then
-                    return skynet.send(addr, "lua", ...)
+                    skynet.send(addr, "lua", k, ...)
                 else
-                    skynet.call(addr, "lua", ...)
+                    return skynet.call(addr, "lua", k, ...)
                 end
             end
         end,
@@ -139,13 +139,14 @@ end
 
 function M.start(handler, start_func)
     assert(handler)
-    assert(start_func)
     skynet.start(function()
         skynet.dispatch("lua", function(_,_, cmd, ...)
             local f = assert(handler[cmd], cmd)
             M.ret(f(...))
         end)
-        start_func()
+        if start_func then
+            start_func()
+        end
     end)
 end
 

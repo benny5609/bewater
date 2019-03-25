@@ -96,8 +96,8 @@ function M:call(op, data, expect_err)
     local ret = coroutine.yield(op)
     local code = ret and ret.err
     if code ~= (expect_err or 0) then
-        error(string.format("call %s error:0x%x, desc:%s",
-            opcode.toname(op), code, errcode.describe(code)))
+        error(string.format("call %s error:0x%x, desc:%s, expect_err:%s",
+            opcode.toname(op), code, errcode.describe(code), expect_err))
     end
     return ret
 end

@@ -26,4 +26,6 @@ ignore = {
     "bash",
     "SERVICE_NAME",
     "self",
+    "423", -- Shadowing a loop variable
+    "212", -- Unused argument
 }
