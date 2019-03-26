@@ -6,6 +6,7 @@ local factory   = require "bw.orm.factory"
 local log       = require "bw.log"
 
 local id_producer -- function create mid
+local notify      -- function notify
 
 local broadcasts = {}   -- mid: msg
 local queues = {}       -- uid: {mid: msg}
@@ -13,6 +14,7 @@ local queues = {}       -- uid: {mid: msg}
 local M = {}
 function M.start(handler)
     id_producer = assert(handler.id_producer)
+    notify = handler.notify
 end
 
 function M.get_broadcasts()
@@ -85,6 +87,9 @@ function M.push(uid, op, args)
         err = -1
     })
     queue[mid] = msg
+    if notify then
+        notify(uid)
+    end
     return mid
 end
 
