@@ -23,13 +23,13 @@ local function publish(pconf, confname)
     bash("cd %s && mkdir -p skynet bewater proj/%s", tmp, projname)
     bash("cp -r skynet luaclib lualib service cservice %s/skynet", tmp)
     bash("cp -r %s/lualib %s/luaclib %s/service %s/bewater", bewater, bewater, bewater, tmp)
-    bash("cp -r %s/etc %s/script %s/service %s/shell %s",
+    bash("cp -r %s/etc %s/lualib %s/service %s/shell %s",
         conf.workspace, conf.workspace, conf.workspace, conf.workspace, proj)
 
     -- 配置文件
     pconf.workspace = string.format("%s/proj/%s/", pconf.remote_path, projname)
     local str = "return ".. util.dump(pconf)
-    local file = io.open(proj.."/script/conf.lua", "w+")
+    local file = io.open(proj.."/lualib/conf.lua", "w+")
     file:write(str)
     file:close()
 
@@ -86,7 +86,7 @@ end
 
 skynet.start(function()
     if nodename == "all" then
-        local ret = bash("cd %s/script/publish/conf && ls", conf.workspace)
+        local ret = bash("cd %s/lualib/publish/conf && ls", conf.workspace)
         for filename in string.gmatch(ret, "([^\n]+).lua") do
             local pconf = require("publish.conf."..filename)
             publish(pconf, filename)

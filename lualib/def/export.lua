@@ -2,7 +2,7 @@ local skynet    = require "skynet"
 local conf      = require "conf"
 local opcode    = require "def.opcode"
 local errcode   = require "def.errcode"
-local def       = require "def"
+local def       = require "def.def"
 
 local export = {}
 function export.js_module(str)

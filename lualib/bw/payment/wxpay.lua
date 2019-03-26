@@ -4,9 +4,9 @@ local xml2lua   = require "bw.xml.xml2lua"
 local http      = require "bw.web.http_helper"
 local util      = require "bw.util"
 local log       = require "bw.log"
-local conf      = require "conf"
-local def       = require "def"
 local errcode   = require "def.errcode"
+local def       = require "def.def"
+local conf      = require "conf"
 local trace     = log.trace("wxpay")
 
 local M = {}
