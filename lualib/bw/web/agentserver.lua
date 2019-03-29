@@ -41,6 +41,12 @@ local function on_message(handler, url, args, body, header, ip)
             }
         end
         if api.data then
+            if not data then
+                return {
+                    err = errcode.ARGS_ERROR,
+                    desc = "data nil",
+                }
+            end
             for k, t in pairs(api.data) do
                 if t == "str" then
                     if type(data[k]) ~= "string" then

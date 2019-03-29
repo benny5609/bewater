@@ -16,5 +16,5 @@ skynet.start(function()
         }
     }) ]]
     skynet.error("Be water my friend.")
-    test "rmsg"
+    test "json"
 end)
