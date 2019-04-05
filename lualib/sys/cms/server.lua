@@ -35,7 +35,7 @@ function M.create_auth(account)
 end
 
 function M.req_login(data)
-    local account = data.userName
+    local account = data.account
     local password = data.password
     trace("req_login, account:%s, password:%s", account, password)
     local info = acc2info[account]
