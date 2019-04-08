@@ -39,15 +39,27 @@ function M.save_doc(name, tbl)
     file:close()
 end
 
-function M.get(k)
-    return M.get_settings()[k]
+function M.get(name)
+    assert(name)
+    local settings = M.get_settings()
+    for _, v in ipairs(settings) do
+        if v.name == name then
+            return v
+        end
+    end
 end
 
-function M.set(k, v)
-    assert(k)
+function M.set(name, v)
+    assert(name)
     assert(v.name)
     local settings = M.get_settings()
-    settings[k] = v
+    for i, v in ipairs(settings) do
+        if v.name == name then
+            settings[i] = v
+            return
+        end
+    end
+
     save_settings(settings)
 end
 
@@ -63,7 +75,7 @@ end
 function M.get_version_list(name)
     local settings = M.get_settings()
     local doc = M.get_doc(name)
-    local setting = settings[name]
+    local setting = M.get(name)
     local cur, cur_android, cur_ios
     local list = {}
     local ret = bash("ls --full-time %s/assets", setting.path)

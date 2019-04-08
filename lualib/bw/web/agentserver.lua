@@ -29,7 +29,8 @@ local function on_message(handler, url, args, body, header, ip)
         if not ret then
             return {
                 err = errcode.BODY_ERROR,
-                desc = "body error"
+                desc = "body error",
+                url = url,
             }
         end
         ret = {}
@@ -38,6 +39,7 @@ local function on_message(handler, url, args, body, header, ip)
             return {
                 err = errcode.AUTH_FAIL,
                 desc = "authorization fail",
+                url = url,
             }
         end
         if api.data then
@@ -45,6 +47,7 @@ local function on_message(handler, url, args, body, header, ip)
                 return {
                     err = errcode.ARGS_ERROR,
                     desc = "data nil",
+                    url = url,
                 }
             end
             for k, t in pairs(api.data) do
@@ -53,6 +56,7 @@ local function on_message(handler, url, args, body, header, ip)
                         return {
                             err = errcode.ARGS_ERROR,
                             desc = string.format("args error, %s must string", k),
+                            url = url,
                         }
                     end
                 elseif t == "str?" then
@@ -60,6 +64,7 @@ local function on_message(handler, url, args, body, header, ip)
                         return {
                             err = errcode.ARGS_ERROR,
                             desc = string.format("args error, %s must string", k),
+                            url = url,
                         }
                     end
                 elseif t == "num" then
@@ -67,6 +72,7 @@ local function on_message(handler, url, args, body, header, ip)
                         return {
                             err = errcode.ARGS_ERROR,
                             desc = string.format("args error, %s must number", k),
+                            url = url,
                         }
                     end
                 elseif t == "num?" then
@@ -74,6 +80,7 @@ local function on_message(handler, url, args, body, header, ip)
                         return {
                             err = errcode.ARGS_ERROR,
                             desc = string.format("args error, %s must number", k),
+                            url = url,
                         }
                     end
                 else
@@ -90,12 +97,14 @@ local function on_message(handler, url, args, body, header, ip)
                 ret = {err = ret}
                 if ret.err ~= 0 then
                     ret.desc = errcode.describe(ret.err)
+                    ret.url = url
                 end
             end
         end) then
             return {
                 err = errcode.TRACEBACK,
-                desc = "server traceback"
+                desc = "server traceback",
+                url = url,
             }
         end
         if type(ret) == "table" then
@@ -105,7 +114,8 @@ local function on_message(handler, url, args, body, header, ip)
     else
         return {
             err = errcode.API_NOT_EXIST,
-            desc = "api not exist"
+            desc = "api not exist",
+            url = url,
         }
     end
 end
