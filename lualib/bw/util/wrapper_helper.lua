@@ -1,6 +1,10 @@
 local conf = require "conf"
 local json = require "cjson.safe"
 local bash = require "bw.bash"
+local log  = require "bw.log"
+local util = require "bw.util"
+local trace = log.trace("wrapper_helper")
+
 bash = bash.bash
 
 local function save_settings(settings)
@@ -43,6 +47,7 @@ function M.get(name)
     assert(name)
     local settings = M.get_settings()
     for _, v in ipairs(settings) do
+        trace("v.name:%s, name:%s", v.name, name)
         if v.name == name then
             return v
         end
@@ -73,7 +78,6 @@ function M.remove_settings(names)
 end
 
 function M.get_version_list(name)
-    local settings = M.get_settings()
     local doc = M.get_doc(name)
     local setting = M.get(name)
     local cur, cur_android, cur_ios

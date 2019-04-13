@@ -1,8 +1,7 @@
 local gm     = require "bw.gm"
 local function ret(output)
-    local time_str = string.format("[%s] ", os.date("%Y-%m-%d %H:%M:%S"))
     return {
-        log = time_str .. output
+        log = output
     }
 end
 return function(_, data)
