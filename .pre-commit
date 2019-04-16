@@ -5,7 +5,7 @@ if [[ "$STAGED_FILES" = "" ]]; then
     exit 0
 fi
 PASS=true
-echo -e "LUACHECK..."
+echo -e "LUACHECK...\n"
 # Check for luacheck
 which luacheck &> /dev/null
 if [[ "$?" == 1 ]]; then
@@ -13,10 +13,10 @@ if [[ "$?" == 1 ]]; then
     exit 1
 fi
 luacheck --config .luacheckrc ./
-if [[ "$?" == 1 ]]; then
-    echo -e "\e[1;31mCOMMIT FAILED\e[0m"
-    exit 1
-else
-    echo -e "\e[1;32mCOMMIT SUCCESSED\e[0m"
+if [[ "$?" == 0 ]]; then
+    echo -e "\e[1;32mCOMMIT SUCCESSED\e[0m\n"
     exit 0
+else
+    echo -e "\e[1;31mCOMMIT FAILED\e[0m\n"
+    exit 1
 fi
