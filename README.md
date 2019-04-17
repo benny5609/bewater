@@ -18,9 +18,12 @@ bewater(通用模块,本仓库) https://github.com/zhandouxiaojiji/bewater.git
     examples(测试服务)
 skynet(fork skynet项目，不作任何改动) https://github.com/zhandouxiaojiji/skynet.git
 proj
-    xxgame(你的项目)
-        lualib(项目lua库)
-        service(项目用到的服务)
+    xxgame1(你的项目1)
+        lualib
+        service
+    xxgame2(你的项目2)
+        lualib
+        service
     bewater-test(测试节点) https://github.com/zhandouxiaojiji/bewater-test.git
 ```
 ## 配置
@@ -168,6 +171,12 @@ ti.delay(5.5, function()
 end)
 ti.destroy()
 ```
+## 代码规范
+使用luacheck进行代码质量检查，配置文件.luacheckrc
+```
+luacheck --config .luacheck.rc ./
+```
+我也写了个简单git钩子.pre-commit，将此文件重名名拷到.git/hooks/pre-commit，并chmod 775 pre-commit，在每次git commit前自动都会luacheck所有脚本，没有报错才能提交。这个钩子适合所有lua项目。
 ## 网页后台管理
 之前写过一版简单的[skynet-webconsole](https://github.com/zhandouxiaojiji/webconsole)，新版还在开发([skynet-cms-layui](https://github.com/zhandouxiaojiji/skynet-cms-layui))
 ![preview2](https://github.com/zhandouxiaojiji/webconsole/blob/master/images/preview1.jpg)
