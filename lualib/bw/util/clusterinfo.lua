@@ -4,8 +4,8 @@
 local skynet = require "skynet"
 local http   = require "bw.web.http_helper"
 local util   = require "bw.util"
+local bash   = require "bw.util.bash"
 local conf   = require "conf"
-local bash   = require "bw.bash"
 
 local M = {}
 local _cache = {}

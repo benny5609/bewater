@@ -12,7 +12,7 @@ include_files = {
 exclude_files = {
     "lualib/bw/xml/*",
     "lualib/bw/ws/*",
-    "lualib/bw/bash.lua",
+    "lualib/bw/util/bash.lua",
     "lualib/bw/schedule.lua",
     "lualib/bw/ip/ip_country.lua",
     "lualib/def/typedef/*",

@@ -1,6 +1,6 @@
 local skynet    = require "skynet"
 local class     = require "bw.class"
-local bash      = require "bw.bash"
+local bash      = require "bw.util.bash"
 local log       = require "bw.log"
 local conf      = require "conf"
 
