@@ -1,6 +1,6 @@
 local skynet     = require "skynet"
 local bewater    = require "bw.bewater"
-local hash_array = require "bw.hash_array"
+local hash_array = require "bw.util.hash_array"
 local log        = require "bw.log"
 local env        = require "env"
 
