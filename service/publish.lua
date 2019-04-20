@@ -4,6 +4,9 @@ local util = require "bw.util"
 local bash = require "bw.util.bash"
 bash = bash.bash
 
+local exclude_file = ...
+local exclude = exclude_file and string.format('--delete --exclude_file="%s"', exclude_file) or ""
+
 local nodename = require "publish.nodename"
 
 local function publish(pconf, confname)
@@ -74,7 +77,7 @@ local function publish(pconf, confname)
         skynet.sleep(200)
         bash("ssh -p %s %s mkdir -p %s", pconf.remote_port, pconf.remote_host, pconf.remote_path)
         skynet.error("正在推送到远程服务器")
-        bash("scp -rpB -P %s %s/* %s:%s ", pconf.remote_port, tmp, pconf.remote_host, pconf.remote_path)
+        skynet.error(bash("rsync -rv %s %s/* %s:%s", exclude, tmp, pconf.remote_host, pconf.remote_path))
         skynet.error("正在重新启动远程服务器")
         bash("ssh -p %s %s sh %s/run.sh", pconf.remote_port, pconf.remote_host, pconf.remote_path)
     end
