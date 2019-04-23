@@ -26,7 +26,7 @@ static const struct luaL_Reg luaaes [] = {
     {NULL, NULL}
 };
 
-LUALIB_API int luaopen_aes_core(lua_State *L) 
+LUALIB_API int luaopen_aes_core(lua_State *L)
 {
     luaL_Reg libs[] = {
         {"init", l_init},
@@ -136,7 +136,7 @@ static int l_encrypt(lua_State *L)
     unsigned char* pt= (unsigned char*)lua_tolstring(L, 1,&pt_len);
     int ct_len=((pt_len&0xfffffffff80)+0x80);
     unsigned char* ct=(unsigned char*)malloc(ct_len);
-    
+
     unsigned char* key= (unsigned char*)lua_tostring(L, 2);
     unsigned char* iv= (unsigned char*)lua_tostring(L, 3);
     ct_len=encrypt(pt,pt_len,key,iv,ct);
@@ -151,7 +151,7 @@ static int l_encrypt(lua_State *L)
     {
         free(ct);
         lua_pushnumber(L,-1);
-        
+
         unsigned long l;
         char buf[256];
         l=ERR_get_error();
@@ -167,11 +167,11 @@ static int l_decrypt(lua_State *L)
     unsigned char* ct= (unsigned char*)lua_tolstring(L, 1,&ct_len);
     int pt_len=ct_len;
     unsigned char* pt=(unsigned char*)malloc(pt_len);
-    
-    
+
+
     unsigned char* key= (unsigned char*)lua_tostring(L, 2);
     unsigned char* iv= (unsigned char*)lua_tostring(L, 3);
-    
+
     pt_len=decrypt(ct,ct_len,key,iv,pt);
     if(pt_len>=0)
     {
@@ -184,7 +184,7 @@ static int l_decrypt(lua_State *L)
     {
         free(pt);
         lua_pushnumber(L,-1);
-        
+
         unsigned long l;
         char buf[256];
         l=ERR_get_error();
