@@ -32,12 +32,9 @@ function M.gen_token(params, private_key)
         playerSSign = encode_uri(params.player_ssign),
     }
     local data = sign.concat_args(args)
-    local sign_str = sha256.hmac_sha256(data, private_key)
-    print("&&&&&&& sign_str", sign_str)
+    local sign_str = codec.rsa_sha256_private_sign(data, private_key)
     sign_str = codec.base64_encode(sign_str)
-    print("&&&&&&& sign_str", sign_str)
     sign_str = encode_uri(sign_str)
-    print("&&&&&&& sign_str", sign_str)
     local ret, resp_str = http.post(API, 'cpSign='..sign_str)
     if not ret then
         log.error('cannot request huawei api')
