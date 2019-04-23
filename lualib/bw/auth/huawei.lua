@@ -1,9 +1,9 @@
-local json = require "cjson.safe"
+local json  = require "cjson.safe"
 local codec = require "codec"
-local http = require "bw.web.http_helper"
-local sign = require "bw.auth.sign"
-local sha256 = require "bw.auth.sha256"
-local log  = require "bw.log"
+local http  = require "bw.web.http_helper"
+local sign  = require "bw.auth.sign"
+local log   = require "bw.log"
+local util  = require "bw.util"
 
 local table_insert  = table.insert
 local table_sort    = table.sort
@@ -34,15 +34,16 @@ function M.gen_token(params, private_key)
     local data = sign.concat_args(args)
     local sign_str = codec.rsa_sha256_private_sign(data, private_key)
     sign_str = codec.base64_encode(sign_str)
-    sign_str = encode_uri(sign_str)
-    local ret, resp_str = http.post(API, 'cpSign='..sign_str)
+    args.cpSign = encode_uri(sign_str)
+    local ret, resp_str = http.post(API, sign.concat_args(args))
     if not ret then
         log.error('cannot request huawei api')
         return
     end
     local resp = json.decode(resp_str)
     if not resp or not resp.rtnSign then
-        log.error('huawei api decode error, resp:'..resp_str)
+        log.error('huawei api decode error, resp:'
+            ..resp_str..' params:'..util.dump(params))
         return
     end
     return resp.rtnSign
