@@ -42,6 +42,13 @@ function M.rsa_private_sign(args, private_key, mark)
     local bs = codec.rsa_private_sign(str, private_key)
     return encode_uri(codec.base64_encode(bs))
 end
+
+function M.rsa_sha256_private_sign(args, private_key, mark)
+    local str = M.concat_args(args, mark)
+    local bs = codec.rsa_sha256_private_sign(str, private_key)
+    return encode_uri(codec.base64_encode(bs))
+end
+
 --[[
 function M.rsa_public_verify(args, public_key, mark)
     local str = M.concat_args(args, mark)

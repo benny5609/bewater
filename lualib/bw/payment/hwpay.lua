@@ -1,4 +1,4 @@
--- 支付宝支付
+-- 华为支付
 local conf  = require "conf"
 local codec = require "codec"
 local sign  = require "bw.auth.sign"
@@ -15,34 +15,30 @@ function M.create_order(param)
     assert(param.pay_channel)
     assert(param.pay_method)
 
+    local url = string.format('%s/api/payment/huawei_notify', conf.pay.host),
     local args = {
-        partner = partner,
-        seller_id = partner,
-        out_trade_no = order_no..'-'..os.time(),
-        subject = item_desc,
-        body = item_desc,
-        total_fee = pay_price,
-        notify_url = string.format("%s/api/payment/alipay_notify", conf.pay.host),
-        service = "mobile.securitypay.pay",
-        payment_type = '1',
-        anti_phishing_key = '',
-        exter_invoke_ip = '',
-        _input_charset = 'utf-8',
-        it_b_pay = '30m',
-        return_url = 'm.alipay.com',
+        productNo = param.item_sn,
+        applicationID = param.appid,
+        requestId = param.order_no,
+        merchantId = param.cpid,
+        sdkChannel = '1',
+        urlver = '2',
+        url = url,
     }
-    args.sign = sign.rsa_private_sign(args, private_key, true)
-    args.sign_type = "RSA"
+    local sign = sign.rsa_private_sign(args, private_key, true)
     return {
-        order_no = order_no,
-        order = sign.concat_args(args, true),
+        appid    = param.appid,
+        cpid     = param.cpid,
+        cp       = '琢玉教育',
+        item_sn  = param.item_sn,
+        order_no = param.order_no,
+        url      = url,
+        catalog  = 'X5',
+        sign     = sign,
     }
 end
 
 function M.notify(public_key, param)
-    if param.trade_status ~= "TRADE_SUCCESS" then
-        return
-    end
     local args = {}
     for k, v in pairs(param) do
         if k ~= "sign" and k ~= "sign_type" then

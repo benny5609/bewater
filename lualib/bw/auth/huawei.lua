@@ -49,8 +49,4 @@ function M.gen_token(params, private_key)
     return resp.rtnSign
 end
 
-function M.notify()
-
-end
-
 return M

@@ -1,3 +1,4 @@
+-- 苹果支付
 local json = require "cjson.safe"
 local http = require "bw.web.http_helper"
 local log  = require "bw.log"

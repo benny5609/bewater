@@ -1,3 +1,4 @@
+-- 微信支付
 local sign      = require "bw.auth.sign"
 local lua2xml   = require "bw.xml.lua2xml"
 local xml2lua   = require "bw.xml.xml2lua"
