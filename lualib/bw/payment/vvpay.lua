@@ -1,6 +1,7 @@
 -- vivo 支付
 local codec = require "codec"
 local sign = require "bw.auth.sign"
+local conf = require "conf"
 
 local md5 = codec.md5_encode
 
@@ -8,8 +9,6 @@ local M = {}
 function M.create_order(param)
     assert(param.appid)
     assert(param.order_no)
-
-    local item_name = item_name
 
     local url = string.format('%s/api/payment/vivo_notify', conf.pay.host)
     local args = {
