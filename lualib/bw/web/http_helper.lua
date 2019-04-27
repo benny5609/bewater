@@ -23,21 +23,24 @@ function M.post(url, post, header, no_reply)
     end
 end
 
-function M.url_encoding(tbl, encode)
-    local data = {}
-    for k, v in pairs(tbl) do
-        table.insert(data, string.format("%s=%s", k, v))
-    end
-
-    local url = table.concat(data, "&")
-    if encode then
-        return string.gsub(url, "([^A-Za-z0-9])", function(c)
-            return string.format("%%%02X", string.byte(c))
-        end)
-    else
-        return url
-    end
+function M.encode_uri(s)
+    assert(s)
+    s = string.gsub(s, "([^A-Za-z0-9])", function(c)
+        return string.format("%%%02X", string.byte(c))
+    end)
+    return s
 end
+
+function M.decode_uri(s)
+    assert(s)
+    local data = {}
+    for ss in string.gmatch(s, "([^&]+)") do
+        local k, v = string.match(ss, "(.+)=(.+)")
+        data[k] = v
+    end
+    return data
+end
+
 
 --[[
 {

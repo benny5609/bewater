@@ -8,6 +8,23 @@ local json      = require "cjson.safe"
 
 local map = {} -- appid -> access
 
+local function url_encoding(tbl, encode)
+    local data = {}
+    for k, v in pairs(tbl) do
+        table.insert(data, string.format("%s=%s", k, v))
+    end
+
+    local url = table.concat(data, "&")
+    if encode then
+        return string.gsub(url, "([^A-Za-z0-9])", function(c)
+            return string.format("%%%02X", string.byte(c))
+        end)
+    else
+        return url
+    end
+end
+
+
 local function request_access_token(appid, secret)
     assert(appid and secret)
     local ret, resp = http.get("https://api.weixin.qq.com/cgi-bin/token", {
@@ -60,7 +77,7 @@ function M:set_user_storage(appid, secret, openid, session_key, data)
         table.insert(kv_list, {key = k, value = v})
     end
     local post = json.encode({kv_list = kv_list})
-    local url = "https://api.weixin.qq.com/wxa/set_user_storage?"..http.url_encoding({
+    local url = "https://api.weixin.qq.com/wxa/set_user_storage?"..url_encoding({
         access_token = M.get_access_token(appid, secret),
         openid = openid,
         appid = appid,
@@ -78,7 +95,7 @@ end
 -- key_list {"score", "gold"}
 function M:remove_user_storage(appid, secret, openid, session_key, key_list)
     local post = json.encode({key = key_list})
-    local url = "https://api.weixin.qq.com/wxa/remove_user_storage?"..http.url_encoding({
+    local url = "https://api.weixin.qq.com/wxa/remove_user_storage?"..url_encoding({
         access_token = M.get_access_token(appid, secret),
         openid = openid,
         appid = appid,
