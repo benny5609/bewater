@@ -1,10 +1,10 @@
 #!/bin/sh
 #STAGED_FILES=$(find ./ -name *.lua)
-STAGED_FILES=$(git status -s | grep "[M|??].*lua$" | awk '{printf $2 " "}')
+STAGED_FILES=$(git status -s | grep "[M|A|??].*lua$" | awk '{printf $2 " "}')
 if [[ "$STAGED_FILES" = "" ]]; then
     exit 0
 fi
-PASS=true
+
 echo -e "LUACHECK...\n"
 # Check for luacheck
 which luacheck &> /dev/null
