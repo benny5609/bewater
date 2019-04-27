@@ -7,15 +7,13 @@ local M = {}
 function M.create_order(param)
     local order_no      = assert(param.order_no)
     local private_key   = assert(param.private_key)
-    local item_desc     = assert(param.item_desc)
     local pay_price     = assert(param.pay_price)
-    local partner       = assert(param.partner)
     assert(param.uid)
     assert(param.item_sn)
     assert(param.pay_channel)
     assert(param.pay_method)
 
-    local url = string.format('%s/api/payment/huawei_notify', conf.pay.host),
+    local url = string.format('%s/api/payment/huawei_notify', conf.pay.host)
     local args = {
         productNo = param.item_sn,
         applicationID = param.appid,
@@ -25,7 +23,7 @@ function M.create_order(param)
         urlver = '2',
         url = url,
     }
-    local sign = sign.rsa_private_sign(args, private_key, true)
+    local str = sign.rsa_private_sign(args, private_key, true)
     return {
         appid    = param.appid,
         cpid     = param.cpid,
@@ -34,14 +32,14 @@ function M.create_order(param)
         order_no = param.order_no,
         url      = url,
         catalog  = 'X5',
-        sign     = sign,
+        sign     = str,
     }
 end
 
 function M.notify(public_key, param)
     local args = {}
     for k, v in pairs(param) do
-        if k ~= "sign" and k ~= "sign_type" then
+        if k ~= "sign" and k ~= "signType" then
             args[k] = v
         end
     end
@@ -49,7 +47,7 @@ function M.notify(public_key, param)
     local src = sign.concat_args(args)
     local bs = codec.base64_decode(param.sign)
     local pem = public_key
-    return codec.rsa_public_verify(src, bs, pem, 2)
+    return codec.rsa_sha256_public_verify(src, bs, pem, 2)
 end
 
 return M

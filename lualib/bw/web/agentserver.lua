@@ -24,6 +24,7 @@ local function on_message(handler, url, args, body, header, ip)
     local api = handler.api[url]
     if api then
         local ret, data = bewater.try(function()
+            skynet.error("######", body)
             return handler.unpack(body, url)
         end)
         if not ret then
@@ -85,7 +86,7 @@ local function on_message(handler, url, args, body, header, ip)
                     end
                 else
                     util.printdump(data)
-                    error(string.format("api %s def type %s error", api, t))
+                    error(string.format("api %s def type %s error", url, t))
                 end
             end
         end
