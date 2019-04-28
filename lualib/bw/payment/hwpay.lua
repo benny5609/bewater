@@ -22,7 +22,10 @@ function M.create_order(param)
         urlver = '2',
         url = url,
     }
-    local str = sign.rsa_private_sign(args, private_key, true)
+    local str = sign.concat_args(args)
+    local bs = codec.rsa_sha256_private_sign(str, private_key)
+    str = codec.base64_encode(bs)
+
     return {
         appid    = param.appid,
         cpid     = param.cpid,

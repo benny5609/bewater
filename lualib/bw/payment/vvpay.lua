@@ -17,7 +17,6 @@ function M.create_order(param)
         orderAmount = param.pay_price,
         productName = param.item_name,
         productDesc = param.item_name,
-        extuid = " ",
         notifyUrl = url,
     }
 
