@@ -16,14 +16,14 @@ local M = {}
 function M.create_order(param)
     local order_no      = assert(param.order_no)
     local item_desc     = assert(param.item_name)
-    local pay_price     = assert(param.pay_price)
+    local pay_price     = assert(param.pay_price) * 0.7
     local secret        = assert(param.secret)
     assert(param.pay_channel)
     assert(param.item_sn)
 
     return {
         order_no    = order_no,
-        price       = pay_price,
+        price       = pay_price*100//1 >> 0,
         name        = item_desc,
         desc        = item_desc,
         url         = string.format("%s:%s/api/payment/opop_notify", conf.pay.host, conf.pay.port),
@@ -37,8 +37,8 @@ function M.notify(param, public_key, secret)
         string.format('%s=%s', 'partnerOrder', param.partnerOrder),
         string.format('%s=%s', 'productName', param.productName),
         string.format('%s=%s', 'productDesc', param.productDesc),
-        string.format('%s=%s', 'price', param.price),
-        string.format('%s=%s', 'count', param.count),
+        string.format('%s=%d', 'price', param.price),
+        string.format('%s=%d', 'count', param.count),
         string.format('%s=%s', 'attach', param.attach),
     }
     local src = table.concat(list, "&")
