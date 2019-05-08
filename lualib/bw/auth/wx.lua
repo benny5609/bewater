@@ -1,12 +1,18 @@
 --  微信验证
---  每个需要用到的服务都需要在启动的时候调wx.init
 --
-
+local skynet    = require "skynet"
+local json      = require "cjson.safe"
+local bewater   = require "bw.bewater"
 local http      = require "bw.web.http_helper"
 local sha256    = require "bw.auth.sha256"
-local json      = require "cjson.safe"
 
-local map = {} -- appid -> access
+local load_cache
+local save_cache
+
+local cache = bewater.protect {
+    tokens = {},    -- appid -> token
+    tickets = {},   -- token -> ticket
+}
 
 local function url_encoding(tbl, encode)
     local data = {}
@@ -24,7 +30,6 @@ local function url_encoding(tbl, encode)
     end
 end
 
-
 local function request_access_token(appid, secret)
     assert(appid and secret)
     local ret, resp = http.get("https://api.weixin.qq.com/cgi-bin/token", {
@@ -34,25 +39,60 @@ local function request_access_token(appid, secret)
     })
     if ret then
         resp = json.decode(resp)
-        local access = {}
-        access.token       = resp.access_token
-        access.exires_in   = resp.expires_in
-        access.time        = os.time()
-        map[appid] = access
+        cache.tokens[appid] = {
+            token   = resp.access_token,
+            exires  = skynet.time() + resp.expires_in,
+        }
+        save_cache(cache)
+    else
+        error(resp)
+    end
+end
+
+local function request_ticket(appid, token)
+    assert(appid)
+    local ret, resp = http.get("https://api.weixin.qq.com/cgi-bin/ticket/getticket", {
+        access_token = token,
+        type = 2,
+    })
+    if ret then
+        resp = json.decode(resp)
+        cache.tickets[appid] = {
+            ticket   = resp.ticket,
+            exires  = skynet.time() + resp.expires_in,
+        }
+        save_cache(cache)
     else
         error(resp)
     end
 end
 
 local M = {}
+
+function M.start(handler)
+    save_cache = assert(handler.save_cache)
+    load_cache = assert(handler.load_cache)
+
+    cache = load_cache()
+end
+
 function M.get_access_token(appid, secret)
     assert(appid and secret)
-    local access = map[appid]
-    if not access or  os.time() - access.time > access.exires_in then
+    local token = cache.tokens[appid]
+    if not token or skynet.time() > token.exires then
         request_access_token(appid, secret)
-        return map[appid]
+        return cache.tokens[appid].token
     end
-    return access.token
+    return token.token
+end
+
+function M.get_sdk_ticket(appid, token)
+    local ticket = cache.tickets[token]
+    if not ticket or skynet.time() > ticket.expires then
+        request_ticket(appid, token)
+        return cache.tickets[appid].ticket
+    end
+    return ticket.ticket
 end
 
 function M.check_code(appid, secret, js_code)
