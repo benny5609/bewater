@@ -5,7 +5,6 @@
 
 local skynet        = require "skynet.manager"
 local date_helper   = require "bw.util.date_helper"
-local sname         = require "bw.sname"
 local bash          = require "bw.util.bash"
 
 local root         = skynet.getenv "root"

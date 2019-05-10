@@ -9,53 +9,6 @@ require "skynet.cluster"
 local trace = log.trace("gm")
 
 local skynet_cmd = {}
-local gmcmd = {
-    skynet = skynet_cmd,
-}
-local CMD = {}
-function CMD.add_gmcmd(modname, gmcmd_path)
-    gmcmd[modname] = require(gmcmd_path)
-    assert(type(gmcmd[modname]) == "table", modname)
-end
-
-function CMD.run(modname, cmd, ...)
-    modname = string.lower(modname)
-    cmd = string.lower(cmd)
-    local mod = gmcmd[modname]
-    if not mod then
-        return string.format("模块[%s]未初始化", modname)
-    end
-    local f = mod[cmd]
-    if not f then
-        return string.format("GM指令[%s][%s]不存在", modname, cmd)
-    end
-    local args = {...}
-    local ret
-    if not bewater.try(function()
-        ret = f(table.unpack(args))
-    end) then
-        return "服务器执行TRACEBACK了"
-    end
-    return ret or "执行成功"
-end
-
-local hotfix_addrs = {}
-function CMD.reg_hotfix(addr)
-    --trace("reg_hotfix:%s", addr)
-    hotfix_addrs[addr] = true
-end
-
-function CMD.unreg_hotfix(addr)
-    hotfix_addrs[addr] = nil
-end
-
-skynet.start(function()
-    skynet.dispatch("lua", function(_,_, cmd, ...)
-        local f = assert(CMD[cmd], cmd)
-        bewater.ret(f(...))
-    end)
-end)
-
 function skynet_cmd.gc()
     skynet.call(".launcher", "lua", "GC")
 end
@@ -125,3 +78,52 @@ function skynet_cmd.time(...)
     local cur = schedule.changetime(t)
     return string.format("时间修改至 %s", date_helper.format(cur))
 end
+local gmcmd = {
+    skynet = skynet_cmd,
+}
+local M = {}
+function M.add_gmcmd(modname, gmcmd_path)
+    gmcmd[modname] = require(gmcmd_path)
+    assert(type(gmcmd[modname]) == "table", modname)
+end
+
+function M.run(modname, cmd, ...)
+    modname = string.lower(modname)
+    cmd = string.lower(cmd)
+    local mod = gmcmd[modname]
+    if not mod then
+        return string.format("模块[%s]未初始化", modname)
+    end
+    local f = mod[cmd]
+    if not f then
+        return string.format("GM指令[%s][%s]不存在", modname, cmd)
+    end
+    local args = {...}
+    local ret
+    if not bewater.try(function()
+        ret = f(table.unpack(args))
+    end) then
+        return "服务器执行TRACEBACK了"
+    end
+    return ret or "执行成功"
+end
+
+local hotfix_addrs = {}
+function M.reg_hotfix(addr)
+    --trace("reg_hotfix:%s", addr)
+    hotfix_addrs[addr] = true
+end
+
+function M.unreg_hotfix(addr)
+    hotfix_addrs[addr] = nil
+end
+
+function M.start(cmds)
+    for k, v in pairs(cmds) do
+        gmcmd[k] = v
+    end
+end
+
+return M
+
+
