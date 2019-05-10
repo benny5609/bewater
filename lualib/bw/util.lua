@@ -1,13 +1,6 @@
 local skynet = require "skynet.manager"
 
 local util = {}
--- 处理skynet.send的消息
-util.NORET = "NORET"
-function util.ret(noret, ...)
-    if noret ~= "NORET" then
-        skynet.ret(skynet.pack(noret, ...))
-    end
-end
 
 -- 有需要的节点在启动时调用
 function util.init_proto_env(path)
