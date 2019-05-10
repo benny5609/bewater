@@ -7,7 +7,7 @@ skynet.init(function()
         local skynet = require "skynet"
         local util  = require "bw.util"
         local http  = require "bw.web.http_helper"
-        local mongo = require "bw.db.mongo_helper"
+        local mongo = require "db.mongo"
 
         local CMD = {}
         local ips = {}

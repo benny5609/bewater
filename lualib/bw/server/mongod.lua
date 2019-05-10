@@ -1,6 +1,7 @@
-local skynet = require "skynet.manager"
-local mongo  = require "skynet.db.mongo"
-local util   = require "bw.util"
+local skynet  = require "skynet.manager"
+local mongo   = require "skynet.db.mongo"
+local bewater = require "bw.bewater"
+local util    = require "bw.util"
 
 local db
 
@@ -79,13 +80,15 @@ function M.set(key, value)
 end
 
 return function(conf)
-    assert(conf.host and conf.port and conf.name)
-    db = mongo.client({
-        host = conf.host,
-        port = conf.port,
-    })[conf.name]
-    skynet.dispatch("lua", function(_, _, cmd, ...)
-        local f = assert(M[cmd], ...)
-        util.ret(f(...))
+    skynet.start(function()
+        assert(conf.host and conf.port and conf.name)
+        db = mongo.client({
+            host = conf.host,
+            port = conf.port,
+        })[conf.name]
+        skynet.dispatch("lua", function(_, _, cmd, ...)
+            local f = assert(M[cmd], ...)
+            bewater.ret(f(...))
+        end)
     end)
 end

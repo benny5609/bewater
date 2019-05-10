@@ -1,6 +1,6 @@
 local skynet    = require "skynet"
 local bewater   = require "bw.bewater"
-local rmsg      = require "bw.share.rmsg"
+local rmsg      = require "bw.sever.rmsg"
 local sname     = require "sname"
 bewater.start(rmsg, function()
     rmsg.start({

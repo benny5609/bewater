@@ -1,8 +1,8 @@
 local class     = require "bw.class"
-local mongo     = require "bw.db.mongo_helper"
 local factory   = require "bw.orm.factory"
 local util      = require "bw.util"
 local log       = require "bw.log"
+local mongo     = require "db.mongo"
 
 local trace = log.trace("rank")
 

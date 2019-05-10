@@ -1,5 +1,5 @@
 local skynet    = require "skynet"
-local rmsg      = require "bw.share.rmsg"
+local rmsg      = require "bw.server.rmsg"
 local util      = require "bw.util"
 local log       = require "bw.log"
 

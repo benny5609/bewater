@@ -1,6 +1,6 @@
 local bewater       = require "bw.bewater"
-local mongo         = require "bw.db.mongo_helper"
-local id_producer   = require "bw.share.id_producer"
+local id_producer   = require "bw.server.id_producer"
+local mongo         = require "db.mongo"
 
 bewater.start(id_producer, function()
     id_producer.start({
