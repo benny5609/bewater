@@ -5,14 +5,18 @@
 
 local skynet        = require "skynet.manager"
 local date_helper   = require "bw.util.date_helper"
+local sname         = require "bw.sname"
 local bash          = require "bw.util.bash"
 
-local conf
+local root         = skynet.getenv "root"
+local CLUSTER_NAME = skynet.getenv "CLUSTER_NAME"
+
+local alert -- function
 
 local mainfile = io.open(string.format("%s/log/%s.log",
-    conf.workspace, conf.clustername), "w+")
+    root, CLUSTER_NAME), "w+")
 local errfile = io.open(string.format("%s/log/error.log",
-    conf.workspace), "a+")
+    root), "a+")
 
 local function write_log(file, addr, str)
     str = string.format("[%08x][%s] %s", addr, os.date("%Y-%m-%d %H:%M:%S", os.time()), str)
@@ -24,8 +28,8 @@ local function write_log(file, addr, str)
     file:flush()
 
     if string.match(str, "\n(%w+ %w+)") == "stack traceback" then
-        if conf.alert then
-            conf.alert()
+        if alert then
+            alert(str)
         end
         errfile:write(str.."\n")
         errfile:flush()
@@ -34,6 +38,11 @@ end
 
 local logs = {} -- key(sys or uid) -> {last_time, file}
 local CMD = {}
+function CMD.set_alert(func)
+    assert(type(func) == "function")
+    alert = func
+end
+
 function CMD.error(addr, str)
     write_log(errfile, addr, str)
 end
@@ -45,9 +54,9 @@ function CMD.trace(addr, sys, str)
         if log then
             log.file:close()
         end
-        bash.bash("mkdir -p %s/log/%s", conf.workspace, sys)
+        bash.bash("mkdir -p %s/log/%s", root, sys)
         local filename = string.format("%s/log/%s/%s.log",
-            conf.workspace, sys, os.date("%Y%m%d", os.time()))
+            root, sys, os.date("%Y%m%d", os.time()))
         local file = io.open(filename, "a+")
         log = {file = file}
         logs[sys] = log
@@ -66,9 +75,9 @@ function CMD.role(addr, uid, sys, str)
             log.file:close()
         end
         local dir = string.format("%d/%d/%d", uid//1000000, uid%1000000//1000, uid%1000)
-        bash.bash("mkdir -p %s/log/role/%s", conf.workspace, dir)
+        bash.bash("mkdir -p %s/log/role/%s", root, dir)
         local filename = string.format("%s/log/role/%s/%s.log",
-            conf.workspace, dir, os.date("%Y%m%d", os.time()))
+            root, dir, os.date("%Y%m%d", os.time()))
         local file = io.open(filename, "a+")
         log = {file = file}
         logs[uid] = log
@@ -110,31 +119,22 @@ skynet.register_protocol {
     end
 }
 
-function CMD.start(handler, func)
-    conf = handler
-    skynet.start(function()
-        skynet.dispatch("lua", function(_, _, cmd, ...)
-            assert(CMD[cmd], cmd)(...)
-            -- no return, don't call this service, use send
-        end)
-        skynet.fork(function()
-            while true do
-                local cur_time = os.time()
-                for k, v in pairs(logs) do
-                    if cur_time - v.last_time > 3600 then
-                        v.file:close()
-                        logs[k] = nil
-                    end
+skynet.start(function()
+    skynet.register ".logger"
+    skynet.dispatch("lua", function(_, _, cmd, ...)
+        assert(CMD[cmd], cmd)(...)
+        -- no return, don't call this service, use send
+    end)
+    skynet.fork(function()
+        while true do
+            local cur_time = os.time()
+            for k, v in pairs(logs) do
+                if cur_time - v.last_time > 3600 then
+                    v.file:close()
+                    logs[k] = nil
                 end
-                skynet.sleep(100)
             end
-        end)
-        if func then
-            func
+            skynet.sleep(100)
         end
     end)
-end
-
-return CMD
-
-
+end)
