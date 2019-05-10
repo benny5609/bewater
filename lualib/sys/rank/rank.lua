@@ -48,7 +48,7 @@ function mt:update(k, v)
         end
     end
 
-    local old, i = self:find(k)
+    local old = self:find(k)
     if old then
         old.v = v
     else
