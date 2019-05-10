@@ -5,9 +5,9 @@
 
 local skynet        = require "skynet.manager"
 local date_helper   = require "bw.util.date_helper"
-local conf          = require "conf"
-local sname         = require "bw.sname"
 local bash          = require "bw.util.bash"
+
+local conf
 
 local mainfile = io.open(string.format("%s/log/%s.log",
     conf.workspace, conf.clustername), "w+")
@@ -24,10 +24,8 @@ local function write_log(file, addr, str)
     file:flush()
 
     if string.match(str, "\n(%w+ %w+)") == "stack traceback" then
-        if conf.alert and conf.alert.enable then
-            skynet.fork(function()
-                skynet.send(sname.ALERT, "lua", "traceback", str)
-            end)
+        if conf.alert then
+            conf.alert()
         end
         errfile:write(str.."\n")
         errfile:flush()
@@ -112,22 +110,31 @@ skynet.register_protocol {
     end
 }
 
-skynet.start(function()
-    skynet.register ".logger"
-    skynet.dispatch("lua", function(_, _, cmd, ...)
-        assert(CMD[cmd], cmd)(...)
-        -- no return, don't call this service, use send
-    end)
-    skynet.fork(function()
-        while true do
-            local cur_time = os.time()
-            for k, v in pairs(logs) do
-                if cur_time - v.last_time > 3600 then
-                    v.file:close()
-                    logs[k] = nil
+function CMD.start(handler, func)
+    conf = handler
+    skynet.start(function()
+        skynet.dispatch("lua", function(_, _, cmd, ...)
+            assert(CMD[cmd], cmd)(...)
+            -- no return, don't call this service, use send
+        end)
+        skynet.fork(function()
+            while true do
+                local cur_time = os.time()
+                for k, v in pairs(logs) do
+                    if cur_time - v.last_time > 3600 then
+                        v.file:close()
+                        logs[k] = nil
+                    end
                 end
+                skynet.sleep(100)
             end
-            skynet.sleep(100)
+        end)
+        if func then
+            func
         end
     end)
-end)
+end
+
+return CMD
+
+

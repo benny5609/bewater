@@ -2,22 +2,6 @@ local skynet = require "skynet.manager"
 
 local util = {}
 
--- 有需要的节点在启动时调用
-function util.init_proto_env(path)
-    local sname = require "bw.sname"
-    skynet.call(sname.PROTO, "lua", "register_file", path)
-end
-
--- 获取节点内的protobuf
-function util.get_protobuf()
-    local sname = require "bw.sname"
-    local protobuf_env = skynet.call(sname.PROTO, "lua", "get_protobuf_env")
-    assert(type(protobuf_env) == "userdata")
-    assert(not package.loaded["protobuf"])
-    debug.getregistry().PROTOBUF_ENV = protobuf_env
-    return require "bw.protobuf"
-end
-
 local function __TRACEBACK__(errmsg)
     local track_text = debug.traceback(tostring(errmsg), 2)
     skynet.error("---------------------------------------- TRACKBACK ----------------------------------------")
@@ -158,34 +142,6 @@ local function new_module(modname)
     local new_mod = require(modname)
     package.loaded[modname] = module
     return new_mod
-end
-
-local class_prop = {
-    classname = true,
-    class = true,
-    Get = true,
-    Set = true,
-    super = true,
-    __newindex = true,
-    __index = true,
-    new = true,
-}
-
-function util.reload_class(modname)
-    local old_class = require(modname)
-    local new_class = new_module(modname)
-
-    if old_class.classname and old_class.class then
-        for k, v in pairs(new_class.class) do
-            if not class_prop[k] then
-                old_class[k] = v
-            end
-        end
-    else
-        for k, v in pairs(new_class) do
-            old_class[k] = v
-        end
-    end
 end
 
 function util.reload_module(modname)
@@ -355,4 +311,14 @@ function util.printbuff(buff)
     end
     print(str)
 end
+
+-- 获取节点内的protobuf
+function util.get_protobuf(proto_service)
+    local protobuf_env = skynet.call(proto_service, "lua", "get_protobuf_env")
+    assert(type(protobuf_env) == "userdata")
+    assert(not package.loaded["protobuf"])
+    debug.getregistry().PROTOBUF_ENV = protobuf_env
+    return require "bw.protobuf"
+end
+
 return util

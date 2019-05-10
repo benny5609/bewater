@@ -1,6 +1,14 @@
-local skynet = require "skynet"
-local sname = require "bw.sname"
+local skynet  = require "skynet"
+local bewater = require "bw.bewater"
+local alert   = require "bw.server.alert"
 return function()
-    skynet.call(sname.ALERT, "lua", "test", "hello")
+    bewater.start(alert, {
+        corpid     = '',
+        corpsecret = '',
+        agentid    = '',
+        proj       = 'test',
+        desc       = '测试服',
+
+    })
     error("test")
 end

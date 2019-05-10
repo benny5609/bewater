@@ -7,18 +7,18 @@ local lock      = require "bw.lock"
 local util      = require "bw.util"
 local bash      = require "bw.util.bash"
 local json      = require "cjson.safe"
-local conf      = require "conf"
 
 local trace  = log.trace("alert")
 local send_lock = lock.new()
 local host = "https://qyapi.weixin.qq.com"
 local access_token = ''
 local expires = 0
+local conf
 
 local function request_token()
     local ret, resp = http.get(host.."/cgi-bin/gettoken", {
-        corpid = conf.alert.corpid,
-        corpsecret = conf.alert.corpsecret
+        corpid = conf.corpid,
+        corpsecret = conf.corpsecret
     })
     if ret then
         local data = json.decode(resp)
@@ -46,7 +46,7 @@ local function send(str)
     local token = get_token()
     local ret, resp_str = http.post(string.format("%s/cgi-bin/message/send?access_token=%s", host, token), json.encode{
         touser = "@all",
-        agentid = conf.alert.agentid,
+        agentid = conf.agentid,
         msgtype = "text",
         text = {content = str},
     })
@@ -78,28 +78,24 @@ local function send_traceback()
     send_lock:unlock()
 end
 
-local CMD = {}
-function CMD.traceback(err)
+local M = {}
+function M.traceback(err)
     count = count + 1
     send_traceback(err)
 end
 
-function CMD.node_dead(proj, clustername, pnet_addr, inet_addr, pid, cpu, mem)
-    local str = string.format("救命啊，有节点挂掉了!\n项目:%s\n节点:%s\n公网ip:%s\n内网ip:%s\n进程: pid:%s CPU:%s MEM:%.1fM",
-        proj, clustername, pnet_addr, inet_addr, pid, cpu, mem/1024)
-    trace(str)
-    CMD.test(str)
-end
 
-function CMD.test(str)
+function M.test(str)
     send(str)
 end
 
-skynet.start(function()
-    skynet.dispatch("lua", function(_,_, cmd, ...)
-        local f = assert(CMD[cmd], cmd)
-        bewater.ret(f(...))
-    end)
+function M.start(handler)
+    conf = handler
+    assert(conf.corpid)
+    assert(conf.corpsecret)
+    assert(conf.agentid)
+    assert(conf.desc)
+    assert(conf.proj)
 
     skynet.fork(function()
         while true do
@@ -109,4 +105,6 @@ skynet.start(function()
             skynet.sleep(6000)
         end
     end)
-end)
+end
+
+return M

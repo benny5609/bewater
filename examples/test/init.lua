@@ -1,7 +1,6 @@
 local skynet    = require "skynet"
 local http      = require "bw.web.http_helper"
 local wc        = require "bw.cms.webconsole"
-local sname     = require "bw.sname"
 local json      = require "cjson.safe"
 
 local function test(name)
