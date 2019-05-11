@@ -3,29 +3,41 @@
 SRC_DIR = ./lualib-src
 LIB_DIR = ./luaclib
 
-SRC = ${wildcard ${SRC_DIR}/*.c}
-LIB = ${patsubst lua-%.c, ${LIB_DIR}/%.so, ${notdir ${SRC}}}
+INCLUDE_DIR=skynet/3rd/lua
 
 all:build
 
 build:
 	mkdir -p luaclib
 
+CFLAGS = -g3 -O2 -rdynamic -Wall -I$(INCLUDE_DIR)
+SHARED = -fPIC --shared
+
+
 all:${LIB_DIR}/aes.so ${LIB_DIR}/packet.so ${LIB_DIR}/random.so \
-	${LIB_DIR}/webclient.so ${LIB_DIR}/codec.so
+	${LIB_DIR}/webclient.so ${LIB_DIR}/codec.so ${LIB_DIR}/cjson.so
 
 
 ${LIB_DIR}/aes.so:${SRC_DIR}/lua-aes.c
-	cc -g -O2 -Wall -Iskynet/3rd/lua -fPIC --shared $< -o $@ -lcurl
+	gcc ${CFLAGS} ${SHARED} $< -o $@ -lcurl
 ${LIB_DIR}/packet.so:${SRC_DIR}/lua-packet.c
-	cc -g -O2 -Wall -Iskynet/3rd/lua -fPIC --shared $< -o $@
+	gcc ${CFLAGS} ${SHARED} $< -o $@
 ${LIB_DIR}/random.so:${SRC_DIR}/lua-random.c
-	cc -g -O2 -Wall -Iskynet/3rd/lua -fPIC --shared $< -o $@
+	gcc ${CFLAGS} ${SHARED} $< -o $@
 ${LIB_DIR}/webclient.so:${SRC_DIR}/lua-webclient.c
-	cc -g -O2 -Wall -Iskynet/3rd/lua -fPIC --shared $< -o $@ -lcurl
+	gcc ${CFLAGS} ${SHARED} $< -o $@ -lcurl
 ${LIB_DIR}/codec.so:${SRC_DIR}/lua-codec.c
-	cc -g -O2 -Wall -Iskynet/3rd/lua -fPIC --shared $< -o $@ -lcurl
+	gcc ${CFLAGS} ${SHARED} $< -o $@ -lcurl
+
+CJSON_SOURCE=3rd/lua-cjson/lua_cjson.c \
+			 3rd/lua-cjson/strbuf.c \
+			 3rd/lua-cjson/fpconv.c
+${LIB_DIR}/cjson.so:${CJSON_SOURCE}
+	gcc $(CFLAGS) -I3rd/lua/lua-cjson $(SHARED) $^ -o $@ $(LDFLAGS)
+
+3rd/lua-cjson/lua_cjson.c:
+	git submodule update --init 3rd/lua-cjson
 
 .PHONY:clean
 clean:
-	rm ${LIB}
+	rm ${LIB_DIR}/*
