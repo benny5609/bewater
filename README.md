@@ -4,19 +4,19 @@ skynet官方并没有提供多少游戏相关的解决方案，我造了些轮�
 ## 项目结构
 项目结构可以参照[bewater-sample](https://github.com/zhandouxiaojiji/bewater-sample)，或者以第三方库的形式引入你的项目。我们有时候需要同时维护多个新老项目，我把通用部分抽离出来，一方面是为了让旧项目与新代码保持同步，另一方面为了降低新建项目的成本，做到开箱即用。
 ```
-examples(测试服务)
-    etc(启动配置)
-    lualib(测试lib)
-    service(测试服务)
-luaclib(编译好的c库)
-lualib-src(c库源码)
 lualib(lua库)
    bw(一些常用的lua库)
    sys(一些业务相关的系统，可以忽略)
    def(一些定义，在你的项目里把它覆盖）
 service(通用服务)
-shell(测试启动脚本)
+luaclib(编译好的c库)
+lualib-src(c库源码)
+examples(测试服务)
+    etc(启动配置)
+    lualib(测试lib)
+    service(测试服务)
 skynet(fork skynet项目，不作任何改动)
+shell(测试启动脚本)
 ```
 ## 运行测试脚本
 ```
