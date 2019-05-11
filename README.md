@@ -29,24 +29,24 @@ skynet(fork skynet项目，不作任何改动)
 
 ## lua库
 ```
-bw.timer      定时器
-bw.lock       协程锁
-bw.class      伪类
-bw.xml        xml库
-bw.bewater    框架相关api
-bw.uuid       生成唯一uuid
-bw.const      给table添加只读限制
-bw.payment    支付宝支付&微信支付&苹果支付
-bw.server     一些通用的服务
+bw.timer   定时器
+bw.lock    协程锁
+bw.class   伪类
+bw.xml     xml库
+bw.bewater 框架相关api
+bw.uuid    生成唯一uuid
+bw.const   给table添加只读限制
+bw.payment 支付宝支付&微信支付&苹果支付
+bw.server  一些通用的服务
 ```
 
 ## c库
 ```
-cjson 		  json库
-codec 		  集成md5,rsa,base64,aes等编码加解密算法
-protobuf 	  pb库
-random 		  随机库
-webclient 	http库
+cjson     json库
+codec     集成md5,rsa,base64,aes等编码加解密算法
+protobuf  pb库
+random    随机库
+webclient http库
 ```
 
 ## 服务处理call和send的情况
@@ -80,7 +80,7 @@ webclient 	http库
 目前skynet只有在logger服务捕捉SIGHUP信号，其它信号需要写C服务，后续再加上
 
 ```
--- 安全停机:
+-- 安全停机
 local log = require "bw.log"
 log.sighup() -- 向logger注册信号处理服务
 skynet.dispatch("lua", function(_, _, cmd)
@@ -128,7 +128,7 @@ ti.destroy()
 ```
 luacheck --config .luacheck.rc ./
 ```
-我也写了个简单git钩子tools/pre-commit，将此文件重名名拷到.git/hooks目录下，在每次git commit前自动都会luacheck所有修改过的lua脚本，没有报错才能提交。这个钩子适合所有lua项目。
+我也写了个简单git钩子tools/pre-commit，将此文件拷到.git/hooks目录下，之后在每次git commit前都会自动luacheck所有修改过的lua脚本，没有报错才能提交。这个钩子适合所有lua项目。
 
 ## 优化与改进计划
 + 最初的思路是设计各种通用的服务，然后暴露一些接口给使用者，这种设计思路其实是错误的。应该把通用的逻辑抽成lua库，让使用者自己制定服务，参照云风写的agent和gateserver二者的关系。后续将逐步消灭service目录下的服务，改成lualib。
@@ -138,4 +138,4 @@ luacheck --config .luacheck.rc ./
 + 经过多次重构和迭代之后，越来越理解云风为什么把skynet做的这么轻量级了，你的制定条条框框越少，代码的可扩展性和可复用性就越强。bewater也在朝这个方向改进，收集更多的可复用的轮子，而不是写一些难以扩展的所谓通用服务。
 
 ## 关于bewater
-Be water My friend 是在我心目中浩气长存的伟大武术家李小龙先生已经解释过啦，如果你想更加了解多点的话，不妨一起探讨一下。(QQ:1013299930)
+Be water My friend 是在我心目中浩气长存的伟大武术家李小龙先生已经解释过啦，如果你想更加了解多点的话，不妨Issue一下。

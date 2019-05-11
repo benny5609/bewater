@@ -14,5 +14,5 @@ skynet.start(function()
         }
     }) ]]
     skynet.error("Be water my friend.")
-    test "logger"
+    test "bewater"
 end)

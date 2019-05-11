@@ -8,14 +8,15 @@ local date_helper   = require "bw.util.date_helper"
 local bash          = require "bw.util.bash"
 
 local root         = skynet.getenv "root"
-local CLUSTER_NAME = skynet.getenv "CLUSTER_NAME"
+local CLUSTER_NAME = skynet.getenv "CLUSTER_NAME" or "main"
 
 local alert -- function
 
-local mainfile = io.open(string.format("%s/log/%s.log",
-    root, CLUSTER_NAME), "w+")
-local errfile = io.open(string.format("%s/log/error.log",
-    root), "a+")
+local mainfile = io.open(string.format("%s/logs/%s.log", root, CLUSTER_NAME), "w+")
+local errfile = io.open(string.format("%s/logs/error.log", root), "a+")
+
+assert(mainfile)
+assert(errfile)
 
 local function write_log(file, addr, str)
     str = string.format("[%08x][%s] %s", addr, os.date("%Y-%m-%d %H:%M:%S", os.time()), str)
