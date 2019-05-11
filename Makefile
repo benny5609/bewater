@@ -9,7 +9,7 @@ all:build skynet
 
 build:
 	mkdir -p luaclib
-
+	mkdir -p logs
 
 SKYNET_MAKEFILE=skynet/Makefile
 $(SKYNET_MAKEFILE):
