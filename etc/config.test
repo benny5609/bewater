@@ -1,0 +1,23 @@
+-- common config
+
+root = "./"
+
+lualoader = "skynet/lualib/loader.lua"
+snax = "service/?.lua;service/?/init.lua;"
+lua_cpath = "luaclib/?.so;skynet/luaclib/?.so"
+cpath = "skynet/cservice/?.so"
+bootstrap = "snlua bootstrap"   -- The service for bootstrap
+
+-- subsystem config
+lua_path = "examples/lualib/?.lua;lualib/?.lua;skynet/lualib/?.lua;"
+
+common_lua_service = root.."service/?.lua;"..root.."skynet/service/?.lua;"
+luaservice = "examples/service/?/init.lua;examples/service/?.lua;service/?.lua;skynet/service/?.lua;"
+
+start = "test"  -- main script
+
+-- variable
+thread = 8
+logpath = "."
+harbor = 0
+
