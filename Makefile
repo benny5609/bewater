@@ -1,14 +1,22 @@
-.PHONY:all
+.PHONY:all skynet
 
 SRC_DIR = ./lualib-src
 LIB_DIR = ./luaclib
 
 INCLUDE_DIR=skynet/3rd/lua
 
-all:build
+all:build skynet
 
 build:
 	mkdir -p luaclib
+
+
+SKYNET_MAKEFILE=skynet/Makefile
+$(SKYNET_MAKEFILE):
+	git submodule update --init
+
+skynet: | $(SKYNET_MAKEFILE)
+	cd skynet && $(MAKE) linux
 
 CFLAGS = -g3 -O2 -rdynamic -Wall -I$(INCLUDE_DIR)
 SHARED = -fPIC --shared

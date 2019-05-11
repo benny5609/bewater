@@ -5,3 +5,7 @@
 	path = 3rd/pbc
 	url = git@github.com:cloudwu/pbc.git
     ignore = dirty
+[submodule "skynet"]
+	path = skynet
+	url = git@github.com:zhandouxiaojiji/skynet.git
+    ignore = dirty
