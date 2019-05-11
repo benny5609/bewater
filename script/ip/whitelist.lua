@@ -1,4 +1,4 @@
-local redis = require "bw.db.redis_helper"
+local redis = require "db.redis"
 
 local M = {}
 function M.add(ip)

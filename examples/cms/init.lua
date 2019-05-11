@@ -1,5 +1,5 @@
 local skynet     = require "skynet"
-local gateserver = require "bw.web.gateserver"
+local gateserver = require "bw.server.http_gate"
 local server     = require "sys.cms.server"
 
 server.start({

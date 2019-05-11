@@ -1,7 +1,7 @@
 local skynet = require "skynet"
 local bewater = require "bw.bewater"
 
-require "bw.ip.ip_country"
+require "bw.util.ip_country"
 require "bw.schedule"
 
 local check_list = {
@@ -16,7 +16,6 @@ local check_list = {
 
 skynet.start(function()
     skynet.register "check"
-    bewater.reg_code(_G)
 
     local count = 0
     for i, v in ipairs(check_list) do

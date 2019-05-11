@@ -1,28 +1,32 @@
-local conf      = require "conf"
+local skynet      = require "skynet"
+local date_helper = require "bw.util.date_helper"
+
+local desc = skynet.getenv "DESC" or "未知"
+local clustername = skynet.getenv "CLUSTER_NAME" or "未知"
+local gate = string.format("%s:%s", skynet.getenv "LOGIN_HOST", skynet.getenv "LOGIN_PORT")
+local cms = string.format("%s:%s", skynet.getenv "CMS_HOST", skynet.getenv "CMS_PORT")
+local mongo = string.format("%s:%s", skynet.getenv "CMS_HOST", skynet.getenv "CMS_PORT")
+local mysql = string.format("%s:%s", skynet.getenv "CMS_HOST", skynet.getenv "CMS_PORT")
+local redis = string.format("%s:%s", skynet.getenv "CMS_HOST", skynet.getenv "CMS_PORT")
+local alert = skynet.getenv("ALERT_ENABLE") and "已开启" or "未开启"
 
 return function()
     local info = require "bw.util.clusterinfo"
     local profile = info.profile
     return {
-        list = {
-            {k = "项目", v = conf.desc or "未知"},
-            {k = "节点", v = conf.clustername or "未知"},
-            {k = "外网ip", v = info.pnet_addr or "未知"},
-            {k = "内网ip", v = info.inet_addr or "未知"},
-            {k = "进程号", v = info.pid or "未知"},
-            {k = "性能", v = profile and string.format("CPU:%sMEM:%.fM",
-                profile.cpu, profile.mem/1024) or "未知"},
-            {k = "监听端口", v = conf.gate and string.format("%s:%s",
-                conf.gate.host, conf.gate.port) or "未知"},
-            {k = "后台地址", v = conf.webconsole and string.format("%s:%s",
-                conf.webconsole.host, conf.webconsole.port) or "未知"},
-            {k = "mongo", v = conf.mongo and string.format("%s:%s[%s]",
-                conf.mongo.host, conf.mongo.port, conf.mongo.name) or "未知"},
-            {k = "redis", v = conf.redis and string.format("%s:%s",
-                conf.redis.host, conf.redis.port) or "未知"},
-            {k = "mysql", v = conf.mysql and string.format("%s:%s[%s]",
-                conf.mysql.host, conf.mysql.port, conf.mysql.name) or "未知"},
-            {k = "警报", v = (conf.alert and conf.alert.enable) and "已开启" or "未开启"},
-        },
+        online      = 0,
+        run_time    = date_helper.format_now(),
+        desc        = desc,
+        clustername = clustername,
+        pnet_addr   = info.pnet_addr or "未知",
+        inet_addr   = info.inet_addr or "未知",
+        pid         = info.pid or "未知",
+        profile     = profile,
+        gate        = gate,
+        webconsole  = cms,
+        mongo       = mongo,
+        redis       = redis,
+        mysql       = mysql,
+        alert       = alert,
     }
 end

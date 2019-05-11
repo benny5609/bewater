@@ -3,8 +3,8 @@
 local skynet    = require "skynet"
 local json      = require "cjson.safe"
 local bewater   = require "bw.bewater"
-local http      = require "bw.web.http_helper"
 local sha256    = require "bw.auth.sha256"
+local http      = require "bw.http"
 
 local load_cache
 local save_cache

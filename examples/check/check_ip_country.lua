@@ -1,4 +1,4 @@
-local ip_country    = require "bw.ip.ip_country"
+local ip_country    = require "bw.util.ip_country"
 return function()
     local cn = '113.111.109.39'
     local c = ip_country.get_country(cn)

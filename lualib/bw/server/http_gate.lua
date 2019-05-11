@@ -4,13 +4,10 @@ local httpd         = require "http.httpd"
 local sockethelper  = require "http.sockethelper"
 local bewater       = require "bw.bewater"
 local log           = require "bw.log"
-local whitelist     = require "bw.ip.whitelist"
-local blacklist     = require "bw.ip.blacklist"
-local conf          = require "conf"
 
 local trace = log.trace("gateserver")
 
-require "bw.ip.ip_country"
+require "bw.util.ip_country"
 
 local function response(fd, ...)
     local ok, err = httpd.write_response(sockethelper.writefunc(fd), ...)
@@ -36,27 +33,12 @@ end
 
 function gateserver.start(handler, agentname, port, preload)
     skynet.start(function()
-        bewater.reg_code()
         for i= 1, preload or 10 do
             agents[i] = skynet.newservice(agentname)
         end
         local balance = 1
         local fd = socket.listen("0.0.0.0", port)
         socket.start(fd , function(_fd, ip)
-            if conf.whitelist and not whitelist.check(ip) then
-                socket.start(_fd)
-                skynet.error(string.format("not in whitelist:%s", ip))
-                response(_fd, 403)
-                socket.close(_fd)
-                return
-            end
-            if conf.blacklist and blacklist.check(ip) then
-                socket.start(fd)
-                skynet.error(string.format("in blacklist:%s", ip))
-                response(fd, 403)
-                socket.close(fd)
-                return
-            end
             trace("%s connected, pass it to agent :%08x", _fd, agents[balance])
             skynet.send(agents[balance], "lua", _fd, ip)
             balance = balance + 1

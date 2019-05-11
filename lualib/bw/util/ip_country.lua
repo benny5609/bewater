@@ -6,7 +6,7 @@ skynet.init(function()
     addr = service.new("ip_country", function()
         local skynet = require "skynet"
         local util  = require "bw.util"
-        local http  = require "bw.web.http_helper"
+        local http  = require "bw.http"
         local mongo = require "db.mongo"
 
         local CMD = {}

@@ -1,11 +1,11 @@
 -- 企业微信警报系统
 local skynet    = require "skynet"
-local http      = require "bw.web.http_helper"
 local bewater   = require "bw.bewater"
 local log       = require "bw.log"
 local lock      = require "bw.lock"
 local util      = require "bw.util"
 local bash      = require "bw.util.bash"
+local http      = require "bw.http"
 local json      = require "cjson.safe"
 
 local trace  = log.trace("alert")

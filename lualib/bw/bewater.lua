@@ -21,11 +21,6 @@ function M.try(func, ...)
     return xpcall(func, __TRACEBACK__, ...)
 end
 
-function M.reg_code(env)
-    local code = require "bw.proto.code"
-    code.REG(env)
-end
-
 -- 给一个服务注入一段代码
 -- return ok, output
 function M.inject(addr, source)

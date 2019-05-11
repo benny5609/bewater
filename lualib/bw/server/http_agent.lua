@@ -148,7 +148,6 @@ function agentserver.start(handler)
     end
 
     skynet.start(function()
-        bewater.reg_code()
         skynet.dispatch("lua", function (_,_, ...)
             local args = {...}
             if type(args[1]) == "string" then

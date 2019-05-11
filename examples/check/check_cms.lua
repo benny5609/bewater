@@ -1,6 +1,6 @@
 local skynet    = require "skynet.manager"
 local json      = require "cjson.safe"
-local http      = require "bw.web.http_helper"
+local http      = require "bw.http"
 local errcode   = require "def.errcode"
 
 local authorization

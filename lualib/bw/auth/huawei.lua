@@ -1,9 +1,9 @@
 local json  = require "cjson.safe"
 local codec = require "codec"
-local http  = require "bw.web.http_helper"
 local sign  = require "bw.auth.sign"
 local log   = require "bw.log"
 local util  = require "bw.util"
+local http  = require "bw.http"
 
 local table_insert  = table.insert
 local table_sort    = table.sort

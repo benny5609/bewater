@@ -3,9 +3,9 @@
 -- @module webclient
 -- @usage local webclient = skynet.newservice("webclient")
 
-local skynet = require "skynet"
+local skynet       = require "skynet.manager"
 local webclientlib = require "webclient"
-local webclient = webclientlib.create()
+local webclient    = webclientlib.create()
 local requests = nil
 
 local function resopnd(request, result)
@@ -105,6 +105,7 @@ local function request(url, get, post, header, no_reply)
 end
 
 skynet.start(function()
+    skynet.register ".webclient"
     skynet.dispatch("lua", function(_, _, command, ...)
         assert(command == "request")
         request(...)

@@ -1,13 +1,13 @@
 -- oppo支付
-local codec     = require "codec"
-local sign      = require "bw.auth.sign"
-local http      = require "bw.web.http_helper"
-local util      = require "bw.util"
-local log       = require "bw.log"
-local errcode   = require "def.errcode"
-local def       = require "def.def"
-local conf      = require "conf"
-local trace     = log.trace("oppay")
+local codec   = require "codec"
+local sign    = require "bw.auth.sign"
+local util    = require "bw.util"
+local http    = require "bw.http"
+local log     = require "bw.log"
+local errcode = require "def.errcode"
+local def     = require "def.def"
+local conf    = require "conf"
+local trace   = log.trace("oppay")
 
 local CALLBACK_OK = "OK"
 local CALLBACK_FAIL = "FAIL"
