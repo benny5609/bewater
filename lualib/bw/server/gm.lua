@@ -52,18 +52,6 @@ function skynet_cmd.list()
     return str
 end
 
-function skynet_cmd.hotfix()
-    trace("gm hotfix")
-    for addr, _ in pairs(hotfix_addrs) do
-        skynet.send(addr, "lua", "hotfix")
-    end
-end
-
-function skynet_cmd.publish(nodename)
-    trace("publish:%s", nodename)
-    skynet.newservice("publish", nodename)
-end
-
 function skynet_cmd.alert()
     error("test alert")
 end
@@ -106,16 +94,6 @@ function M.run(modname, cmd, ...)
         return "服务器执行TRACEBACK了"
     end
     return ret or "执行成功"
-end
-
-local hotfix_addrs = {}
-function M.reg_hotfix(addr)
-    --trace("reg_hotfix:%s", addr)
-    hotfix_addrs[addr] = true
-end
-
-function M.unreg_hotfix(addr)
-    hotfix_addrs[addr] = nil
 end
 
 function M.start(cmds)
