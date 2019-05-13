@@ -70,6 +70,19 @@ webclient http库
     end)
 ```
 
+## 协程锁与防重入
+服务间通讯通常是用skynet.call或者skynet.send，我们平常用的最多的是call，call有个坑就是当前协程会被挂起，在协程被唤醒前可能同样的代码又被执行了一次。在处理关键业务的时候(比如加经验，货币)需要特别小心重入是否会引发逻辑上的bug。协程锁跟线程锁是差不多原理，在lock的地方挂起等待上一次协程处理完再继续往下执行。
+```
+local lock = require "bw.lock"
+local l = lock.new()
+function test()
+    l:lock()
+    -- do something
+    l:unlock()
+end
+```
+不过这种锁还是要慎用，容易造成单个服务的消息队列过长。实在没办法比如是客户端不可预知的操作，可以加个锁预防一下。
+
 ## logger服务
 + 文件fd，保存一段时间，自动关闭
 + 系统log分系统存, 一天一份日志
@@ -89,12 +102,6 @@ skynet.dispatch("lua", function(_, _, cmd)
         skynet.abort()
     end
 end)
-```
-## GM系统
-按模块添加方法集，然后在后台输入命令
-```
-local gm = require "bw.gm"
-gm.add_gmcmd("test_module", "test_cmd")
 ```
 
 ## 活动日程
