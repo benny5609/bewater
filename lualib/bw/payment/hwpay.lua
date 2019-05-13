@@ -29,7 +29,7 @@ function M.create_order(param)
     return {
         appid    = param.appid,
         cpid     = param.cpid,
-        cp       = '琢玉教育',
+        cp       = param.cp,
         item_sn  = param.item_sn,
         order_no = param.order_no,
         url      = url,
