@@ -13,7 +13,7 @@ local CLUSTER_NAME = skynet.getenv "CLUSTER_NAME" or "main"
 local alert -- function
 
 local mainfile = io.open(string.format("%s/logs/%s.log", root, CLUSTER_NAME), "w+")
-local errfile = io.open(string.format("%s/logs/error.log", root), "a+")
+local errfile = io.open(string.format("%s/logs/%s_error.log", root, CLUSTER_NAME), "a+")
 
 assert(mainfile)
 assert(errfile)
@@ -54,8 +54,8 @@ function CMD.trace(addr, sys, str)
         if log then
             log.file:close()
         end
-        bash.bash("mkdir -p %s/log/%s", root, sys)
-        local filename = string.format("%s/log/%s/%s.log",
+        bash.bash("mkdir -p %s/logs/%s", root, sys)
+        local filename = string.format("%s/logs/%s/%s.log",
             root, sys, os.date("%Y%m%d", os.time()))
         local file = io.open(filename, "a+")
         log = {file = file}
