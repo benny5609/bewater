@@ -31,8 +31,7 @@ function util.run_cluster(clustername)
 end
 
 function util.gc()
-    local conf = require "conf"
-    if conf.debug then
+    if skynet.getenv "DEBUG" then
         collectgarbage("collect")
         return collectgarbage("count")
     end
