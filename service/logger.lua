@@ -75,8 +75,8 @@ function CMD.role(addr, uid, sys, str)
             log.file:close()
         end
         local dir = string.format("%d/%d/%d", uid//1000000, uid%1000000//1000, uid%1000)
-        bash.bash("mkdir -p %s/log/role/%s", root, dir)
-        local filename = string.format("%s/log/role/%s/%s.log",
+        bash.bash("mkdir -p %s/logs/role/%s", root, dir)
+        local filename = string.format("%s/logs/role/%s/%s.log",
             root, dir, os.date("%Y%m%d", os.time()))
         local file = io.open(filename, "a+")
         log = {file = file}
