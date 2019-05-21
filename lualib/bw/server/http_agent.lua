@@ -115,7 +115,8 @@ local function on_message(url, args, body, header, ip)
     else
         return default_pack({
             err = errcode.API_NOT_EXIST,
-            desc = "api not exist"
+            desc = "api not exist",
+            url = url,
         })
     end
 end
@@ -187,6 +188,7 @@ function M.start(handler)
 end
 
 function M.reg(params)
+    skynet.error("http_agent reg:", params.url)
     api[params.url] = {
         url     = assert(params.url),
         handler = assert(params.handler),
