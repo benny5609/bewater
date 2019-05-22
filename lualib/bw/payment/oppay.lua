@@ -6,7 +6,6 @@ local http    = require "bw.http"
 local log     = require "bw.log"
 local errcode = require "def.errcode"
 local def     = require "def.def"
-local conf    = require "conf"
 local trace   = log.trace("oppay")
 
 local CALLBACK_OK = "OK"
@@ -18,6 +17,7 @@ function M.create_order(param)
     local item_desc     = assert(param.item_name)
     local pay_price     = assert(param.pay_price) * 0.7
     local secret        = assert(param.secret)
+    local url           = assert(param.url)
     assert(param.pay_channel)
     assert(param.item_sn)
 
@@ -26,7 +26,7 @@ function M.create_order(param)
         price       = pay_price*100//1 >> 0,
         name        = item_desc,
         desc        = item_desc,
-        url         = string.format("%s:%s/api/payment/opop_notify", conf.pay.host, conf.pay.port),
+        url         = url,
         attach      = codec.md5_encode(order_no..secret),
     }
 end

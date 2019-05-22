@@ -134,7 +134,6 @@ end
 local M = {}
 function M.start(handler)
     -- handler 需要提供
-    -- handler.auth = function(auth) return uid end -- 授权
     -- 如果是非字符串，handler需要提供pack和unpack方法
     default_pack = handler.pack or default_pack
     default_unpack = handler.unpack or default_unpack
@@ -188,7 +187,7 @@ function M.start(handler)
 end
 
 function M.reg(params)
-    skynet.error("http_agent reg:", params.url)
+    --skynet.error("http_agent reg:", params.url)
     api[params.url] = {
         url     = assert(params.url),
         handler = assert(params.handler),

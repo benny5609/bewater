@@ -110,10 +110,12 @@ skynet.register_protocol {
     unpack = function(...) return ... end,
     dispatch = function()
         -- reopen signal
+        skynet.error("handle SIGHUP, skynet will be stop")
         if sighup_addr then
+            skynet.error("1")
             skynet.send(sighup_addr, "lua", "SIGHUP")
         else
-            skynet.error("handle SIGHUP, skynet will be stop")
+            skynet.error("2")
             skynet.abort()
         end
     end

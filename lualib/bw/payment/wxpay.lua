@@ -7,7 +7,6 @@ local http      = require "bw.http"
 local log       = require "bw.log"
 local errcode   = require "def.errcode"
 local def       = require "def.def"
-local conf      = require "conf"
 local trace     = log.trace("wxpay")
 
 local M = {}
@@ -20,19 +19,20 @@ function M.create_order(param)
     local item_desc     = assert(param.item_desc)
     local pay_method    = assert(param.pay_method)
     local pay_price     = assert(param.pay_price)
+    local url           = assert(param.url)
     assert(param.pay_channel)
     assert(param.item_sn)
 
     local args = {
-        appid           = appid,
-        mch_id          = mch_id,
-        nonce_str       = math.random(10000)..uid,
-        trade_type      = pay_method == "wxpay" and "APP" or "NATIVE",
-        body            = item_desc,
-        out_trade_no    = order_no..'-'..os.time(),
-        total_fee       = pay_price*100//1 >> 0,
-        spbill_create_ip= '127.0.0.1',
-        notify_url      = string.format("%s:%s/api/payment/wxpay_notify", conf.pay.host, conf.pay.port),
+        appid            = appid,
+        mch_id           = mch_id,
+        nonce_str        = math.random(10000)..uid,
+        trade_type       = pay_method == "wxpay" and "APP" or "NATIVE",
+        body             = item_desc,
+        out_trade_no     = order_no..'-'..os.time(),
+        total_fee        = pay_price*100//1 >> 0,
+        spbill_create_ip = '127.0.0.1',
+        notify_url       = url,
     }
     args.sign = sign.md5_args(args, key)
     local xml = lua2xml.encode("xml", args, true)

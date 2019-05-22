@@ -14,8 +14,8 @@ function M.start(handler)
     id = load_id() + reserve_count
     if not id then
         id = initial_id
-        save_id(id)
     end
+    save_id(id)
     reserve_id = id + reserve_count
 end
 

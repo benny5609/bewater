@@ -1,5 +1,4 @@
 -- 华为支付
-local conf  = require "conf"
 local codec = require "codec"
 local sign  = require "bw.auth.sign"
 
@@ -7,12 +6,12 @@ local M = {}
 function M.create_order(param)
     local private_key   = assert(param.private_key)
     local pay_price     = assert(param.pay_price)
+    local url           = assert(param.url)
     assert(param.order_no)
     assert(param.item_sn)
     assert(param.pay_channel)
     assert(param.pay_method)
 
-    local url = string.format('%s/api/payment/huawei_notify', conf.pay.host)
     local args = {
         productNo = param.item_sn,
         applicationID = param.appid,
