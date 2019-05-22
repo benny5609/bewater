@@ -11,7 +11,6 @@ local print = print
 local io = io
 local tinsert = table.insert
 local rawget = rawget
-local rawset = rawset
 
 local M = {}
 
@@ -33,6 +32,11 @@ M.GC = GC
 function M.lasterror()
 	return c._last_error(P)
 end
+
+local map_entry_cache = setmetatable({}, {__index = function (self, typename)
+	rawset(self, typename, c._env_map_entry(P, typename))
+	return self[typename]
+end})
 
 local decode_type_cache = {}
 local _R_meta = {}
@@ -254,9 +258,16 @@ function _writer:string_repeated(k,v)
 end
 
 function _writer:message_repeated(k,v, message_type)
-	for _,v in ipairs(v) do
-		local submessage = c._wmessage_message(self, k)
-		encode_message(submessage, message_type, v)
+	if map_entry_cache[message_type] then
+		for dk , dv in pairs(v) do
+			local submessage = c._wmessage_message(self, k)
+			encode_message(submessage, message_type, {key=dk, value=dv})
+		end
+	else
+		for _,v in ipairs(v) do
+			local submessage = c._wmessage_message(self, k)
+			encode_message(submessage, message_type, v)
+		end
 	end
 end
 
@@ -428,18 +439,7 @@ local function default_table(typename)
 		return v
 	end
 
-	local default_inst = assert(decode_message(typename , ""))
-	v = { 
-		__index = function(tb, key)
-			local ret = default_inst[key]
-			if 'table' ~= type(ret) then
-				return ret
-			end 
-			ret = setmetatable({}, { __index = ret })
-			rawset(tb, key, ret)
-			return ret
-		end
-	}
+	v = { __index = assert(decode_message(typename , "")) }
 
 	default_cache[typename]  = v
 	return v
