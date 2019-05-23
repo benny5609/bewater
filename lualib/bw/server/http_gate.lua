@@ -58,7 +58,9 @@ function gateserver.start(handler, agentname, port, preload)
                 bewater.ret(f[subcmd](f, ...))
             end
         end)
-
+        if handler.start then
+            handler.start()
+        end
     end)
 end
 

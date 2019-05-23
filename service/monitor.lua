@@ -12,6 +12,7 @@ local CMD = {}
 function CMD.register(addr)
     assert(addr)
     table_insert(addr_list, addr)
+    trace("register %s", addr)
 end
 
 function CMD.unregister(addr)
