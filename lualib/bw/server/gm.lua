@@ -82,15 +82,19 @@ function M.run(modname, cmd, ...)
     if not mod then
         return string.format("模块[%s]未初始化", modname)
     end
-    local f = mod[cmd]
-    if not f then
-        return string.format("GM指令[%s][%s]不存在", modname, cmd)
+
+    local f
+    if type(mod) == "function" then
+        f = mod
+    else
+        local f = mod[cmd]
+        if not f then
+            return string.format("GM指令[%s][%s]不存在", modname, cmd)
+        end
     end
     local args = {...}
     local ret
-    if not bewater.try(function()
-        ret = f(table.unpack(args))
-    end) then
+    if not bewater.try(function() ret = f(table.unpack(args)) end) then
         return "服务器执行TRACEBACK了"
     end
     return ret or "执行成功"
@@ -100,6 +104,8 @@ function M.start(cmds)
     for k, v in pairs(cmds) do
         gmcmd[k] = v
     end
+
+    bewater.start(M)
 end
 
 return M

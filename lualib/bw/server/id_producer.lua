@@ -19,7 +19,7 @@ function M.start(handler)
     reserve_id = id + reserve_count
 end
 
-function M.stop()
+function M.save()
     save_id(id)
 end
 
