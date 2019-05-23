@@ -10,6 +10,7 @@ local addr_list = {}
 
 local CMD = {}
 function CMD.register(addr)
+    assert(addr)
     table_insert(addr_list, addr)
 end
 
@@ -22,7 +23,9 @@ function CMD.unregister(addr)
 end
 
 function CMD.shutdown(force)
+    skynet.error("monitor shutdown")
     for _, v in pairs(addr_list) do
+        skynet.error("shutdown", v)
         if force then
             bewater.try(function()
                 skynet.call(v, "lua", "shutdown", force)
@@ -31,7 +34,9 @@ function CMD.shutdown(force)
             skynet.call(v, "lua", "shutdown", force)
         end
     end
-    skynet.sleep(100)
+    skynet.timeout(100, function()
+        skynet.abort()
+    end)
 end
 
 bewater.start(CMD)

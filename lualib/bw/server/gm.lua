@@ -66,9 +66,11 @@ function skynet_cmd.time(...)
     local cur = schedule.changetime(t)
     return string.format("时间修改至 %s", date_helper.format(cur))
 end
+
 local gmcmd = {
     skynet = skynet_cmd,
 }
+
 local M = {}
 function M.add_gmcmd(modname, gmcmd_path)
     gmcmd[modname] = require(gmcmd_path)
@@ -77,25 +79,29 @@ end
 
 function M.run(modname, cmd, ...)
     modname = string.lower(modname)
-    cmd = string.lower(cmd)
+    cmd = cmd and string.lower(cmd) or nil
     local mod = gmcmd[modname]
     if not mod then
         return string.format("模块[%s]未初始化", modname)
     end
 
     local f
+    local ret
+    local args = {...}
     if type(mod) == "function" then
         f = mod
+        if not bewater.try(function() ret = f(cmd, table.unpack(args)) end) then
+            return "服务器执行TRACEBACK了"
+        end
+
     else
-        local f = mod[cmd]
+        f = mod[cmd]
         if not f then
             return string.format("GM指令[%s][%s]不存在", modname, cmd)
         end
-    end
-    local args = {...}
-    local ret
-    if not bewater.try(function() ret = f(table.unpack(args)) end) then
-        return "服务器执行TRACEBACK了"
+        if not bewater.try(function() ret = f(table.unpack(args)) end) then
+            return "服务器执行TRACEBACK了"
+        end
     end
     return ret or "执行成功"
 end
