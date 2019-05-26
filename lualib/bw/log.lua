@@ -1,10 +1,15 @@
 local skynet = require "skynet"
 local util   = require "bw.util"
 
+local tconcat  = table.concat
+local tinsert  = table.insert
+local sformat  = string.format
+local srep     = string.rep
 local tostring = tostring
 local select   = select
-local sformat  = string.format
 local os       = os
+
+local log = {}
 
 local llevel_desc = {
     [0] = "EMG",
@@ -73,7 +78,20 @@ local function format_log(addr, str)
     return sformat("[:%.8x] [%s] %s", addr, format_now() , str)
 end
 
-local function syslog(level, str)
+local function syslog(level, ...)
+    local n = select("#",...)
+    local out = {}
+    local v_str
+    for i=1,n do
+        local v = select(i,...)
+        if type(v) == "table" then
+            v_str = "table:\n" .. log.dump(v)
+        else
+            v_str = tostring(v)
+        end
+        tinsert(out, v_str)
+    end
+    local str = tconcat(out," ")
     if log_src then
         str = sformat("[%s] %s", get_log_src(4), str)
     end
@@ -84,18 +102,17 @@ local function syslog(level, str)
     skynet.send(".syslog", "lua", level, str)
 end
 
-local log = {}
 
 function log.highlight(...)
     return highlight(...)
 end
 
-function log.format_log(...)
-    return format_log(...)
+function log.format_log(addr, ...)
+    return format_log(addr, ...)
 end
 
 function log.debug(...)
-
+    syslog(llevel.DEBUG, ...)
 end
 
 function log.debugf(fmt, ...)
@@ -103,7 +120,7 @@ function log.debugf(fmt, ...)
 end
 
 function log.info(...)
-
+    syslog(llevel.INFO, ...)
 end
 
 function log.infof(fmt, ...)
@@ -111,15 +128,17 @@ function log.infof(fmt, ...)
 end
 
 function log.error(...)
-
+    syslog(llevel.ERROR, ...)
+    syslog(llevel.ERROR, debug.traceback())
 end
 
 function log.errorf(fmt, ...)
     syslog(llevel.ERROR, sformat(fmt, ...))
+    syslog(llevel.ERROR, debug.traceback())
 end
 
 function log.warning(...)
-
+    syslog(llevel.WARNING, ...)
 end
 
 function log.warningf(fmt, ...)
@@ -131,8 +150,29 @@ function log.syslog(level, str, addr)
     syslog(level, str)
 end
 
-function log.dump(obj, depth)
-
+function log.dump(root, depth)
+    depth = depth or 10
+    local cache = {  [root] = "." }
+    local function _dump(t, space, name, d)
+        if d <= 0 then
+            return ""
+        end
+        local temp = {}
+        for k,v in pairs(t) do
+            local key = tostring(k)
+            if cache[v] then
+                tinsert(temp,"+" .. key .. " {" .. cache[v].."}")
+            elseif type(v) == "table" then
+                local new_key = name .. "." .. key
+                cache[v] = new_key
+                tinsert(temp,"+" .. key .. _dump(v,space .. "|" .. srep(" ",#key), new_key, d - 1))
+            else
+                tinsert(temp,"+" .. key .. " [" .. tostring(v).."]")
+            end
+        end
+        return tconcat(temp,"\n"..space)
+    end
+    return (_dump(root, "","", depth))
 end
 
 return log

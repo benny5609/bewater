@@ -72,7 +72,6 @@ function util.dump(root, ...)
         space = space .. "  "
         for k, v in pairs(t) do
             if filter[v] then
-
                 table.insert(tbl, space .. _to_key(k) .. " = " .. filter[v])
             elseif filter[v] or type(v) ~= "table" then
                 local val = tostring(v)
