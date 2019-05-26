@@ -18,8 +18,9 @@ start = "test"  -- main script
 
 -- variable
 thread = 8
-logpath = "."
 harbor = 0
 logservice = "snlua"
-logger = "logger"
+logger = "syslog"
 
+DEBUG = "true"
+APPNAME = "skynet-test"
