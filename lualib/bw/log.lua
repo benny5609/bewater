@@ -4,6 +4,7 @@ local util   = require "bw.util"
 local tostring = tostring
 local select   = select
 local sformat  = string.format
+local os       = os
 
 local llevel_desc = {
     [0] = "EMG",
@@ -48,17 +49,34 @@ local to_screen = false
 if skynet.getenv("DEBUG") == "true" then
     to_screen = true
 end
+local log_src = false
+if skynet.getenv("LOG_SRC") == "true" then
+    log_src = true
+end
+
+local function format_now()
+    return os.date("%Y-%m-%d %H:%M:%S", skynet.time()//1)
+end
 
 local function highlight(s, level)
     local c = color_level_map[level] or "red"
     return sformat("\x1b[1;%dm%s\x1b[0m", color[c], tostring(s))
 end
 
+local function get_log_src(level)
+    local info = debug.getinfo(level+1, "Sl")
+    local src = info.source
+    return src .. ":" .. info.currentline .. ":"
+end
+
 local function format_log(addr, str)
-    return sformat("[:%.8x] %s", addr, str)
+    return sformat("[:%.8x] [%s] %s", addr, format_now() , str)
 end
 
 local function syslog(level, str)
+    if log_src then
+        str = sformat("[%s] %s", get_log_src(4), str)
+    end
     str = format_log(skynet.self(), str)
     if to_screen then
         print(highlight(str, level))

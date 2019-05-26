@@ -22,5 +22,6 @@ harbor = 0
 logservice = "snlua"
 logger = "syslog"
 
-DEBUG = "true"
 APPNAME = "skynet-test"
+DEBUG = "true"
+LOG_SRC = "true"
