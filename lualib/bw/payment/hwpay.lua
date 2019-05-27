@@ -7,10 +7,11 @@ function M.create_order(param)
     local private_key   = assert(param.private_key)
     local pay_price     = assert(param.pay_price)
     local url           = assert(param.url)
-    assert(param.order_no)
-    assert(param.item_sn)
-    assert(param.pay_channel)
-    assert(param.pay_method)
+    assert(param.order_no, 'no order no')
+    assert(param.item_sn, 'no item sn')
+    assert(param.pay_channel, 'no pay channel')
+    assert(param.pay_method, 'no pay method')
+    assert(param.catalog, 'no catalog')
 
     local args = {
         productNo = param.item_sn,
@@ -32,7 +33,7 @@ function M.create_order(param)
         item_sn  = param.item_sn,
         order_no = param.order_no,
         url      = url,
-        catalog  = 'X5',
+        catalog  = param.catalog,
         sign     = str,
     }
 end
