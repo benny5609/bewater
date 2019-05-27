@@ -1,5 +1,7 @@
 local skynet = require "skynet"
+local log    = require "bw.log"
 local huawei = require "bw.auth.huawei"
+
 local private_key = [[-----BEGIN RSA PRIVATE KEY-----
 MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCHJJ1kxhOXDh4M
 9QgXj2sXahxG7clGnWDp5YW9f/+Xyf2RzZma1JB76KqXh2ZNyJfpG/4tsUqm1KBQ
@@ -38,5 +40,5 @@ return function ()
         player_ssign = 'VUOoWexHeQC98OFHyWapgKSACDwBgEHWb6IvPutKO0Z/wSVU3SDoK7/vnaLsYte6cYJu/RVWxoGh8lJfHuMoMucKutoNEXnAnPgTG5cfXf79DCtTnhMJ3lHBjaYFD03RWb2XBRKlnF7m455DeU2bvPZOsi7BhTDNPD0bTxY7PWlASLCSX7C7WqHN4/AWxDiU+ki2pPBstuSDecoUQQATBU35bQE2V7DtOsoGAhseuKXZe7yExMqszyZHLKaaqsbqq1rCua6FvJtwlwO82eY7N5kyW29r3MQ/uW1XGh4aPDods9UfD90BSLoPPmLjV9tREX/HFIdxkZ3FVWbkcWR4YQ==',
     }
     local sign = huawei.gen_token(params, private_key)
-    skynet.error("rtnSign", sign)
+    log.info("rtnSign", sign)
 end

@@ -2,6 +2,7 @@ local skynet  = require "skynet.manager"
 local mongo   = require "skynet.db.mongo"
 local bewater = require "bw.bewater"
 local util    = require "bw.util"
+local log     = require "bw.log"
 
 local db
 
@@ -34,8 +35,7 @@ function M.update(name, query_tbl, update_tbl)
     update_tbl = util.num2str(update_tbl)
     local ok, err, r = db[name]:findAndModify({query = query_tbl, update = update_tbl})
     if not ok then
-        skynet.error("mongo update error")
-        util.printdump(r)
+        log.error("mongo update error", r)
         error(err)
     end
     return true
@@ -45,8 +45,7 @@ function M.insert(name, tbl)
     tbl = util.num2str(tbl)
     local ok, err, r = db[name]:safe_insert(tbl)
     if not ok then
-        skynet.error("mongo update error")
-        util.printdump(r)
+        log.error("mongo update error", r)
         error(err)
     end
     return true

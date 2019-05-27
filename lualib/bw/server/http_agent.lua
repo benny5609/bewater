@@ -33,7 +33,7 @@ local function response(fd, ...)
     local ok, err = httpd.write_response(writefunc, ...)
     if not ok then
         -- if err == sockethelper.socket_error , that means socket closed.
-        skynet.error(string.format("fd = %d, %s", fd, err))
+        log.errorf("fd = %d, %s", fd, err)
     end
 end
 
@@ -150,8 +150,8 @@ function M.start(handler)
             -- limit request body size to 8192 (you can pass nil to unlimit)
             local code, url, method, header, body = httpd.read_request(sockethelper.readfunc(fd), nil)
             --util.printdump(header)
-            skynet.error(string.format("recv code:%s, url:%s, method:%s, header:%s, body:%s",
-                code, url, method, util.tbl2str(header), body))
+            log.errorf("recv code:%s, url:%s, method:%s, header:%s, body:%s",
+                code, url, method, util.tbl2str(header), body)
             if method == "OPTIONS" then
                 return resp_options(fd, header)
             end
@@ -175,9 +175,9 @@ function M.start(handler)
                 end
             else
                 if url == sockethelper.socket_error then
-                    skynet.error("socket closed")
+                    log.debug("socket closed")
                 else
-                    skynet.error(url)
+                    log.debug(url)
                 end
             end
             socket.close(fd)
@@ -186,7 +186,6 @@ function M.start(handler)
 end
 
 function M.reg(params)
-    --skynet.error("http_agent reg:", params.url)
     api[params.url] = {
         url     = assert(params.url),
         handler = assert(params.handler),

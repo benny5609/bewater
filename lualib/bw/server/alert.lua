@@ -22,15 +22,15 @@ local function request_token()
     if ret then
         local data = json.decode(resp)
         if data.errcode ~= 0 then
-            skynet.error("alert request_token error", util.dump(data))
+            log.error("alert request_token error", data)
             return
         end
         access_token = data.access_token
         expires = skynet.time() + data.expires_in
-        skynet.error("alert request_token:", access_token)
+        log.error("alert request_token:", access_token)
         return access_token
     else
-        skynet.error("cannot get token")
+        log.error("cannot get token")
     end
 end
 
@@ -55,7 +55,7 @@ local function send(str)
             send(str)
         end
     else
-        skynet.error("alert send error", ret, resp_str)
+        log.error("alert send error", ret, resp_str)
     end
 end
 

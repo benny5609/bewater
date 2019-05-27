@@ -11,7 +11,7 @@ local function response(fd, ...)
     local ok, err = httpd.write_response(sockethelper.writefunc(fd), ...)
     if not ok then
         -- if err == sockethelper.socket_error , that means socket closed.
-        skynet.error(string.format("fd = %d, %s", fd, err))
+        log.errorf("fd = %d, %s", fd, err)
     end
 end
 

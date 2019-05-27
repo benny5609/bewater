@@ -1,4 +1,5 @@
 local skynet    = require "skynet"
+local log       = require "bw.log"
 local conf      = require "conf"
 local opcode    = require "def.opcode"
 local errcode   = require "def.errcode"
@@ -87,7 +88,7 @@ function export.errcode(path)
 end
 
 function export.def(path)
-    skynet.error("export_def")
+    log.debug("export_def")
     local str = export.js_obj(def, 0)
     local file = io.open(path or conf.workspace.."/data/def.js", "w+")
     file:write(header..export.js_module(str))

@@ -1,8 +1,10 @@
 local skynet = require "skynet"
-local json = require "cjson"
+local json   = require "cjson"
+local log    = require "bw.log"
+
 return function()
-    skynet.error(json.encode({}))
-    skynet.error(json.encode_empty_table_as_array(true))
-    skynet.error(json.encode({}))
-    skynet.error(json.encode({}))
+    log.debug(json.encode({}))
+    log.debug(json.encode_empty_table_as_array(true))
+    log.debug(json.encode({}))
+    log.debug(json.encode({}))
 end

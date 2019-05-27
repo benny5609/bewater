@@ -4,6 +4,7 @@
 -- @usage local webclient = skynet.newservice("webclient")
 
 local skynet       = require "skynet.manager"
+local log          = require "bw.log"
 local webclientlib = require "webclient"
 local webclient    = webclientlib.create()
 local requests = nil
@@ -30,7 +31,7 @@ local function query()
             local request = requests[finish_key];
             assert(request)
 
-            xpcall(resopnd, function() skynet.error(debug.traceback()) end, request, result)
+            xpcall(resopnd, function() log.error(debug.traceback()) end, request, result)
 
             webclient:remove_request(request.req)
             requests[finish_key] = nil

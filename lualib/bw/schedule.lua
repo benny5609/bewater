@@ -1,5 +1,6 @@
 local skynet    = require "skynet"
 local service   = require "skynet.service"
+local log       = require "bw.log"
 
 local schedule = {}
 local service_addr
@@ -81,7 +82,7 @@ local function changetime(ti)
     ti.min = ti.min or current.min
     ti.sec = ti.sec or current.sec
     local nt = next_time(current, ti)
-    skynet.error(string.format("Change time to %s", os.date(nil, nt)))
+    log.debug("change time to %s", os.date(nil, nt))
     task.difftime = os.difftime(nt,ct)
     for k,v in pairs(task) do
         if type(v) == "table" then

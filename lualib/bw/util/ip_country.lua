@@ -44,12 +44,12 @@ skynet.init(function()
             local url = string.format('http://www.ip.cn/index.php?ip=%s', ip)
             local ret, resp = http.get(url, nil, headers)
             if not ret then
-                skynet.error(string.format("request www.ip.cn error ip:%s", ip))
+                log.errorf("request www.ip.cn error ip:%s", ip)
             end
             local str = string.match(resp, "GeoIP:(.+)</p><p>")
             local country = string.match(str or "", " ([^,]+)$") or "unknown"
             if country == "unknown" then
-                skynet.error("request ip country error, resp:", resp)
+                log.error("request ip country error, resp:", resp)
             end
             ips[ip] = country
             mongo.insert("ipinfo", {ip = ip, country = country})

@@ -1,5 +1,6 @@
-local skynet = require "skynet"
+local skynet  = require "skynet"
 local bewater = require "bw.bewater"
+local log     = require "bw.log"
 
 require "bw.util.ip_country"
 require "bw.schedule"
@@ -24,13 +25,13 @@ skynet.start(function()
             ret = ret()
         end
         assert(ret, v.." error")
-        skynet.error(string.format("check %s %s", v, ret and "ok" or "fail"))
+        log.debugf("check %s %s", v, ret and "ok" or "fail")
         if ret then
             count = count + 1
         else
             break
         end
     end
-    skynet.error(string.format("check %d files, %d ok, %d fail", 
-        #check_list, count, #check_list - count))
+    log.warningf("check %d files, %d ok, %d fail",
+        #check_list, count, #check_list - count)
 end)

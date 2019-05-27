@@ -23,9 +23,9 @@ function CMD.unregister(addr)
 end
 
 function CMD.shutdown(force)
-    skynet.error("monitor shutdown")
+    log.debug("monitor shutdown")
     for _, v in pairs(addr_list) do
-        skynet.error("shutdown", v)
+        log.debug("shutdown", v)
         if force then
             bewater.try(function()
                 skynet.call(v, "lua", "shutdown", force)

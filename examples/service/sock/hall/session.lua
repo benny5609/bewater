@@ -9,8 +9,6 @@ local opcode    = require "def.opcode"
 local errcode   = require "def.errcode"
 local env       = require "env"
 
-local trace = log.trace("session")
-
 local mt = {}
 mt.__index = mt
 
@@ -30,7 +28,7 @@ end
 
 -- 被动关闭
 function mt:close()
-    trace("close %s", self.fd)
+    log.debugf("close %s", self.fd)
 end
 
 -- 主动关闭
@@ -40,7 +38,7 @@ function mt:kick()
 end
 
 function mt:send(op, data, csn)
-    trace("send:%s, csn:%s, fd:%s", opcode.toname(op), csn, self.fd)
+    log.debugf("send:%s, csn:%s, fd:%s", opcode.toname(op), csn, self.fd)
     local msg, len
     protobuf.encode(opcode.toname(op), data or {}, function(buffer, bufferlen)
         msg, len = packet.pack(op, csn or 0, self.ssn or 0,
@@ -57,14 +55,12 @@ function mt:recv(msg, len)
     local modulename = opcode.tomodule(op)
     local simplename = opcode.tosimplename(op)
     if opcode.has_session(op) then
-        skynet.error(string.format("recv package, 0x%x %s, csn:%d, ssn:%d, crypt_type:%s, crypt_key:%s, sz:%d",
-            op, opname, csn, ssn, crypt_type, crypt_key, sz))
+        log.debugf("recv package, 0x%x %s, csn:%d, ssn:%d, crypt_type:%s, crypt_key:%s, sz:%d",
+            op, opname, csn, ssn, crypt_type, crypt_key, sz)
     end
 
     local data = protobuf.decode(opname, buff, sz)
     assert(type(data) == "table", data)
-    trace("recv, op:%s, csn:%s, fd:%s, data:%s", opcode.toname(op), csn, self.fd, util.dump(data))
-    --util.printdump(data)
 
     local ret = 0 -- 返回整数为错误码，table为返回客户端数据
     local mod = assert(self.visitor[modulename], modulename)

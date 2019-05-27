@@ -1,8 +1,9 @@
 -- Http 请求 get post
 --
-local skynet    = require "skynet"
-local json      = require "cjson.safe"
-local sname     = require "sname"
+local skynet = require "skynet"
+local json   = require "cjson.safe"
+local log    = require "bw.log"
+local sname  = require "sname"
 
 local M = {}
 function M.get(url, get, header, no_reply)
@@ -14,7 +15,6 @@ function M.get(url, get, header, no_reply)
 end
 
 function M.post(url, post, header, no_reply)
-    --skynet.error("http post:", url, post)
     if no_reply then
         return skynet.send(sname.WEBCLIENT, "lua", "request", url, nil, post, header, no_reply)
     else
@@ -66,7 +66,7 @@ function M.ip_info(ip)
     local _, resp = M.get("http://ip.taobao.com/service/getIpInfo.php", {ip = ip})
     resp = json.decode(resp)
     if not resp then
-        skynet.error("get ip_info error", ip, resp)
+        log.error("get ip_info error", ip, resp)
         resp = {}
     end
     return resp.data or {}

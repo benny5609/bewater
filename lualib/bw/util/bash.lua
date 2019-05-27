@@ -92,11 +92,11 @@ function bash(expr, ...)
         end)
     end
     local cmd = eval(expr)
-    --skynet.error(cmd)
+    --log.debug(cmd)
     local ret = io_popen(cmd)
     if ret ~= "" then
         ret = string.match(ret, "(.+)\n$") -- 去掉最后一个换行符
-        --skynet.error(ret)
+        --log.debug(ret)
     end
     return ret
 end

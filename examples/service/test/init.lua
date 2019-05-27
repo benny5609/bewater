@@ -1,6 +1,7 @@
-local skynet    = require "skynet"
-local http      = require "bw.http"
-local json      = require "cjson.safe"
+local skynet = require "skynet"
+local http   = require "bw.http"
+local log    = require "bw.log"
+local json   = require "cjson.safe"
 
 local function test(name)
     require("test_"..name)()
@@ -13,6 +14,6 @@ skynet.start(function()
             {account = "root", password = "123"}
         }
     }) ]]
-    skynet.error("Be water my friend.")
+    log.info("Be water my friend.")
     test "logger"
 end)

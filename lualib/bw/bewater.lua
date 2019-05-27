@@ -48,7 +48,7 @@ function M.timeout_call(ti, ...)
 
     if co then
         co = nil
-        skynet.error("call timeout:", ...)
+        log.warning("call timeout:", ...)
         return false
     else
         if ret[1] then
