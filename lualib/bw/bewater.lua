@@ -1,4 +1,5 @@
 local skynet = require "skynet.manager"
+local log    = require "bw.log"
 
 local M = {}
 M.NORET = "NORET"
@@ -10,9 +11,9 @@ end
 
 local function __TRACEBACK__(errmsg)
     local track_text = debug.traceback(tostring(errmsg), 2)
-    skynet.error("---------------------------------------- TRACKBACK ----------------------------------------")
-    skynet.error(track_text, "LUA ERROR")
-    skynet.error("---------------------------------------- TRACKBACK ----------------------------------------")
+    log.error("---------------------------------------- TRACKBACK ----------------------------------------")
+    log.error(track_text, "LUA ERROR")
+    log.error("---------------------------------------- TRACKBACK ----------------------------------------")
     return false
 end
 

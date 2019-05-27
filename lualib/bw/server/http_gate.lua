@@ -5,8 +5,6 @@ local sockethelper  = require "http.sockethelper"
 local bewater       = require "bw.bewater"
 local log           = require "bw.log"
 
-local trace = log.trace("gateserver")
-
 require "bw.util.ip_country"
 
 local function response(fd, ...)
@@ -39,7 +37,7 @@ function gateserver.start(handler, agentname, port, preload)
         local balance = 1
         local fd = socket.listen("0.0.0.0", port)
         socket.start(fd , function(_fd, ip)
-            --trace("%s connected, pass it to agent :%08x", _fd, agents[balance])
+            --log.debugf("%s connected, pass it to agent :%08x", _fd, agents[balance])
             skynet.send(agents[balance], "lua", _fd, ip)
             balance = balance + 1
             if balance > #agents then

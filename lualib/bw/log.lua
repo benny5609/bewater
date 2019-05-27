@@ -129,12 +129,10 @@ end
 
 function log.error(...)
     syslog(llevel.ERROR, ...)
-    syslog(llevel.ERROR, debug.traceback())
 end
 
 function log.errorf(fmt, ...)
     syslog(llevel.ERROR, sformat(fmt, ...))
-    syslog(llevel.ERROR, debug.traceback())
 end
 
 function log.warning(...)

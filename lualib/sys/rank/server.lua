@@ -3,8 +3,6 @@ local bewater   = require "bw.bewater"
 local log       = require "bw.log"
 local rank_cls  = require "sys.rank.rank"
 
-local trace = log.trace("rank.server")
-
 local ranks = {}
 
 local CMD = {}
@@ -20,7 +18,7 @@ local server = {}
 function server.start(handler, start_func)
     handler = handler or {}
     skynet.start(function()
-        trace("start")
+        log.info("start")
         skynet.dispatch("lua", function(_, _, cmd, ...)
             local func = assert(handler[cmd] or CMD[cmd], cmd)
             bewater.ret(func(...))

@@ -7,7 +7,6 @@ local http      = require "bw.http"
 local log       = require "bw.log"
 local errcode   = require "def.errcode"
 local def       = require "def.def"
-local trace     = log.trace("wxpay")
 
 local M = {}
 function M.create_order(param)
@@ -40,7 +39,7 @@ function M.create_order(param)
     local data = xml2lua.decode(resp_str).xml
 
     if data.return_code ~= "SUCCESS" and data.return_msg ~= "OK" then
-        log.error(string.format("wxpay create_order error, param:%s, resp:%s", util.dump(param), resp_str))
+        log.errorf("wxpay create_order error, param:%s, resp:%s", util.dump(param), resp_str)
         return errcode.WXORDER_FAIL
     end
 
@@ -92,7 +91,7 @@ function M.notify(order, key, param)
     end
 
     if param.result_code ~= "SUCCESS" or param.return_code ~= "SUCCESS" then
-        trace("wxpay fail %s", util.dump(param))
+        log.errorf("wxpay fail %s", util.dump(param))
     else
         order.pay_time = os.time()
         order.tid = param.transaction_id

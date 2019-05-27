@@ -14,6 +14,7 @@ exclude_files = {
     "lualib/bw/ws/*",
     "lualib/bw/util/bash.lua",
     "lualib/bw/schedule.lua",
+    "lualib/bw/protobuf.lua",
     "lualib/bw/util/ip_country.lua",
     "lualib/def/typedef/*",
     "service/sock/README.md",

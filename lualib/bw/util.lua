@@ -2,31 +2,14 @@ local skynet = require "skynet.manager"
 
 local util = {}
 
-local function __TRACEBACK__(errmsg)
-    local track_text = debug.traceback(tostring(errmsg), 2)
-    skynet.error("---------------------------------------- TRACKBACK ----------------------------------------")
-    skynet.error(track_text, "LUA ERROR")
-    skynet.error("---------------------------------------- TRACKBACK ----------------------------------------")
-    --local exception_text = "LUA EXCEPTION\n" .. track_text
-    return false
-end
-
--- 尝试调一个function 这个function可以带可变参数, 如果被调用的函数有异常 返回false，
--- 退出此方法继续执行其他代码并打印出异常信息
-function util.try(func, ...)
-    return xpcall(func, __TRACEBACK__, ...)
-end
-
 function util.shell(cmd, ...)
     cmd = string.format(cmd, ...)
-    skynet.error(cmd)
     return io.popen(cmd):read("*all")
 end
 
 function util.run_cluster(clustername)
     local conf = require "conf"
     local cmd = string.format("cd %s/shell && sh start.sh %s", conf.workspace, clustername)
-    skynet.error(cmd)
     os.execute(cmd)
 end
 
@@ -93,10 +76,6 @@ function util.dump(root, ...)
     table.insert(tbl, "}")
 
     return table.concat(tbl, "\n")
-end
-
-function util.printdump(root, ...)
-    skynet.error(util.dump(root, ...))
 end
 
 function util.is_in_list(list, obj)

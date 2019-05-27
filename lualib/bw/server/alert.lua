@@ -8,7 +8,6 @@ local bash      = require "bw.util.bash"
 local http      = require "bw.http"
 local json      = require "cjson.safe"
 
-local trace  = log.trace("alert")
 local send_lock = lock.new()
 local host = "https://qyapi.weixin.qq.com"
 local access_token = ''
@@ -68,7 +67,7 @@ local function send_traceback()
         return
     end
     local info = require "bw.util.clusterinfo"
-    local path = string.format("%s/log/error.log", info.workspace)
+    local path = string.format("%s/logs/error.log", info.workspace)
     local str = string.format("服务器出错了\n项目:%s\n节点:%s\n公网ip:%s\n内网ip:%s\n进程:%s\n日志:%s\n累计报错:%d次",
         conf.desc or conf.proj, info.clustername, info.pnet_addr, info.inet_addr, info.pid, path, count)
 

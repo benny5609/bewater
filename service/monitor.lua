@@ -1,7 +1,6 @@
 local skynet  = require "skynet.manager"
 local bewater = require "bw.bewater"
 local log     = require "bw.log"
-local trace   = log.trace("monitor")
 
 local table_insert = table.insert
 local table_remove = table.remove
@@ -12,7 +11,7 @@ local CMD = {}
 function CMD.register(addr)
     assert(addr)
     table_insert(addr_list, addr)
-    trace("register %s", addr)
+    log.infof("register %s", addr)
 end
 
 function CMD.unregister(addr)

@@ -4,8 +4,6 @@ local util      = require "bw.util"
 local log       = require "bw.log"
 local mongo     = require "db.mongo"
 
-local trace = log.trace("rank")
-
 local mt = {}
 function mt:ctor(cmp)
     assert(type(cmp) == "function")
@@ -25,7 +23,7 @@ end
 function mt:save()
     local new_obj = factory.extract_data(self.obj)
     if util.cmp_table(new_obj, self.obj) then
-        trace("no change, rank:%s", self.obj.name)
+        log.infof("no change, rank:%s", self.obj.name)
     end
     mongo.update("rank", {name = self.name}, self.obj)
     self.obj = new_obj

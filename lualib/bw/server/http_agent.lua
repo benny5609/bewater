@@ -6,9 +6,8 @@ local urllib        = require "http.url"
 local json          = require "cjson.safe"
 local bewater       = require "bw.bewater"
 local util          = require "bw.util"
-local errcode       = require "def.errcode"
 local log           = require "bw.log"
-local print = log.print("agentserver")
+local errcode       = require "def.errcode"
 
 local api = {}
 

@@ -6,7 +6,6 @@ local http    = require "bw.http"
 local log     = require "bw.log"
 local errcode = require "def.errcode"
 local def     = require "def.def"
-local trace   = log.trace("oppay")
 
 local CALLBACK_OK = "OK"
 local CALLBACK_FAIL = "FAIL"

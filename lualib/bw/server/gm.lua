@@ -6,8 +6,6 @@ local date_helper   = require "bw.util.date_helper"
 
 require "skynet.cluster"
 
-local trace = log.trace("gm")
-
 local skynet_cmd = {}
 function skynet_cmd.gc()
     skynet.call(".launcher", "lua", "GC")
@@ -57,7 +55,7 @@ function skynet_cmd.alert()
 end
 
 function skynet_cmd.time(...)
-    trace("gm time")
+    log.debug("gm time")
     local args = table.pack(...)
     local t = {}
     for i = 1, #args, 2 do

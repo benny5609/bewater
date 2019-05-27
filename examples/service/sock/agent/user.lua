@@ -74,14 +74,13 @@ function mt:recv(msg, len)
     local simplename = opcode.tosimplename(op)
     if opcode.has_session(op) then
         self.ssn = self.ssn + 1
-        skynet.error(string.format("recv package, 0x%x %s, csn:%d, ssn:%d, crypt_type:%s, crypt_key:%s, sz:%d",
-            op, opname, csn, ssn, crypt_type, crypt_key, sz))
+        log.errorf("recv package, 0x%x %s, csn:%d, ssn:%d, crypt_type:%s, crypt_key:%s, sz:%d",
+            op, opname, csn, ssn, crypt_type, crypt_key, sz)
     end
 
     local data = protobuf.decode(opname, buff, sz)
     assert(type(data) == "table", data)
     trace("recv, op:%s, csn:%s, fd:%s, data:%s", opcode.toname(op), csn, self.fd, util.dump(data))
-    --util.printdump(data)
 
     local ret = 0 -- 返回整数为错误码，table为返回客户端数据
     local mod = assert(self.role[modulename], opcode.toname(op))
