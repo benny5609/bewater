@@ -1,11 +1,11 @@
-.PHONY:all skynet
+.PHONY:all skynet lib
 
 SRC_DIR = ./lualib-src
 LIB_DIR = ./luaclib
 
 INCLUDE_DIR=skynet/3rd/lua
 
-all:build skynet
+all:build skynet lib
 
 build:
 	mkdir -p luaclib
@@ -22,7 +22,7 @@ CC = gcc
 CFLAGS = -g3 -O2 -rdynamic -Wall -I$(INCLUDE_DIR)
 SHARED = -fPIC --shared
 
-all:${LIB_DIR}/aes.so ${LIB_DIR}/packet.so ${LIB_DIR}/random.so \
+lib:${LIB_DIR}/aes.so ${LIB_DIR}/packet.so ${LIB_DIR}/random.so \
 	${LIB_DIR}/webclient.so ${LIB_DIR}/codec.so ${LIB_DIR}/cjson.so \
 	${LIB_DIR}/protobuf.so ${LIB_DIR}/syslog.so
 
@@ -63,4 +63,4 @@ ${LIB_DIR}/protobuf.so: ${PBC_SOURCE}
 
 .PHONY:clean
 clean:
-	rm ${LIB_DIR}/*
+	rm -f ${LIB_DIR}/*
