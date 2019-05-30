@@ -39,17 +39,17 @@ return function()
     local type_list = typeof.parse_string(define)
 
     trace("--------- type define ------------")
-    util.printdump(type_list)
+    log.debug(type_list)
 
     trace("--------- init cls map ------------")
     orm.init(type_list)
 
     trace("--------- cls map---------------")
-    util.printdump(orm.get_cls_map())
+    log.debug(orm.get_cls_map())
 
     trace("-----------------role")
     local role = orm.create("RoleInfo", {serverid=10001, name="standalone"})
-    util.printdump(to_data(role))
+    log.debug(to_data(role))
 
     trace("-----------------obj")
     local obj = orm.create("User", {
@@ -61,15 +61,15 @@ return function()
     })
     trace("--------------", obj.uid)
 
-    util.printdump(to_data(obj))
+    log.debug(to_data(obj))
 
     trace("-----------------obj+role")
     obj.roles[#obj.roles+1] = role
-    util.printdump(to_data(obj))
+    log.debug(to_data(obj))
 
     trace("------------ set dirty data")
     obj.roles[2] = {a = 1}
-    util.printdump(to_data(obj))
+    log.debug(to_data(obj))
 
     local function to_mongo(obj)
         local metatable = getmetatable(obj)
@@ -101,7 +101,7 @@ return function()
     end
 
     trace("----------- to_mongo")
-    util.printdump(to_mongo(obj))
+    log.debug(to_mongo(obj))
     trace("----------- to_mongo list")
     local user = orm.create("User", {
         roles = {
@@ -116,5 +116,5 @@ return function()
             },
         },
     })
-    util.printdump(to_mongo(user))
+    log.debug(to_mongo(user))
 end

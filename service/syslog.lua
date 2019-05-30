@@ -1,4 +1,6 @@
--- rsyslog 添加配置 local4.* /var/log/app.log
+-- rsyslog 添加配置
+-- local4.* /var/log/app.log
+-- $EscapeControlCharactersOnReceive off
 --
 local skynet      = require "skynet.manager"
 local syslog      = require "syslog"

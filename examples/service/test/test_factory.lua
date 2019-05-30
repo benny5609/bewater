@@ -9,12 +9,12 @@ return function()
     local obj = factory.create_obj("role", {
         roleid = 123
     })
-    util.printdump(obj)
+    log.debug(obj)
     obj = factory.create_obj("user", {
         uid = 10001,
         aaa = 11,
     })
-    util.printdump(obj)
+    log.debug(obj)
     local new_obj = factory.extract_data(obj)
     obj.token = "xxoo"
     if util.cmp_table(new_obj, obj) then

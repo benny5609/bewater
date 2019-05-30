@@ -1,6 +1,5 @@
 local skynet        = require "skynet"
 local log           = require "bw.log"
-local schedule      = require "bw.schedule"
 local bewater       = require "bw.bewater"
 local date_helper   = require "bw.util.date_helper"
 
@@ -61,6 +60,7 @@ function skynet_cmd.time(...)
     for i = 1, #args, 2 do
         t[args[i]] = tonumber(args[i+1])
     end
+    local schedule = require "bw.schedule"
     local cur = schedule.changetime(t)
     return string.format("时间修改至 %s", date_helper.format(cur))
 end

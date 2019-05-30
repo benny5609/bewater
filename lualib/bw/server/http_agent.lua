@@ -89,7 +89,7 @@ local function on_message(url, args, body, header, ip)
                         return errf(errcode.ARGS_ERROR, "args error, %s must number", k)
                     end
                 else
-                    util.printdump(data)
+                    log.debug(data)
                     error(string.format("api %s def type %s error", url, t))
                 end
             end
@@ -149,7 +149,7 @@ function M.start(handler)
             socket.start(fd)
             -- limit request body size to 8192 (you can pass nil to unlimit)
             local code, url, method, header, body = httpd.read_request(sockethelper.readfunc(fd), nil)
-            --util.printdump(header)
+            --log.info(header)
             log.errorf("recv code:%s, url:%s, method:%s, header:%s, body:%s",
                 code, url, method, util.tbl2str(header), body)
             if method == "OPTIONS" then

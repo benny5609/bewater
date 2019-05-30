@@ -24,9 +24,9 @@ return function()
     rmsg.push(uid, 0x1000, {a = "hello2", b = {cc = 1, dd = 2}})
 
     local list = rmsg.fetch(uid, time)
-    util.printdump(list)
+    log.debug(list)
 
     rmsg.process(uid, list[1].mid, 0)
     rmsg.process(uid, list[3].mid, 0x0002)
-    util.printdump(rmsg.fetch(uid, time))
+    log.debug(rmsg.fetch(uid, time))
 end
