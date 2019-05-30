@@ -31,6 +31,14 @@ function M.encode_uri(s)
 end
 
 function M.decode_uri(s)
+    s = string.gsub(s, '%%(%x%x)', function(h)
+        return string.char(tonumber(h, 16))
+    end)
+    return s
+end
+
+
+function M.parse_uri(s)
     assert(s)
     local data = {}
     for ss in string.gmatch(s, "([^&]+)") do

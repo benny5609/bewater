@@ -1,7 +1,8 @@
 -- 华为支付
 local skynet = require "skynet"
-local codec = require "codec"
-local sign  = require "bw.auth.sign"
+local codec  = require "codec"
+local sign   = require "bw.auth.sign"
+local http   = require "bw.http"
 
 local M = {}
 function M.create_order(param)
@@ -15,7 +16,7 @@ function M.create_order(param)
     assert(param.pay_method, 'no pay method')
     assert(param.catalog, 'no catalog')
 
-    local order_no = param.order_no.."TIME"..tostring(skynet.time()//1)
+    local order_no = param.order_no.."TIME"..tostring(skynet.time()//1>>0)
 
     local args = {
         productNo     = param.item_name,
@@ -42,6 +43,7 @@ function M.create_order(param)
     }
 end
 
+
 function M.notify(public_key, param)
     local args = {}
     for k, v in pairs(param) do
@@ -51,7 +53,7 @@ function M.notify(public_key, param)
     end
 
     local src = sign.concat_args(args)
-    local bs = codec.base64_decode(param.sign)
+    local bs = codec.base64_decode(http.decode_uri(param.sign))
     local pem = public_key
     return codec.rsa_sha256_public_verify(src, bs, pem, 2)
 end
