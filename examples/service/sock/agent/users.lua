@@ -3,8 +3,6 @@ local log       = require "bw.log"
 local user      = require "user"
 local env       = require "env"
 
-local trace = log.trace("users")
-
 local users = {} -- uid:user
 local fd2user = setmetatable({}, {__mode = "kv"})
 local half_closed = {} -- fd:bool
@@ -17,7 +15,7 @@ function M.open(fd, uid, ip)
         u:kick()
         half_closed[old_fd] = true
         skynet.timeout(100, function()
-            trace("half_close old_fd:%s", old_fd)
+            log.debugf("half_close old_fd:%s", old_fd)
             skynet.call(env.HALL, "lua", "half_close", old_fd)
             half_closed[old_fd] = nil
         end)
@@ -33,11 +31,11 @@ end
 function M.close(fd)
     local u = fd2user[fd]
     if not u or u.fd ~= fd then
-        trace("close, fd:%s, u.fd:%s", fd, u and u.fd)
+        loog.debugf("close, fd:%s, u.fd:%s", fd, u and u.fd)
         return
     end
     u:close()
-    trace("close, uid:%s", u.uid)
+    log.debugf("close, uid:%s", u.uid)
     skynet.call(env.GATE, "lua", "kick", fd)
 end
 
@@ -59,7 +57,7 @@ function M.check_timeout()
         if u:check_timeout() then
             skynet.call(env.HALL, "lua", "agents_remove_uid", uid)
             users[uid] = nil
-            trace("destroy user:%s", uid)
+            log.debugf("destroy user:%s", uid)
         end
     end
 end

@@ -6,8 +6,6 @@ local env       = require "env"
 local sessions  = require "sessions"
 local agents    = require "agents"
 
-local trace = log.trace("hall")
-
 local server_path, role_path, visitor_path = ...
 env.SERVER  = assert(server_path)
 env.ROLE    = assert(role_path)
@@ -31,7 +29,7 @@ function CMD.start(param)
         server.start()
     end
     env.IS_OPEN = true
-    trace("hall start")
+    log.info("hall start")
 end
 
 function CMD.stop()

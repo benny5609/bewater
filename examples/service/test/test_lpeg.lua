@@ -1,7 +1,6 @@
 local lpeg = require "lpeg"
 local log = require "bw.log"
 
-local trace = log.trace("test_lpeg")
 return function()
     local match = lpeg.match
     local P = lpeg.P

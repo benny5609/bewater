@@ -10,8 +10,6 @@ local opcode    = require "def.opcode"
 local errcode   = require "def.errcode"
 local env       = require "env"
 
-local trace = log.trace("user")
-
 local mt = {}
 mt.__index = mt
 
@@ -27,12 +25,12 @@ function mt:ctor(fd, uid, ip)
     local role = require(env.ROLE)
     self.role = role.new(uid)
 
-    trace("new user, fd:%s, uid:%s", fd, uid)
+    log.debugf("new user, fd:%s, uid:%s", fd, uid)
 end
 
 -- 被动关闭
 function mt:close()
-    trace("onclose")
+    log.debugf("onclose")
     if self.role.offline then
         self.role:offline()
     end
@@ -46,14 +44,14 @@ function mt:kick()
 end
 
 function mt:online()
-    trace("online")
+    log.debug("online")
     if self.role.online then
         self.role:online()
     end
 end
 
 function mt:send(op, data, csn)
-    trace("send:%s, fd:%s, csn:%s", opcode.toname(op), self.fd, csn)
+    log.debugf("send:%s, fd:%s, csn:%s", opcode.toname(op), self.fd, csn)
     local msg, len
     protobuf.encode(opcode.toname(op), data or {}, function(buffer, bufferlen)
         msg, len = packet.pack(op, csn or 0, self.ssn,
@@ -80,7 +78,7 @@ function mt:recv(msg, len)
 
     local data = protobuf.decode(opname, buff, sz)
     assert(type(data) == "table", data)
-    trace("recv, op:%s, csn:%s, fd:%s, data:%s", opcode.toname(op), csn, self.fd, util.dump(data))
+    log.debugf("recv, op:%s, csn:%s, fd:%s, data:%s", opcode.toname(op), csn, self.fd, data)
 
     local ret = 0 -- 返回整数为错误码，table为返回客户端数据
     local mod = assert(self.role[modulename], opcode.toname(op))

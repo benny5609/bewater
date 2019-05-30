@@ -3,8 +3,6 @@ local typeof    = require "bw.orm.typedef"
 local util      = require "bw.util"
 local log       = require "bw.log"
 
-local trace = log.trace("test_orm")
-
 return function()
 
     local define = [[
@@ -38,20 +36,20 @@ return function()
 
     local type_list = typeof.parse_string(define)
 
-    trace("--------- type define ------------")
+    log.debug("--------- type define ------------")
     log.debug(type_list)
 
-    trace("--------- init cls map ------------")
+    log.debug("--------- init cls map ------------")
     orm.init(type_list)
 
-    trace("--------- cls map---------------")
+    log.debug("--------- cls map---------------")
     log.debug(orm.get_cls_map())
 
-    trace("-----------------role")
+    log.debug("-----------------role")
     local role = orm.create("RoleInfo", {serverid=10001, name="standalone"})
     log.debug(to_data(role))
 
-    trace("-----------------obj")
+    log.debug("-----------------obj")
     local obj = orm.create("User", {
         uid=1,
         token="abc",
@@ -59,15 +57,15 @@ return function()
         roles={{serverid=1, roleid=1}, {serverid=2, roleid=2}},
         extends={[3] = {serverid=3, name="extends3"}, [4] = {serverid=4, name="extends4"}}
     })
-    trace("--------------", obj.uid)
+    log.debug("--------------", obj.uid)
 
     log.debug(to_data(obj))
 
-    trace("-----------------obj+role")
+    log.debug("-----------------obj+role")
     obj.roles[#obj.roles+1] = role
     log.debug(to_data(obj))
 
-    trace("------------ set dirty data")
+    log.debug("------------ set dirty data")
     obj.roles[2] = {a = 1}
     log.debug(to_data(obj))
 
@@ -100,9 +98,9 @@ return function()
         return ret
     end
 
-    trace("----------- to_mongo")
+    log.debug("----------- to_mongo")
     log.debug(to_mongo(obj))
-    trace("----------- to_mongo list")
+    log.debug("----------- to_mongo list")
     local user = orm.create("User", {
         roles = {
             {

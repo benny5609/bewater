@@ -4,14 +4,13 @@ local hash_array = require "bw.util.hash_array"
 local log        = require "bw.log"
 local env        = require "env"
 
-local trace = log.trace("agents")
 local MAX_COUNT = 100 -- 每个agent最多负载人数
 local agents = {}
 local uid2agent = setmetatable({}, {__mode = "kv"})
 local fd2uid = {}
 
 local function new_agent()
-    trace("new_agent")
+    log.debug("new_agent")
     local agent = bewater.protect {
         addr = skynet.newservice("sock/agent"),
         uids = hash_array.new()
@@ -40,7 +39,7 @@ local M = {}
 function M.forward(fd, uid, ip)
     local sessions = require "sessions"
     if not sessions.get_session(fd) then
-        trace("forward fail, session is disconnect, fd:%s", fd)
+        log.errorf("forward fail, session is disconnect, fd:%s", fd)
         return
     end
     local agent = uid2agent[uid]
@@ -50,7 +49,7 @@ function M.forward(fd, uid, ip)
         uid2agent[uid] = agent
     end
     fd2uid[fd] = uid
-    trace("forward fd:%s", fd)
+    log.infof("forward fd:%s", fd)
     skynet.call(env.GATE, "lua", "forward", fd, 0, agent.addr)
     skynet.call(agent.addr, "lua", "open", fd, uid, ip)
 end

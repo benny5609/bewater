@@ -4,8 +4,6 @@ local agents    = require "agents"
 local session   = require "session"
 local env       = require "env"
 
-local trace = log.trace("sessions")
-
 local sessions = {} -- fd:session
 
 local M = {}
@@ -17,7 +15,7 @@ function M.open(fd, addr)
 end
 
 function M.close(fd)
-    trace("close, fd:%s", fd)
+    log.debugf("close, fd:%s", fd)
     if not sessions[fd] then
         return
     end
