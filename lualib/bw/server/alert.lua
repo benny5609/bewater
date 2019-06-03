@@ -59,51 +59,33 @@ local function send(str)
     end
 end
 
-local count = 0 -- 一分钟内累计报错次数
-local last = 0  -- 上次报错时间
-local function send_traceback()
+local function send_traceback(err)
     send_lock:lock()
-    if skynet.time() - last < 60 or count == 0 then
-        return
-    end
     local info = require "bw.util.clusterinfo"
     local path = string.format("%s/logs/error.log", info.workspace)
-    local str = string.format("服务器出错了\n项目:%s\n节点:%s\n公网ip:%s\n内网ip:%s\n进程:%s\n日志:%s\n累计报错:%d次",
-        conf.desc or conf.proj, info.clustername, info.pnet_addr, info.inet_addr, info.pid, path, count)
-
-    count = 0
-    last = skynet.time()
+    local str = string.format("服务器出错了\napp:%s\n公网ip:%s\n内网ip:%s\n进程:%s\n日志:%s\n报错内容:\n%s",
+        conf.appname, info.pnet_addr, info.inet_addr, info.pid, path, err)
     send(str)
     send_lock:unlock()
 end
 
 local M = {}
 function M.traceback(err)
-    count = count + 1
     send_traceback(err)
 end
-
 
 function M.test(str)
     send(str)
 end
 
 function M.start(handler)
+    skynet.register ".alert"
+
     conf = handler
     assert(conf.corpid)
     assert(conf.corpsecret)
     assert(conf.agentid)
-    assert(conf.desc)
-    assert(conf.proj)
-
-    skynet.fork(function()
-        while true do
-            if count > 0 then
-                send_traceback()
-            end
-            skynet.sleep(6000)
-        end
-    end)
+    assert(conf.appname)
 end
 
 return M

@@ -44,6 +44,10 @@ local function write_log(level, str)
     syslog.log(level, str, llocal.LOCAL4)
 end
 
+local function send_traceback(str)
+    skynet.send(".alert", "lua", "traceback", str)
+end
+
 skynet.register_protocol {
     name = "text",
     id = skynet.PTYPE_TEXT,
@@ -55,6 +59,9 @@ skynet.register_protocol {
                 print(log.highlight(str, llevel.ERROR))
             end
             write_log(llevel.ERROR, str)
+            if skynet.getenv "ALERT_ENABLE" then
+                send_traceback(str)
+            end
         else
             if to_screen then
                 print(log.highlight(str, llevel.INFO))
