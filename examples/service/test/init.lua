@@ -15,5 +15,5 @@ skynet.start(function()
         }
     }) ]]
     log.info("Be water my friend.")
-    test "logger"
+    test "xml"
 end)
