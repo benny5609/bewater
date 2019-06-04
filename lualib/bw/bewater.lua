@@ -12,7 +12,10 @@ end
 local function __TRACEBACK__(errmsg)
     local track_text = debug.traceback(tostring(errmsg), 2)
     log.error("---------------------------------------- TRACKBACK ----------------------------------------")
-    log.error(track_text, "LUA ERROR")
+    log.error(track_text)
+    if skynet.getenv "ALERT_ENABLE" == "true" then
+        skynet.send(".alert", "lua", "traceback", track_text)
+    end
     log.error("---------------------------------------- TRACKBACK ----------------------------------------")
     return false
 end

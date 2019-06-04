@@ -59,7 +59,7 @@ skynet.register_protocol {
                 print(log.highlight(str, llevel.ERROR))
             end
             write_log(llevel.ERROR, str)
-            if skynet.getenv "ALERT_ENABLE" then
+            if skynet.getenv "ALERT_ENABLE" == "true" then
                 send_traceback(str)
             end
         else
