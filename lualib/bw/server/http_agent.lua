@@ -165,8 +165,8 @@ function M.start(handler)
                         data = urllib.parse_query(query)
                     end
                     ip = header['x-real-ip'] or string.match(ip, "[^:]+")
-                    response(fd, code, on_message(url, data, body, header, ip),
-                    {
+                    local resp_body, resp_header = on_message(url, data, body, header, ip)
+                    response(fd, code, resp_body, resp_header or {
                         ['Access-Control-Allow-Origin'] = header['origin'],
                         ['Access-Control-Allow-Methons'] = 'PUT, POST, GET, OPTIONS, DELETE',
                         ['Access-Control-Allow-Headers'] = header['access-control-request-headers']
