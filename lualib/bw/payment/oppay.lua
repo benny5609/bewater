@@ -14,7 +14,7 @@ local M = {}
 function M.create_order(param)
     local order_no      = assert(param.order_no)
     local item_desc     = assert(param.item_name)
-    local pay_price     = assert(param.pay_price) * 0.7
+    local pay_price     = assert(param.pay_price)
     local secret        = assert(param.secret)
     local url           = assert(param.url)
     assert(param.pay_channel)
