@@ -18,7 +18,7 @@ function M.create_order(param)
     local args = {
         partner = partner,
         seller_id = partner,
-        out_trade_no = order_no..'-'..os.time(),
+        out_trade_no = order_no,
         subject = item_desc,
         body = item_desc,
         total_fee = pay_price,

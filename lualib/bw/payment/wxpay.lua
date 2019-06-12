@@ -28,7 +28,7 @@ function M.create_order(param)
         nonce_str        = math.random(10000)..uid,
         trade_type       = pay_method == "wxpay" and "APP" or "NATIVE",
         body             = item_desc,
-        out_trade_no     = order_no..'-'..os.time(),
+        out_trade_no     = order_no,
         total_fee        = pay_price*100//1 >> 0,
         spbill_create_ip = '127.0.0.1',
         notify_url       = url,
