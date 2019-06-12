@@ -1,9 +1,9 @@
-local orm       = require 'bw.orm.orm'
-local typedef   = require 'bw.orm.typedef'
-local conf      = require "conf"
+local skynet  = require "skynet"
+local orm     = require 'bw.orm.orm'
+local typedef = require 'bw.orm.typedef'
 
 -- init
-local type_list = typedef.parse("typedef", conf.typedef)
+local type_list = typedef.parse("typedef", skynet.getenv "TYPEDEF")
 orm.init(type_list)
 
 -- apis

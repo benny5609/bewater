@@ -5,7 +5,7 @@ local sockethelper  = require "http.sockethelper"
 local bewater       = require "bw.bewater"
 local log           = require "bw.log"
 
-require "bw.util.ip_country"
+--require "bw.util.ip_country"
 
 local function response(fd, ...)
     local ok, err = httpd.write_response(sockethelper.writefunc(fd), ...)
