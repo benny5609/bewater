@@ -9,6 +9,10 @@ local util          = require "bw.util"
 local log           = require "bw.log"
 local errcode       = require "def.errcode"
 
+local smatch  = string.match
+local sformat = string.format
+local sgsub   = string.gsub
+
 local api = {}
 
 local function default_pack(ret)
@@ -72,25 +76,17 @@ local function on_message(url, args, body, header, ip)
                 return errf(errcode.ARGS_ERROR, "data nil")
             end
             for k, t in pairs(process.data) do
-                if t == "str" then
-                    if type(data[k]) ~= "string" then
-                        return errf(errcode.ARGS_ERROR, "args error, %s must string", k)
+                if t then
+                    if smatch(t, "?") then
+                        if type(data[k]) ~= t then
+                            return errf(errcode.ARGS_ERROR, "args error, %s must %s", k, t)
+                        end
+                    else
+                        t = sgsub(t, "?", "")
+                        if data[k] and type(data[k]) ~= t then
+                            return errf(errcode.ARGS_ERROR, "args error, %s must %s", k, t)
+                        end
                     end
-                elseif t == "str?" then
-                    if data[k] and type(data[k]) ~= "string" then
-                        return errf(errcode.ARGS_ERROR, "args error, %s must string", k)
-                    end
-                elseif t == "num" then
-                    if type(data[k]) ~= "number" then
-                        return errf(errcode.ARGS_ERROR, "args error, %s must number", k)
-                    end
-                elseif t == "num?" then
-                    if data[k] and type(data[k]) ~= "number" then
-                        return errf(errcode.ARGS_ERROR, "args error, %s must number", k)
-                    end
-                else
-                    log.debug(data)
-                    error(string.format("api %s def type %s error", url, t))
                 end
             end
         end
@@ -186,6 +182,11 @@ function M.start(handler)
 end
 
 function M.reg(params)
+    for k, t in pairs(params.data or {}) do
+        t = sgsub(t, "?", "")
+        assert(t == "number" or t == "string" or t == "boolean" or t == "table",
+            sformat("type def error:%s", t))
+    end
     api[params.url] = {
         url     = assert(params.url),
         handler = assert(params.handler),
