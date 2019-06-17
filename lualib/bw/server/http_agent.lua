@@ -78,12 +78,12 @@ local function on_message(url, args, body, header, ip)
             for k, t in pairs(process.data) do
                 if t then
                     if smatch(t, "?") then
-                        if type(data[k]) ~= t then
+                        t = sgsub(t, "?", "")
+                        if data[k] and type(data[k]) ~= t then
                             return errf(errcode.ARGS_ERROR, "args error, %s must %s", k, t)
                         end
                     else
-                        t = sgsub(t, "?", "")
-                        if data[k] and type(data[k]) ~= t then
+                        if type(data[k]) ~= t then
                             return errf(errcode.ARGS_ERROR, "args error, %s must %s", k, t)
                         end
                     end
