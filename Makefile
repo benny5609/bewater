@@ -8,8 +8,8 @@ INCLUDE_DIR=skynet/3rd/lua
 all:build skynet lib
 
 build:
-	mkdir -p luaclib
-	mkdir -p logs
+	-mkdir -p luaclib
+	-mkdir -p logs
 
 SKYNET_MAKEFILE=skynet/Makefile
 $(SKYNET_MAKEFILE):
