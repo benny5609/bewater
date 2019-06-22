@@ -38,7 +38,7 @@ if skynet.getenv("DEBUG") == "true" then
     to_screen = true
 end
 
-syslog.openlog(skynet.getenv "APPNAME", llocal.LOCAL4, 0)
+syslog.openlog(skynet.getenv("APPNAME") or "unknown-app", llocal.LOCAL4, 0)
 
 local function write_log(level, str)
     syslog.log(level, str, llocal.LOCAL4)

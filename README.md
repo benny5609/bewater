@@ -84,24 +84,27 @@ end
 不过这种锁还是要慎用，容易造成单个服务的消息队列过长。实在没办法比如是客户端不可预知的操作，可以加个锁预防一下。
 
 ## logger服务
-+ 文件fd，保存一段时间，自动关闭
-+ 系统log分系统存, 一天一份日志
-+ 玩家log分uid存，一天一份日志
-+ 所有的日志都会用统一再输出到总日志里，终端模式下标准输出，或者写到skynet配置的logpath目录下
-
-## 停机方法
-目前skynet只有在logger服务捕捉SIGHUP信号，其它信号需要写C服务，后续再加上
-
+bewater提供syslog服务作为日志服务，运维方可以使用logrotate等工具进行日志管理和维护，当然这只是个备选。
 ```
--- 安全停机
-local log = require "bw.log"
-log.sighup() -- 向logger注册信号处理服务
-skynet.dispatch("lua", function(_, _, cmd)
-    if cmd == "SIGHUP" then
-    	-- todo save data
-        skynet.abort()
+-- etc 启动配置
+logservice = "snlua"
+logger = "syslog"
+APPNAME = "skynet-test"
+LOG_SRC = "true"
+```
+## 停机方法
+monitor这个服务是用来注册停机事件的，正式服上安全停机需要自行写一个停机的gm指令，然后通知monitor运行停机逻辑。
+```
+-- service A
+skynet.dispatch("lua", function(_, _, cmd, ...)
+    if cmd == "shutdown" then
+        -- todo shutdown A
     end
 end)
+skynet.call(".monitor", "lua", "register", self)
+
+-- gm shutdown
+skynet.call(".monitor", "lua", "shutdown")
 ```
 
 ## 活动日程

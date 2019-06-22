@@ -2,22 +2,22 @@ local skynet  = require "skynet.manager"
 local bewater = require "bw.bewater"
 local log     = require "bw.log"
 
-local table_insert = table.insert
-local table_remove = table.remove
+local tinsert = table.insert
+local tremove = table.remove
 
 local addr_list = {}
 
 local CMD = {}
 function CMD.register(addr)
     assert(addr)
-    table_insert(addr_list, addr)
+    tinsert(addr_list, addr)
     log.infof("register %s", addr)
 end
 
 function CMD.unregister(addr)
     for i, v in ipairs(addr_list) do
         if v == addr then
-            table_remove(v, i)
+            tremove(v, i)
         end
     end
 end
