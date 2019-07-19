@@ -11,7 +11,7 @@ function M.start(handler)
     save_id = assert(handler.save_id)
     reserve_count = handler.reserve_count or 100
     initial_id = handler.initial_id or 10000000
-    id = load_id() + reserve_count
+    id = load_id()
     if not id then
         id = initial_id
     end
