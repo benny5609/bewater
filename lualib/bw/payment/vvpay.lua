@@ -27,7 +27,7 @@ function M.create_order(param)
         appid         = param.appid,
         order_no      = param.order_no,
         notify_url    = param.url,
-        product_price = string.format("%d", param.pay_price),
+        product_price = param.pay_price,
         product_name  = param.item_desc,
         product_des   = param.item_desc,
         sign          = str,
