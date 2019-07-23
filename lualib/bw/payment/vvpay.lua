@@ -24,11 +24,13 @@ function M.create_order(param)
     local str = string.lower(md5(str1 .. "&" .. str2))
 
     return {
-        appid = param.appid,
-        order_no = param.order_no,
-        item_sn = param.item_sn,
-        sign = str,
-        url = url,
+        appid         = param.appid,
+        order_no      = param.order_no,
+        notify_url    = param.url,
+        product_price = param.pay_price,
+        product_name  = param.item_name,
+        product_des   = param.item_name,
+        sign          = str,
     }
 end
 
