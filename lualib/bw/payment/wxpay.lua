@@ -5,6 +5,7 @@ local xml2lua   = require "bw.xml.xml2lua"
 local util      = require "bw.util"
 local http      = require "bw.http"
 local log       = require "bw.log"
+local uuid      = require "bw.uuid"
 local errcode   = require "def.errcode"
 local def       = require "def.def"
 
@@ -98,4 +99,31 @@ function M.notify(order, key, param)
     end
     return WX_OK
 end
+
+function M.query(param)
+    local appid          = assert(param.appid)
+    local mch_id         = assert(param.mch_id)
+    local key            = assert(param.key)
+    local transaction_id = param.transaction_id
+    local out_trade_no   = param.out_trade_no
+    assert(transaction_id or out_trade_no)
+
+    local args = {
+        appid = appid,
+        mch_id = mch_id,
+        transaction_id = transaction_id,
+        nonce_str = string.gsub(uuid(), '-', ''),
+    }
+    args.sign = sign.md5_args(args, key)
+    log.debug(args)
+
+    local xml = lua2xml.encode("xml", args, true)
+    local _, resp_str = http.post("https://api.mch.weixin.qq.com/pay/orderquery", xml)
+    local resp = xml2lua.decode(resp_str).xml
+
+    if resp.result_code == "SUCCESS" then
+        return resp
+    end
+end
+
 return M
