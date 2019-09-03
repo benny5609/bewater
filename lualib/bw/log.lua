@@ -93,7 +93,7 @@ local function syslog(level, ...)
     end
     local str = tconcat(out," ")
     if log_src then
-        str = sformat("[%s] %s", get_log_src(4), str)
+        str = sformat("[%s] %s", get_log_src(3), str)
     end
     str = format_log(skynet.self(), str)
     if to_screen then
