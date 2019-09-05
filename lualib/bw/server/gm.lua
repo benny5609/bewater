@@ -1,9 +1,7 @@
-local skynet        = require "skynet"
-local log           = require "bw.log"
-local bewater       = require "bw.bewater"
-local date_helper   = require "bw.util.date_helper"
-
-require "skynet.cluster"
+local skynet      = require "skynet"
+local log         = require "bw.log"
+local bewater     = require "bw.bewater"
+local date_helper = require "bw.util.date_helper"
 
 local skynet_cmd = {}
 function skynet_cmd.gc()
@@ -104,12 +102,10 @@ function M.run(modname, cmd, ...)
     return ret or "执行成功"
 end
 
-function M.start(cmds)
+function M.init(cmds)
     for k, v in pairs(cmds) do
         gmcmd[k] = v
     end
-
-    bewater.start(M)
 end
 
 return M
