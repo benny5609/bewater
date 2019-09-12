@@ -24,7 +24,7 @@ SHARED = -fPIC --shared
 
 lib:${LIB_DIR}/aes.so ${LIB_DIR}/packet.so ${LIB_DIR}/random.so \
 	${LIB_DIR}/webclient.so ${LIB_DIR}/codec.so ${LIB_DIR}/cjson.so \
-	${LIB_DIR}/protobuf.so ${LIB_DIR}/syslog.so
+	${LIB_DIR}/protobuf.so ${LIB_DIR}/syslog.so ${LIB_DIR}/lfs.so
 
 
 ${LIB_DIR}/aes.so:${SRC_DIR}/lua-aes.c
@@ -60,6 +60,16 @@ ${LIB_DIR}/protobuf.so: ${PBC_SOURCE}
 	-cd 3rd/pbc && ${MAKE}
 	cd 3rd/pbc/binding/lua53 && ${MAKE}
 	cp 3rd/pbc/binding/lua53/protobuf.so ${LIB_DIR}
+
+# lfs
+LFS_SOURCE=3rd/lfs/src/lfs.c
+
+${LFS_SOURCE}:
+	git submodule update --init 3rd/lfs
+
+${LIB_DIR}/lfs.so: ${LFS_SOURCE}
+	gcc $(CFLAGS) $(SHARED) -I3rd/lfs/src/ $^ -o $@ $(LDFLAGS)
+
 
 .PHONY:clean
 clean:
