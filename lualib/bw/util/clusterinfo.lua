@@ -4,7 +4,7 @@
 local skynet = require "skynet"
 local http   = require "bw.http"
 local util   = require "bw.util"
-local bash   = require "bw.util.bash"
+local bash   = require "bw.bash"
 local conf   = require "conf"
 
 local M = {}
@@ -50,7 +50,7 @@ end
 
 -- 内网ip
 function M.get_inet_addr()
-    local ret = bash.bash "ifconfig eth0"
+    local ret = bash.execute "ifconfig eth0"
     return string.match(ret, "inet addr:([^%s]+)") or string.match(ret, "inet ([^%s]+)")
 end
 
@@ -64,14 +64,14 @@ function M._pid()
     if not filename then
         return
     end
-    local pid = bash.bash("cat %s", filename)
+    local pid = bash.execute "cat ${filename}"
     return string.gsub(pid, "\n", "")
 end
 
 function M.get_profile()
     local pid = M.pid
     if not pid then return end
-    local ret = bash.bash(string.format('ps -p %d u', pid))
+    local ret = bash.execute 'ps -p ${pid} u'
     local list = util.split(string.match(ret, '\n(.+)'), ' ')
     return {
         cpu = tonumber(list[3]),
@@ -89,7 +89,7 @@ end
 
 -- 绝对路径
 function M._workspace()
-    local path = bash.bash("cd %s && pwd", conf.workspace)
+    local path = bash.execute "cd ${conf.workspace} && pwd"
     return string.gsub(path, "\n", "")
 end
 

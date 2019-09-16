@@ -4,7 +4,7 @@ local bewater   = require "bw.bewater"
 local log       = require "bw.log"
 local lock      = require "bw.lock"
 local util      = require "bw.util"
-local bash      = require "bw.util.bash"
+local bash      = require "bw.bash"
 local http      = require "bw.http"
 local json      = require "cjson.safe"
 
