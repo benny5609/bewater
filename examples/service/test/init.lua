@@ -16,5 +16,5 @@ skynet.start(function()
     }) ]]
     log.info("Be water my friend.")
     --test "lfs"
-    --test "bash"
+    test "bash"
 end)
