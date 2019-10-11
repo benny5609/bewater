@@ -39,7 +39,7 @@ function M.request_access_token(appid, secret)
     end
 end
 
-local function request_ticket(appid, token)
+function M.request_ticket(appid, token)
     assert(appid)
     local ret, resp = http.get("https://api.weixin.qq.com/cgi-bin/ticket/getticket", {
         access_token = token,
