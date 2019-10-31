@@ -106,8 +106,8 @@ function M.remove_user_storage(appid, access_token, openid, session_key, key_lis
     if resp then
         return json.decode(resp)
     else
-        error(string.format("remove_user_storage error, appid:%s, access_token:%s, openid:%s, session_key:%s, data:%s",
-        appid, access_token, openid, session_key, data))
+        error(string.format("remove_user_storage error, appid:%s, access_token:%s, openid:%s, session_key:%s",
+        appid, access_token, openid, session_key))
     end
 end
 
