@@ -146,7 +146,7 @@ function M.start(handler)
             -- limit request body size to 8192 (you can pass nil to unlimit)
             local code, url, method, header, body = httpd.read_request(sockethelper.readfunc(fd), nil)
             --log.info(header)
-            log.errorf("recv code:%s, url:%s, method:%s, header:%s, body:%s",
+            log.infof("recv code:%s, url:%s, method:%s, header:%s, body:%s",
                 code, url, method, util.tbl2str(header), body)
             if method == "OPTIONS" then
                 return resp_options(fd, header)

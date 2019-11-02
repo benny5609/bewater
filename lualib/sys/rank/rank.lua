@@ -21,12 +21,13 @@ function mt:load(query)
 end
 
 function mt:save()
-    local new_obj = factory.extract_data(self.obj)
-    if util.cmp_table(new_obj, self.obj) then
+    local cur_obj = factory.extract_data(self.obj)
+    if self.last_obj and util.cmp_table(new_obj, self.last_obj) then
         log.infof("no change, rank:%s", self.obj.name)
+        return
     end
     mongo.update("rank", {name = self.name}, self.obj)
-    self.obj = new_obj
+    self.last_obj = cur_obj
 end
 
 function mt:find(k)
