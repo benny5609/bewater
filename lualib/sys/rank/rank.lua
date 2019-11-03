@@ -22,11 +22,12 @@ end
 
 function mt:save()
     local cur_obj = factory.extract_data(self.obj)
-    if self.last_obj and util.cmp_table(new_obj, self.last_obj) then
-        log.infof("no change, rank:%s", self.obj.name)
+    if self.last_obj and util.cmp_table(cur_obj, self.last_obj) then
+        log.debugf("no change, rank:%s", self.obj.name)
         return
     end
-    mongo.update("rank", {name = self.name}, self.obj)
+    mongo.update("rank", {name = self.obj.name}, self.obj)
+    log.debug("save", self.obj.name)
     self.last_obj = cur_obj
 end
 
