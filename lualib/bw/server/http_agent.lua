@@ -133,6 +133,7 @@ function M.start(handler)
     default_pack = handler.pack or default_pack
     default_unpack = handler.unpack or default_unpack
     default_auth = handler.auth or default_auth
+    on_message = handler.on_message or on_message
 
     skynet.start(function()
         skynet.dispatch("lua", function (_,_, ...)
