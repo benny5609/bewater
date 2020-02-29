@@ -60,18 +60,24 @@ function M.drop(name)
     return db[name]:drop()
 end
 
-function M.get(key, default)
+function M.get(key, default, key_str)
     local ret = db.global:findOne({key = key})
     if ret then
-        return util.str2num(ret.value)
+        if key_str then
+            return ret.value
+        else
+            return util.str2num(ret.value)
+        end
     else
         db.global:safe_insert({key = key, value = default})
         return default
     end
 end
 
-function M.set(key, value)
-    value = util.num2str(value)
+function M.set(key, value, keep_str)
+    if not keep_str then
+        value = util.num2str(value)
+    end
     db.global:findAndModify({
         query = {key = key},
         update = {key = key, value = value},
