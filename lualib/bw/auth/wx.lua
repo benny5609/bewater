@@ -53,7 +53,7 @@ function M.request_ticket(appid, token)
     end
 end
 
-function M.check_code(appid, secret, js_code)
+function M.jscode2session(appid, secret, js_code)
     assert(appid and secret and js_code)
     local ret, resp = http.get("https://api.weixin.qq.com/sns/jscode2session",{
         js_code = js_code,
@@ -64,7 +64,7 @@ function M.check_code(appid, secret, js_code)
     if resp then
         return json.decode(resp)
     else
-        error(string.format("check_code error, appid:%s, secret:%s, js_code:%s",
+        error(string.format("jscode2session error, appid:%s, secret:%s, js_code:%s",
         appid, secret, js_code))
     end
 end
