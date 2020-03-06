@@ -1,5 +1,4 @@
 local class     = require "bw.class"
-local factory   = require "bw.orm.factory"
 local util      = require "bw.util"
 local log       = require "bw.log"
 local mongo     = require "db.mongo"
@@ -11,24 +10,26 @@ function mt:ctor(cmp)
     self.obj = nil
 end
 
+local function create_obj(data)
+    return {
+        name = data.name,
+        type = data.type,
+        max_count = data.max_count,
+        items = {}
+    }
+end
+
 function mt:load(query)
     local data = mongo.find_one("rank", {name = query.name}, {_id = false})
     if not data then
-        data = factory.create_obj("Rank", query)
-        mongo.insert("rank", data)
+        mongo.insert("rank", create_obj(query))
     end
-    self.obj = factory.create_obj("Rank", data)
+    self.obj = data
 end
 
 function mt:save()
-    local cur_obj = factory.extract_data(self.obj)
-    if self.last_obj and util.cmp_table(cur_obj, self.last_obj) then
-        log.debugf("no change, rank:%s", self.obj.name)
-        return
-    end
     mongo.update("rank", {name = self.obj.name}, self.obj)
     log.debug("save", self.obj.name)
-    self.last_obj = cur_obj
 end
 
 function mt:find(k)
