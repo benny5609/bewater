@@ -38,6 +38,8 @@ function server.load_rank(rank_name, rank_type, max_count, cmp)
         type = rank_type,
         max_count = max_count,
     })
+    rank:sort()
+    rank:save()
     ranks[rank_name] = rank
 end
 

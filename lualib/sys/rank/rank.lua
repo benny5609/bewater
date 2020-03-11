@@ -3,6 +3,8 @@ local util      = require "bw.util"
 local log       = require "bw.log"
 local mongo     = require "db.mongo"
 
+local tsort = table.sort
+
 local mt = {}
 function mt:ctor(cmp)
     assert(type(cmp) == "function")
@@ -59,6 +61,7 @@ function mt:update(k, v)
         }
     end
 
+    --[[
     for i = #list, 2, -1 do
         if self.cmp(list[i].v, list[i-1].v) then
             local item = list[i]
@@ -66,11 +69,17 @@ function mt:update(k, v)
             list[i-1] = item
         end
     end
+    ]]
+    tsort(list, self.cmp)
 
     while #list > self.obj.max_count do
         list[#list] = nil
     end
     return true
+end
+
+function mt:sort()
+    tsort(self.obj.items, self.cmp)
 end
 
 return class(mt)
