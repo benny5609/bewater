@@ -24,7 +24,8 @@ end
 function mt:load(query)
     local data = mongo.find_one("rank", {name = query.name}, {_id = false})
     if not data then
-        mongo.insert("rank", create_obj(query))
+        data = create_obj(query)
+        mongo.insert("rank", data)
     end
     self.obj = data
 end
