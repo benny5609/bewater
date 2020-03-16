@@ -27,6 +27,7 @@ function mt:load(query)
         data = create_obj(query)
         mongo.insert("rank", data)
     end
+    data.max_count = query.max_count
     self.obj = data
 end
 
@@ -47,7 +48,7 @@ function mt:update(k, v)
     local list = self.obj.items
     local last = list[#list]
     if last and #list >= self.obj.max_count then
-        if not self.cmp(v, last.v) then
+        if not self.cmp({v = v}, last) then
             return false
         end
     end
