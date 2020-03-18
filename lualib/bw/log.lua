@@ -148,6 +148,17 @@ function log.syslog(level, str, addr)
     syslog(level, str)
 end
 
+function log.stat(filename, str)
+    filename = sformat("%s/%s.log", skynet.getenv "LOG_PATH", filename)
+    local file = io.open(filename, "a+")
+    file:write(format_now() .. " " .. str)
+    file:close()
+end
+
+function log.statf(filename, fmt, ...)
+    log.stat(filename, sformat(fmt, ...))
+end
+
 function log.dump(root, depth)
     depth = depth or 10
     local cache = {  [root] = "." }
