@@ -151,7 +151,7 @@ end
 function log.stat(filename, str)
     filename = sformat("%s/%s.log", skynet.getenv "LOG_PATH", filename)
     local file = io.open(filename, "a+")
-    file:write(format_now() .. " " .. str)
+    file:write(format_now() .. " " .. str .. "\n")
     file:close()
 end
 
