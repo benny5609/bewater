@@ -92,7 +92,7 @@ return function(conf)
             port = conf.port,
         })[conf.name]
         skynet.dispatch("lua", function(_, _, cmd, ...)
-            local f = assert(M[cmd], ...)
+            local f = assert(M[cmd], cmd)
             bewater.ret(f(...))
         end)
     end)
