@@ -18,10 +18,13 @@ examples(测试服务)
 skynet(fork skynet项目，不作任何改动)
 shell(测试启动脚本)
 ```
+与客户端对接的示例: https://github.com/zhandouxiaojiji/mini-sample
+
 ## 运行测试脚本
-```
+```shell
 ./run.sh test #启动进程, run.sh [配置名]
 ```
+
 ## 脚本与服务检索优先级
 + examples>bewater>skynet
 + 这三个目录下都有luaclib,lualib-src,lualib,service这几个目录，skynet的所有代码不作改动，通用的写到bewater
@@ -52,7 +55,7 @@ webclient http库
 ## 服务处理call和send的情况
 + bewater提供bewater.ret这个方法，对skynet.ret进行了一次封装，默认情况下以call处理，以skynet.retpack(...)返回
 + 当处理消息的方法返回的是util.NORET，表示发送方以send的方式发送，本服务不作回应
-```
+```lua
     local skynet = require "skynet"
     local bewater = require "bw.bewater"
     local CMD = {}
@@ -72,7 +75,7 @@ webclient http库
 
 ## 协程锁与防重入
 服务间通讯通常是用skynet.call或者skynet.send，我们平常用的最多的是call，call有个坑就是当前协程会被挂起，在协程被唤醒前可能同样的代码又被执行了一次。在处理关键业务的时候(比如加经验，货币)需要特别小心重入是否会引发逻辑上的bug。协程锁跟线程锁是差不多原理，在lock的地方挂起等待上一次协程处理完再继续往下执行。
-```
+```lua
 local lock = require "bw.lock"
 local l = lock.new()
 function test()
@@ -85,7 +88,7 @@ end
 
 ## logger服务
 bewater提供syslog服务作为日志服务，运维方可以使用logrotate等工具进行日志管理和维护，当然这只是个备选。
-```
+```lua
 -- etc 启动配置
 logservice = "snlua"
 logger = "syslog"
@@ -94,7 +97,7 @@ LOG_SRC = "true"
 ```
 ## 停机方法
 monitor这个服务是用来注册停机事件的，正式服上安全停机需要自行写一个停机的gm指令，然后通知monitor运行停机逻辑。
-```
+```lua
 -- service A
 skynet.dispatch("lua", function(_, _, cmd, ...)
     if cmd == "shutdown" then
@@ -109,7 +112,7 @@ skynet.call(".monitor", "lua", "shutdown")
 
 ## 活动日程
 schedule是一个专门负责定时执行的服务，调试方便，特别适合做活动开放的日程
-```
+```lua
 skynet.fork(function()
     while true do
         schedule.submit({mon = 10, day = 1})
@@ -122,7 +125,7 @@ schedule.changetime({mon = 9, day = 30, hour = 23, min = 59, sec = 59})
 
 ## 定时器
 skynet的timeout本身不支持取消，而且每个timeout都会新建一条协程，但是游戏通常需要用大量的定时器。所以我对根据云风大神建议对skynet的timeout进行了封装，以单向链表的数据结构记录时间和回调。timer库可以创建大量的定时器，销毁也比较方便，最好是在同个虚拟机或者单个玩家的对象只挂一个timer，这样比较省资源，也比较方便管理。后续会参照日程表schedule加入修改系统时间的方法，让调试更加方便。
-```
+```lua
 local timer = require "bw.timer"
 local ti = timer.create()
 ti.delay(1, function()
@@ -135,7 +138,7 @@ ti.destroy()
 ```
 ## 代码规范
 使用luacheck进行代码质量检查，配置文件.luacheckrc
-```
+```shell
 luacheck --config .luacheck.rc ./
 ```
 我也写了个简单git钩子tools/pre-commit，将此文件拷到.git/hooks目录下，之后在每次git commit前都会自动luacheck所有修改过的lua脚本，没有报错才能提交。这个钩子适合所有lua项目。
@@ -143,8 +146,6 @@ luacheck --config .luacheck.rc ./
 ## 优化与改进计划
 + 最初的思路是设计各种通用的服务，然后暴露一些接口给使用者，这种设计思路其实是错误的。应该把通用的逻辑抽成lua库，让使用者自己制定服务，参照云风写的agent和gateserver二者的关系。后续将逐步消灭service目录下的服务，改成lualib。
 + 带业务逻辑的服务应该写成目录的形式(即service/?/init.lua)，这样可以保证服务内部api的私有性，不用写在lualib跟其它服务的逻辑混淆。
-+ mongo的数据读写使用orm模块进行严格检查
-+ 日志系统改用rsyslog
 + 经过多次重构和迭代之后，越来越理解云风为什么把skynet做的这么轻量级了，你的制定条条框框越少，代码的可扩展性和可复用性就越强。bewater也在朝这个方向改进，收集更多的可复用的轮子，而不是写一些难以扩展的所谓通用服务。
 
 ## 关于bewater
