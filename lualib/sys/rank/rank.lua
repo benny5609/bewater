@@ -55,7 +55,9 @@ function mt:update(k, v)
 
     local old = self:find(k)
     if old then
-        old.v = v
+        for kk, vv in pairs(v) do
+            old.v[kk] = vv
+        end
     else
         list[#list + 1] = {
             k = k,

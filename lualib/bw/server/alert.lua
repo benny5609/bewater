@@ -12,45 +12,38 @@ local appname = skynet.getenv 'APPNAME'
 local desc    = skynet.getenv 'DESC'
 
 local sample_html = [[
-<style>
-    .item-title {
-        font-size: large;
-        display: inline;
-    }
+<!DOCTYPE html>
+<html>
 
-    .item-content {
+<style>
+    .title {
         font-size: large;
         display: inline;
+        color: red;
     }
 
     .log {
-        white-space: pre;
+        white-space: pre-wrap;
         display: inline;
         color:gray;
     }
 </style>
 
+<body>
 <div>
-    <div class="item-title">节点:</div>
-    <div class="item-content" style="color: red;">%s</div>
-</div>
-<div>
-    <div class="item-title">备注:</div>
-    <div class="item-content" style="color: red;">%s</div>
-</div>
-<div>
-    <div class="item-title">进程:</div>
-    <div class="item-content" style="color: red;">%s</div>
-</div>
-
-<div>
-    <div class="item-title">日志:</div>
-    <div class="log">%s</div>
-</div>
+    <div class="item">节点:%s</div>
+    <div class="item">备注:%s</div>
+    <div class="item">进程:%s</div>
+    <div class="log">日志:%s</div>
+</body>
+</html>
 ]]
 
+
 local sformat = string.format
-local send
+local max_count = 10
+local count = 0
+local logs = ""
 
 local function format_html(msg)
     return sformat(sample_html, appname, desc, pid, msg)
@@ -58,17 +51,31 @@ end
 
 local M = {}
 function M.traceback(err)
-    send(format_html(err))
-end
-
-function M.test(str)
-    send(str)
+    if count >= max_count then
+        return
+    end
+    logs = logs .. err .. '\n'
+    count = count + 1
 end
 
 function M.start(handler)
     skynet.register ".alert"
 
-    send = assert(handler.send)
+    local send_func = assert(handler.send)
+    local interval = handler.interval or 60
+    skynet.fork(function()
+        while true do
+            if logs ~= "" then
+                send_func(format_html(logs))
+                logs = ""
+                count = 0
+                print("sended")
+            else
+                print("no logs")
+            end
+            skynet.sleep(interval*100)
+        end
+    end)
 end
 
 return M
