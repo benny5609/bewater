@@ -5,7 +5,6 @@ local skynet = require "skynet"
 local http   = require "bw.http"
 local util   = require "bw.util"
 local bash   = require "bw.bash"
-local conf   = require "conf"
 
 local M = {}
 local _cache = {}
@@ -29,20 +28,6 @@ setmetatable(M, {
 
 -- 公网ip
 function M._pnet_addr()
-    if conf.remote_host then
-        if conf.remote_port then
-            return conf.remote_host .. ":" .. conf.remote_port
-        else
-            return conf.remote_host
-        end
-    end
-    if conf.host then
-        if conf.port then
-            return conf.host .. ":" .. conf.port
-        else
-            return conf.host
-        end
-    end
     local _, resp = http.get('http://members.3322.org/dyndns/getip')
     local addr = string.gsub(resp, "\n", "")
     return addr
@@ -79,19 +64,10 @@ function M.get_profile()
     }
 end
 
-function M._proj()
-    return conf.proj
-end
-
 function M._clustername()
     return skynet.getenv "clustername"
 end
 
--- 绝对路径
-function M._workspace()
-    local path = bash.execute "cd ${conf.workspace} && pwd"
-    return string.gsub(path, "\n", "")
-end
 
 
 return M
