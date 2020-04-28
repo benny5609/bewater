@@ -47,5 +47,6 @@ REG("API_NOT_EXIST",        0x001b, "api不存在")
 REG("ACC_NOT_EXIST",        0x001c, "账号不存在")
 REG("PASSWD_ERROR",         0x001d, "密码错误")
 REG("CURRENT_VERSION",      0x001e, "该版本正在使用")
+REG("PROCESS_NOT_EXIST",    0x001f, "协议错误")
 
 return errcode
