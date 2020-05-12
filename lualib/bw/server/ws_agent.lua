@@ -6,15 +6,12 @@ local log       = require "bw.log"
 local bewater   = require "bw.bewater"
 local errcode   = require "def.errcode"
 
+local type = type
+
 local protocol, pack, unpack, process
 
 local function default_pack(ret)
-    if type(ret) == "table" then
-        ret.err = ret.err or 0
-        return json.encode(ret)
-    else
-        return json.encode({err = ret})
-    end
+    return json.encode(ret)
 end
 
 local function default_unpack(str)
@@ -41,6 +38,7 @@ function ws.message(id, msg)
         if type(data) == "number" then
             data = {err = data}
         end
+        data.err = data.err or 0
         if data.err ~= 0 then
             data.desc = errcode.describe(data.err)
         end
