@@ -1,5 +1,4 @@
 --  微信验证(access_token和ticket需要在服务中缓存!)
---
 local skynet    = require "skynet"
 local json      = require "cjson.safe"
 local bewater   = require "bw.bewater"
@@ -24,9 +23,9 @@ end
 
 local M = {}
 
-function M.request_access_token(appid, secret)
+function M.request_access_token(appid, secret, api)
     assert(appid and secret)
-    local ret, resp = http.get("https://api.weixin.qq.com/cgi-bin/token", {
+    local ret, resp = http.get(api or "https://api.weixin.qq.com/cgi-bin/token", {
         grant_type  = "client_credential",
         appid       = appid,
         secret      = secret,
@@ -39,9 +38,9 @@ function M.request_access_token(appid, secret)
     end
 end
 
-function M.request_ticket(appid, token)
+function M.request_ticket(appid, token, api)
     assert(appid)
-    local ret, resp = http.get("https://api.weixin.qq.com/cgi-bin/ticket/getticket", {
+    local ret, resp = http.get(api or "https://api.weixin.qq.com/cgi-bin/ticket/getticket", {
         access_token = token,
         type = 2,
     })
@@ -53,10 +52,11 @@ function M.request_ticket(appid, token)
     end
 end
 
-function M.jscode2session(appid, secret, js_code)
+function M.jscode2session(appid, secret, js_code, api)
     assert(appid and secret and js_code)
-    local ret, resp = http.get("https://api.weixin.qq.com/sns/jscode2session",{
-        js_code = js_code,
+    local ret, resp = http.get(api or "https://api.weixin.qq.com/sns/jscode2session",{
+        js_code = not api and js_code or nil,
+        code = api and js_code or nil,
         grant_type = "authorization_code",
         appid = appid,
         secret = secret,
@@ -70,13 +70,13 @@ function M.jscode2session(appid, secret, js_code)
 end
 
 -- data {score = 100, gold = 300}
-function M.set_user_storage(appid, access_token, openid, session_key, data)
+function M.set_user_storage(appid, access_token, openid, session_key, data, api)
     local kv_list = {}
     for k, v in pairs(data) do
         table.insert(kv_list, {key = k, value = v})
     end
     local post = json.encode({kv_list = kv_list})
-    local url = "https://api.weixin.qq.com/wxa/set_user_storage?"..url_encoding({
+    local url = (api or "https://api.weixin.qq.com/wxa/set_user_storage?")..url_encoding({
         access_token = access_token,
         openid = openid,
         appid = appid,
@@ -93,9 +93,9 @@ function M.set_user_storage(appid, access_token, openid, session_key, data)
 end
 
 -- key_list {"score", "gold"}
-function M.remove_user_storage(appid, access_token, openid, session_key, key_list)
+function M.remove_user_storage(appid, access_token, openid, session_key, key_list, api)
     local post = json.encode({key = key_list})
-    local url = "https://api.weixin.qq.com/wxa/remove_user_storage?"..url_encoding({
+    local url = (api or "https://api.weixin.qq.com/wxa/remove_user_storage?")..url_encoding({
         access_token = access_token,
         openid = openid,
         appid = appid,
