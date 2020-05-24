@@ -78,7 +78,7 @@ local function format_log(addr, str)
     return sformat("[:%.8x] [%s] %s", addr, format_now() , str)
 end
 
-local function syslog(level, ...)
+local function dump_args(...)
     local n = select("#",...)
     local out = {}
     local v_str
@@ -91,7 +91,11 @@ local function syslog(level, ...)
         end
         tinsert(out, v_str)
     end
-    local str = tconcat(out," ")
+    return tconcat(out," ")
+end
+
+local function syslog(level, ...)
+    local str = dump_args(...)
     if log_src then
         str = sformat("[%s] %s", get_log_src(3), str)
     end
@@ -141,6 +145,18 @@ end
 
 function log.warningf(fmt, ...)
     syslog(llevel.WARNING, sformat(fmt, ...))
+end
+
+function log.assert(value, ...)
+    if not value then
+        error(dump_args(...))
+    end
+end
+
+function log.assertf(value, fmt, ...)
+    if not value then
+        error(sformat(fmt, ...))
+    end
 end
 
 function log.syslog(level, str, addr)
