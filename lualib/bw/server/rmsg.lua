@@ -5,16 +5,26 @@ local json      = require "cjson.safe"
 local factory   = require "bw.orm.factory"
 local log       = require "bw.log"
 
-local id_producer -- function create mid
-local notify      -- function notify
+local id_producer     -- function create mid
+local notify          -- function notify
+local load_queue      -- function load_queue
+local save_queue      -- function save_queue
+local load_broadcasts -- function load_broadcasts
+local save_broadcasts -- function save_broadcasts
 
 local broadcasts = {}   -- mid: msg
 local queues = {}       -- uid: {mid: msg}
 
 local M = {}
 function M.start(handler)
-    id_producer = assert(handler.id_producer)
-    notify = handler.notify
+    id_producer     = assert(handler.id_producer)
+    load_broadcasts = assert(handler.load_broadcasts)
+    save_broadcasts = assert(handler.save_broadcasts)
+    load_queue      = assert(handler.load_queue)
+    save_queue      = assert(handler.save_queue)
+    notify          = handler.notify
+
+    broadcasts = load_broadcasts()
 end
 
 function M.get_broadcasts()
@@ -28,7 +38,7 @@ end
 function M.get_queue(uid)
     local queue = queues[uid]
     if not queue then
-        queue = {}
+        queue = load_queue(uid)
         queues[uid] = queue
     end
     return queue
@@ -39,7 +49,7 @@ function M.get_msg(uid, mid)
 end
 
 -- 取消息
--- after(过滤之前的消息，通常是创角时间)
+-- after(过滤之前的消息，通常是上一次取消息的时间)
 function M.fetch(uid, after)
     assert(uid)
     assert(after)
@@ -87,6 +97,7 @@ function M.push(uid, op, args)
         err = -1
     })
     queue[mid] = msg
+    save_queue(uid, queue)
     if notify then
         notify(uid)
     end
@@ -104,6 +115,7 @@ function M.broadcast(op, args)
         err = -1,
     })
     broadcasts[mid] = msg
+    save_broadcasts(broadcasts)
 end
 
 return M
