@@ -76,12 +76,14 @@ end
 
 -- 处理结果
 function M.process(uid, mid, err)
-    local msg = M.get_msg(uid, mid)
+    local queue = M.get_queue(uid)
+    local msg = queue[mid]
     if not msg then
         log.error("[rmsg] msg not exist, uid:%s, mid:%s, err:%s", uid, mid, err)
         return
     end
     msg.err = err
+    save_queue(uid, queue)
 end
 
 function M.push(uid, op, args)
