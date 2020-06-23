@@ -8,7 +8,7 @@ local errcode   = require "def.errcode"
 
 local type = type
 
-local protocol, pack, unpack, process
+local protocol, pack, unpack, process, is_binary
 
 local function default_pack(ret)
     return json.encode(ret)
@@ -30,7 +30,7 @@ function ws.handshake(id, header, url)
 end
 
 function ws.message(id, msg)
-    log.debugf("on message, id:%s, msg:%s", id, msg)
+    --log.debugf("on message, id:%s, msg:%s", id, msg)
     local req = unpack(msg)
     log.debug("unpack", req)
 
@@ -39,18 +39,15 @@ function ws.message(id, msg)
             data = {err = data}
         end
         data.err = data.err or 0
-        if data.err ~= 0 then
-            data.desc = errcode.describe(data.err)
-        end
 
         websocket.write(id, pack {
-            name = req.name,
+            name = string.gsub(req.name, "c2s", "s2c"),
             session = req.session,
             data = data,
-        })
+        }, is_binary and "binary" or "text")
     end
 
-    local mod, name = string.match(req.name, "(%w+)%.(%w+)")
+    local mod, name = string.match(req.name, "(%w+)%.(.+)$")
     if not process[mod] or not process[mod][name] then
         return response(errcode.PROCESS_NOT_EXIST)
     end
@@ -80,10 +77,11 @@ end
 
 local M = {}
 function M.start(handler)
-    protocol = handler.protocol or "ws"
-    pack     = pack or default_pack
-    unpack   = unpack or default_unpack
-    process  = assert(handler.process)
+    protocol  = handler.protocol or "ws"
+    pack      = handler.pack or default_pack
+    unpack    = handler.unpack or default_unpack
+    is_binary = handler.is_binary
+    process   = assert(handler.process)
 
     skynet.start(function ()
         skynet.dispatch("lua", function (_,_, id, addr)
