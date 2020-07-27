@@ -7,6 +7,8 @@ local bewater   = require "bw.bewater"
 local errcode   = require "def.errcode"
 
 local type = type
+local fd2role = {}
+local role2fd = {}
 
 local protocol, pack, unpack, process, is_binary
 
@@ -20,17 +22,17 @@ end
 
 local ws = {}
 
-function ws.connect(id)
-    log.debugf("ws connect from: %s", id)
+function ws.connect(fd)
+    log.debugf("ws connect from: %s", fd)
 end
 
-function ws.handshake(id, header, url)
-    local addr = websocket.addrinfo(id)
-    log.debugf("ws handshake from: %s, url:%s, addr:%s", id, url, addr)
+function ws.handshake(fd, header, url)
+    local addr = websocket.addrinfo(fd)
+    log.debugf("ws handshake from: %s, url:%s, addr:%s", fd, url, addr)
 end
 
-function ws.message(id, msg)
-    --log.debugf("on message, id:%s, msg:%s", id, msg)
+function ws.message(fd, msg)
+    --log.debugf("on message, fd:%s, msg:%s", fd, msg)
     local req = unpack(msg)
     log.debug("unpack", req)
 
@@ -40,7 +42,7 @@ function ws.message(id, msg)
         end
         data.err = data.err or 0
 
-        websocket.write(id, pack {
+        websocket.write(fd, pack {
             name = string.gsub(req.name, "c2s", "s2c"),
             session = req.session,
             data = data,
@@ -52,27 +54,28 @@ function ws.message(id, msg)
         return response(errcode.PROCESS_NOT_EXIST)
     end
     if not bewater.try(function()
+        local role = fd2role[fd]
         local func = process[mod][name]
-        response(func(req.data) or 0)
+        response(func(role, req.data, fd) or 0)
     end) then
         return response(errcode.TRACEBACK)
     end
 end
 
-function ws.ping(id)
-    print("ws ping from: " .. tostring(id) .. "\n")
+function ws.ping(fd)
+    print("ws ping from: " .. tostring(fd) .. "\n")
 end
 
-function ws.pong(id)
-    print("ws pong from: " .. tostring(id))
+function ws.pong(fd)
+    print("ws pong from: " .. tostring(fd))
 end
 
-function ws.close(id, code, reason)
-    print("ws close from: " .. tostring(id), code, reason)
+function ws.close(fd, code, reason)
+    print("ws close from: " .. tostring(fd), code, reason)
 end
 
-function ws.error(id)
-    print("ws error from: " .. tostring(id))
+function ws.error(fd)
+    print("ws error from: " .. tostring(fd))
 end
 
 local M = {}
@@ -84,14 +87,33 @@ function M.start(handler)
     process   = assert(handler.process)
 
     skynet.start(function ()
-        skynet.dispatch("lua", function (_,_, id, addr)
-            log.debug(id, protocol, addr)
-            local ok, err = websocket.accept(id, ws, protocol, addr)
+        skynet.dispatch("lua", function (_,_, fd, addr)
+            log.debug(fd, protocol, addr)
+            local ok, err = websocket.accept(fd, ws, protocol, addr)
             if not ok then
                 print(err)
             end
         end)
     end)
+end
+
+function M.bind_role(fd, role)
+    assert(fd)
+    assert(role)
+
+    M.unbind_role(role2fd[role], fd2role[fd])
+
+    fd2role[fd] = role
+    role2fd[role] = fd
+end
+
+function M.unbind_role(fd, role)
+    if fd then
+        fd2role[fd] = nil
+    end
+    if role then
+        role2fd[role] = nil
+    end
 end
 
 return M
