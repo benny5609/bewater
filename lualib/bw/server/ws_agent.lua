@@ -7,6 +7,8 @@ local bewater   = require "bw.bewater"
 local errcode   = require "def.errcode"
 
 local type = type
+local string = string
+
 local fd2role = {}
 local role2fd = {}
 
@@ -114,6 +116,19 @@ function M.unbind_role(fd, role)
     if role then
         role2fd[role] = nil
     end
+end
+
+function M.send(role, opname, data)
+    local fd = role2fd[role]
+    if not fd then
+        return
+    end
+
+    websocket.write(fd, pack {
+        name    = opname,
+        data    = data,
+        session = 0,
+    }, is_binary and "binary" or "text")
 end
 
 return M
