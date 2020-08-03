@@ -1,9 +1,14 @@
+local lock = require "bw.lock"
+local bewater = require "bw.bewater"
+
 local reserve_id
 local id
 
 local reserve_count -- 预分配数
 local initial_id    -- 初始id
 local load_id, save_id -- load & save function
+
+local lock_create = lock.new()
 
 local M = {}
 function M.start(handler)
@@ -24,13 +29,18 @@ function M.save()
 end
 
 function M.create(count)
-    count = count or 1
-    local start_id = id
-    id = id + count
-    if id > reserve_id then
-        reserve_id = id + reserve_count
-        save_id(reserve_id)
-    end
+    local start_id
+    lock_create:lock()
+    bewater.try(function()
+        count = count or 1
+        start_id = id
+        id = id + count
+        if id > reserve_id then
+            reserve_id = id + reserve_count
+            save_id(reserve_id)
+        end
+    end)
+    lock_create:unlock()
     return start_id, count
 end
 
