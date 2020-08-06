@@ -103,7 +103,7 @@ function M.bind_fd_role(fd, role)
     assert(fd)
     assert(role)
 
-    M.unbind_role(role2fd[role], fd2role[fd])
+    M.unbind_fd_role(role2fd[role], fd2role[fd])
 
     fd2role[fd] = role
     role2fd[role] = fd
