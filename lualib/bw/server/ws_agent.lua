@@ -99,7 +99,7 @@ function M.start(handler)
     end)
 end
 
-function M.bind_role(fd, role)
+function M.bind_fd_role(fd, role)
     assert(fd)
     assert(role)
 
@@ -109,7 +109,7 @@ function M.bind_role(fd, role)
     role2fd[role] = fd
 end
 
-function M.unbind_role(fd, role)
+function M.unbind_fd_role(fd, role)
     if fd then
         fd2role[fd] = nil
     end
