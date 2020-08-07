@@ -36,7 +36,7 @@ end
 function ws.message(fd, msg)
     --log.debugf("on message, fd:%s, msg:%s", fd, msg)
     local req = unpack(msg)
-    log.debug("unpack", req)
+    --log.debug("unpack", req)
 
     local function response(data)
         if type(data) == "number" then
@@ -88,15 +88,25 @@ function M.start(handler)
     is_binary = handler.is_binary
     process   = assert(handler.process)
 
-    skynet.start(function ()
-        skynet.dispatch("lua", function (_,_, fd, addr)
-            log.debug(fd, protocol, addr)
-            local ok, err = websocket.accept(fd, ws, protocol, addr)
-            if not ok then
-                print(err)
-            end
+    skynet.start(function()
+        skynet.dispatch("lua", function(_,_, cmd, ...)
+            local f = assert(M[cmd], cmd)
+            bewater.ret(f(...))
         end)
     end)
+end
+
+function M.open(fd, addr)
+    log.debug("open", fd, protocol, addr)
+    local ok, err = websocket.accept(fd, ws, protocol, addr)
+    if not ok then
+        log.error(err)
+    end
+end
+
+function M.close(fd)
+    websocket.close(fd)
+    M.unbind_fd_role(fd, fd2role[fd])
 end
 
 function M.bind_fd_role(fd, role)
