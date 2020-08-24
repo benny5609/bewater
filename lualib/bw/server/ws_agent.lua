@@ -65,19 +65,29 @@ function ws.message(fd, msg)
 end
 
 function ws.ping(fd)
-    print("ws ping from: " .. tostring(fd) .. "\n")
+    log.debug("ws ping from: " .. tostring(fd) .. "\n")
 end
 
 function ws.pong(fd)
-    print("ws pong from: " .. tostring(fd))
+    log.debug("ws pong from: " .. tostring(fd))
 end
 
 function ws.close(fd, code, reason)
-    print("ws close from: " .. tostring(fd), code, reason)
+    log.debug("ws close from: " .. tostring(fd), code, reason)
+    local role = fd2role[fd]
+    if role then
+        fd2role[fd] = nil
+        role2fd[role] = nil
+    end
 end
 
 function ws.error(fd)
     print("ws error from: " .. tostring(fd))
+    local role = fd2role[fd]
+    if role then
+        fd2role[fd] = nil
+        role2fd[role] = nil
+    end
 end
 
 local M = {}

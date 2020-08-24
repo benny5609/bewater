@@ -69,7 +69,6 @@ function M.start(handler)
                 send_func(format_html(logs))
                 logs = ""
                 count = 0
-            else
             end
             skynet.sleep(interval*100)
         end
