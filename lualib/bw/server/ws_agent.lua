@@ -12,7 +12,7 @@ local string = string
 local fd2role = {}
 local role2fd = {}
 
-local protocol, pack, unpack, process, is_binary
+local protocol, pack, unpack, process, is_binary, onclose
 
 local function default_pack(ret)
     return json.encode(ret)
@@ -22,8 +22,9 @@ local function default_unpack(str)
     return json.decode(str)
 end
 
-local ws = {}
+local M = {}
 
+local ws = {}
 function ws.connect(fd)
     log.debugf("ws connect from: %s", fd)
 end
@@ -74,27 +75,19 @@ end
 
 function ws.close(fd, code, reason)
     log.debug("ws close from: " .. tostring(fd), code, reason)
-    local role = fd2role[fd]
-    if role then
-        fd2role[fd] = nil
-        role2fd[role] = nil
-    end
+    M.close(fd)
 end
 
 function ws.error(fd)
     print("ws error from: " .. tostring(fd))
-    local role = fd2role[fd]
-    if role then
-        fd2role[fd] = nil
-        role2fd[role] = nil
-    end
+    M.close(fd)
 end
 
-local M = {}
 function M.start(handler)
     protocol  = handler.protocol or "ws"
     pack      = handler.pack or default_pack
     unpack    = handler.unpack or default_unpack
+    onclose   = handler.onclose
     is_binary = handler.is_binary
     process   = assert(handler.process)
 
@@ -115,8 +108,12 @@ function M.open(fd, addr)
 end
 
 function M.close(fd)
+    local role = fd2role[fd]
     websocket.close(fd)
-    M.unbind_fd_role(fd, fd2role[fd])
+    M.unbind_fd_role(fd, role)
+    if onclose then
+        onclose(role)
+    end
 end
 
 function M.bind_fd_role(fd, role)
